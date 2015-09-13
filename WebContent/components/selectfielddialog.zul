@@ -1,0 +1,22 @@
+<zk>
+	<listbox id="lstFields" vflex="1">
+	<listhead>
+		<listheader label="Name" sort="auto" />
+		<listheader label="Type" sort="auto" />
+	</listhead>
+	<listitem>
+		<listcell label="Field" />
+		<listcell label="VARCHAR" />
+	</listitem>
+	<listitem>
+		<listcell label="" />
+		<listcell label="" />
+	</listitem>
+</listbox>
+<div height="5px"></div>
+<hlayout>
+<div hflex="1"></div>
+<button id="btnOK" label="OK" onClick="" />
+<div></div>
+</hlayout>
+</zk>

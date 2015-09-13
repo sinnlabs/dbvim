@@ -1,0 +1,7 @@
+<zk>
+	<hlayout valign="middle">
+		<label id="label" value="DecimalField" visible="true"/>
+		<space id="space" spacing="0px"></space>
+		<decimalbox id="value" />
+	</hlayout>
+</zk>

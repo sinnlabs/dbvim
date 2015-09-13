@@ -1,0 +1,7 @@
+<zk>
+	<hlayout valign="middle">
+		<label id="label" value="CharacterField" visible="true"/>
+		<space id="space" spacing="0px"></space>
+		<textbox id="value" />
+	</hlayout>
+</zk>

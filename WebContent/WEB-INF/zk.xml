@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Created by ZK Studio
+-->
+
+<zk>
+	<library-property>
+    	<name>org.zkoss.theme.preferred</name>
+    	<value>journal</value> 
+	</library-property>
+	<device-config>
+		<device-type>ajax</device-type>
+		<timeout-uri>/timeout.zul</timeout-uri><!-- An empty URL can cause the browser to reload the same URL -->
+	</device-config>
+	<language-config>
+    	<addon-uri>/WEB-INF/dbfields.xml</addon-uri>
+	</language-config>
+	<richlet>
+		<richlet-name>DataRichlet</richlet-name>
+		<richlet-class>org.dbvim.dbuibuilder.ui.DataRichlet</richlet-class>
+	</richlet>
+	<richlet-mapping>
+		<richlet-name>DataRichlet</richlet-name>
+		<url-pattern>/*</url-pattern>
+	</richlet-mapping>
+</zk>

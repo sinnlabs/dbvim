@@ -1,0 +1,8 @@
+<zk>
+	<hlayout>
+		<button label="as child" id="btnAsChild" />
+		<button label="as parent" id="btnAsParent" />
+		<button label="insert before" id="btnBefore" />
+		<!-- <button label="insert after" id="btnAfter" /> -->
+	</hlayout>
+</zk>

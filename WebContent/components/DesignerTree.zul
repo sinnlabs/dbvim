@@ -1,0 +1,21 @@
+<zk> 
+<caption label="Model Structure"/>
+<tree id="trOutline" vflex="1" context="mnuTree">
+	<treecols>
+		<treecol label="" />
+	</treecols>
+	<treechildren>
+		<treeitem>
+			<treerow>
+				<treecell label="element" />
+			</treerow>
+		</treeitem>
+	</treechildren>
+</tree>
+<button label="Refresh" id="btnRefresh" image="/images/designer/tree/buttons/Window_Refresh_Icon_16.png"/>
+<menupopup id="mnuTree">
+	<menuitem label="Copy" id="mnuCopy" />
+	<menuitem label="Paste" id="mnuPaste" />
+	<menuitem label="Delete" id="mnuDelete" />
+</menupopup>
+</zk>

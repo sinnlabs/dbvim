@@ -1,0 +1,7 @@
+<zk>
+	<hlayout valign="middle">
+		<label id="label" value="IntegerField" visible="true"/>
+		<space id="space" spacing="0px"></space>
+		<intbox id="value" />
+	</hlayout>
+</zk>

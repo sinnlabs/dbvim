@@ -1,0 +1,9 @@
+<zk>
+<grid id="gridProperties"  hflex="1" vflex="1">
+		<columns sizable="true">
+			<column label="Property" sort="auto"/>
+			<column label="Value"/>
+		</columns>
+		<rows></rows>
+	</grid>
+</zk>

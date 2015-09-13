@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<language-addon>
+    <addon-name>dbfields</addon-name>
+ 	<language-name>xul/html</language-name>
+    <component>
+        <component-name>characterfield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.CharacterField</component-class>
+    </component>
+	<component>
+        <component-name>integerfield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.IntegerField</component-class>
+    </component>
+	<component>
+        <component-name>decimalfield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.DecimalField</component-class>
+    </component>
+	<component>
+        <component-name>longfield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.LongField</component-class>
+    </component>
+	<component>
+        <component-name>datetimefield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.DatetimeField</component-class>
+    </component>
+	<component>
+        <component-name>doublefield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.dbvim.dbuibuilder.ui.db.DoubleField</component-class>
+    </component>
+</language-addon>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<storage>
+	<connection JDBC="jdbc:hsqldb:file:E:\db\dbuibuilder.db;shutdown=true" /> 
+	<!-- <connection JDBC="jdbc:sqlserver://bco9b99l96.database.windows.net:1433;database=dbmaker;user=dbuser@bco9b99l96;password=db#User#;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;" />  -->
+</storage>

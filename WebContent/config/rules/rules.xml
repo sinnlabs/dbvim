@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rules>
+	<!-- 
+	<component class="org.zkoss.zul.Tree" rulesClass="org.zerokode.designer.model.rules.TreeRules"/>  
+	<component class="org.zkoss.zul.Listbox" rulesClass="org.zerokode.designer.model.rules.ListboxRules"/>  
+	<component class="org.zkoss.zul.Tabbox" rulesClass="org.zerokode.designer.model.rules.TabboxRules"/>  
+	<component class="org.zkoss.zul.Tab" rulesClass="org.zerokode.designer.model.rules.TabRules"/>  
+	<component class="org.zkoss.zul.Textbox" rulesClass="org.zerokode.designer.model.rules.TextboxRules"/>  
+	<component class="org.zkoss.zul.Radiogroup" rulesClass="org.zerokode.designer.model.rules.RadiogroupRules"/>  
+	 -->
+	
+	<component class="org.zkoss.zul.Window" rulesClass="org.dbvim.dbuibuilder.rules.WindowRules" />
+	<component class="org.dbvim.dbuibuilder.ui.db.CharacterField" rulesClass="org.dbvim.dbuibuilder.rules.CharacterFieldRules" /> 
+	<component class="org.dbvim.dbuibuilder.ui.db.IntegerField" rulesClass="org.dbvim.dbuibuilder.rules.IntegerFieldRules" />
+	<component class="org.dbvim.dbuibuilder.ui.db.DecimalField" rulesClass="org.dbvim.dbuibuilder.rules.DecimalFieldRules" />
+	<component class="org.dbvim.dbuibuilder.ui.db.LongField" rulesClass="org.dbvim.dbuibuilder.rules.LongFieldRules" />
+	<component class="org.dbvim.dbuibuilder.ui.db.DatetimeField" rulesClass="org.dbvim.dbuibuilder.rules.DatetimeFieldRules" />
+	<component class="org.dbvim.dbuibuilder.ui.db.DoubleField" rulesClass="org.dbvim.dbuibuilder.rules.DoubleFieldRules" />
+	<!-- Custom Components -->
+</rules>

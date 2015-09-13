@@ -1,0 +1,41 @@
+<?page title="Form Properties" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<hlayout valign="middle">
+		<label value="Form Title: " />
+		<textbox hflex="1" id="txtFormName" />
+	</hlayout>
+	<groupbox vflex="1">
+		<caption label="Result List" />
+		<hlayout vflex="1">
+			<listbox id="lstAvailableFields" hflex="1" vflex="1">
+				<listhead>
+					<listheader label="Available Fields" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="ID" />
+					<listcell label="int" />
+				</listitem>
+				<listitem>
+					<listcell label="Name" />
+					<listcell label="varchar" />
+				</listitem>
+			</listbox>
+			<vlayout>
+				<button id="btnAdd" label="&gt;&gt;" />
+				<button id="btnRemove" label="&lt;&lt;" />
+			</vlayout>
+			<listbox id="lstResultFields" hflex="1" vflex="1">
+				<listhead>
+					<listheader label="Result Fields" sort="auto" />
+				</listhead>
+			</listbox>
+		</hlayout>
+	</groupbox>
+	<div height="4px"></div>
+	<hlayout>
+		<div hflex="1"></div>
+		<button label="OK" id="btnOK" />
+		<button label="Cancel" id="btnCancel" />
+		<div></div>
+	</hlayout>
+</zk>

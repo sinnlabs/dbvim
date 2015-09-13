@@ -1,0 +1,21 @@
+<zk>
+<vlayout vflex="1" height="100%">
+	<toolbar>
+		<toolbarbutton id="btnDelete" label="Delete"/>
+		<toolbarbutton id="btnRefresh" label="Refresh"/>
+	</toolbar>
+	<tree id="trModelTree" vflex="1">
+	<treecols>
+		<treecol label="All Items" />
+	</treecols>
+	<treechildren>
+		<treeitem>
+			<treerow>
+				<treecell label="quetable" />
+			</treerow>
+		</treeitem>
+	</treechildren>
+</tree>
+<button id="btnAddConnection" label="Add connection" />
+</vlayout>
+</zk>

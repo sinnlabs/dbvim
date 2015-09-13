@@ -1,0 +1,38 @@
+<?page title="new page title" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<borderlayout id="border"
+		apply="org.dbvim.dbuibuilder.zk.SearchComposer">
+		<north>
+			<toolbar>
+				<toolbarbutton id="btnSearch" label="Search" />
+				<toolbarbutton id="btnSave" label="Save" visible="false" />
+				<toolbarbutton id="btnCreate" label="Create" visible="false" />
+				<separator orient="vertical"></separator>
+				<toolbarbutton id="btnNewSearch" label="New search" />
+				<toolbarbutton id="btnNewEntry" label="New entry" />
+				<toolbarbutton id="btnChangeAll" label="Change all" disabled="true"/>
+				<toolbarbutton id="btnCopyToNew" label="Copy entry" disabled="true"/>
+				<toolbarbutton id="btnDelete" label="Delete" disabled="true"/>
+			</toolbar>
+		</north>
+		<center>
+			<borderlayout>
+				<north collapsible="true" size="122px"
+					id="searchResults" splittable="true" visible="false">
+					<listbox id="lstResults" vflex="1">
+						<listhead>
+							
+						</listhead>
+						<listfoot>
+							<listfooter label="Total: "></listfooter>
+							<listfooter id="lstFooterTotal" label="0" align="right"/>
+						</listfoot>
+					</listbox>
+				</north>
+				<center>
+					<idspace id="center" vflex="1" hflex="1"></idspace>
+				</center>
+			</borderlayout>
+		</center>
+	</borderlayout>
+</zk>

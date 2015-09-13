@@ -1,0 +1,10 @@
+<zk>
+	<vlayout>
+		<hlayout>
+			<label value="Name:"/> <textbox id="txtName" hflex="1" />
+		</hlayout>
+		<hlayout>
+			<div hflex="1" /><button id="btnOK" label="OK" />
+		</hlayout>
+	</vlayout>
+</zk>

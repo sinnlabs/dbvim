@@ -1,0 +1,53 @@
+/**
+ * 
+ */
+package org.dbvim.dbuibuilder.ui;
+
+import org.dbvim.dbuibuilder.db.Value;
+import org.dbvim.dbuibuilder.db.model.DBField;
+
+/**
+ * @author peter.liverovsky
+ *
+ */
+public interface IField<T> {
+	/**
+	 * Use to set mapping
+	 * @param field
+	 */
+	public void setDBField(DBField field);
+	
+	/**
+	 * Used for set mapping when component loaded from ZUML
+	 * @return
+	 */
+	public String getMapping();
+	
+	/**
+	 * Used for set mapping when component loaded from ZUML
+	 * @param map
+	 */
+	public void setMapping(String map);
+
+	/**
+	 * Set the field value
+	 * @param v
+	 */
+	public void setDBValue(Value<T> v);
+	
+	/**
+	 * Returns field db value
+	 * @return value or null if value not set
+	 */
+	public Value<T> getDBValue();
+	
+	/**
+	 * Show error on the client
+	 */
+	public void setErrorMessage(String err);
+	
+	/**
+	 * Clear error on the client
+	 */
+	public void clearErrorMessage();
+}

@@ -1,0 +1,24 @@
+<?page title="Add Connection" contentType="text/html;charset=UTF-8"?>
+<zk>
+<groupbox> 
+<caption label="Connection Properties"/>
+	<vlayout>
+		<hlayout valign="middle">
+			<label value="Name" />
+			<textbox id="txtName" />
+		</hlayout>
+		<hlayout valign="middle">
+			<label value="Class Name" />
+			<textbox id="txtClass" />
+		</hlayout>
+		<hlayout valign="middle">
+			<label value="JDBC String" />
+			<textbox id="txtJDBC" />
+		</hlayout>
+		<hlayout>
+			<button id="btnOK" label="OK"/>
+			<button id="btnCancel" label="Cancel"></button>
+		</hlayout>
+	</vlayout>
+</groupbox>
+</zk>
