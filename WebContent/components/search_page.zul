@@ -3,17 +3,31 @@
 	<borderlayout id="border"
 		apply="org.dbvim.dbuibuilder.zk.SearchComposer">
 		<north>
-			<toolbar>
-				<toolbarbutton id="btnSearch" label="Search" />
-				<toolbarbutton id="btnSave" label="Save" visible="false" />
-				<toolbarbutton id="btnCreate" label="Create" visible="false" />
-				<separator orient="vertical"></separator>
-				<toolbarbutton id="btnNewSearch" label="New search" />
-				<toolbarbutton id="btnNewEntry" label="New entry" />
-				<toolbarbutton id="btnChangeAll" label="Change all" disabled="true"/>
-				<toolbarbutton id="btnCopyToNew" label="Copy entry" disabled="true"/>
-				<toolbarbutton id="btnDelete" label="Delete" disabled="true"/>
-			</toolbar>
+			<vlayout>
+				<hlayout id="divSearch" hflex="1"><div hflex="1" style="background-color: #89afdc;">
+					<label style="font-size: 8pt;">Current mode: </label>
+					<label style="font-size: 8pt; font-weight: bold;">Search</label>
+				</div></hlayout>
+				<hlayout id="divNewEntry" visible="false" hflex="1"><div hflex="1" style="background-color: #a2c455;">
+					<label style="font-size: 8pt;">Current mode: </label>
+					<label style="font-size: 8pt; font-weight: bold;">New</label>
+				</div></hlayout>
+				<hlayout id="divModify" visible="false" hflex="1"><div hflex="1" style="background-color: #de9d24;">
+					<label style="font-size: 8pt;">Current mode: </label>
+					<label style="font-size: 8pt; font-weight: bold;">Modify</label>
+				</div></hlayout>
+				<toolbar>
+					<toolbarbutton id="btnSearch" label="Search" />
+					<toolbarbutton id="btnSave" label="Save" visible="false" />
+					<toolbarbutton id="btnCreate" label="Create" visible="false" />
+					<separator orient="vertical"></separator>
+					<toolbarbutton id="btnNewSearch" label="New search" />
+					<toolbarbutton id="btnNewEntry" label="New entry" />
+					<toolbarbutton id="btnChangeAll" label="Change all" disabled="true"/>
+					<toolbarbutton id="btnCopyToNew" label="Copy entry" disabled="true"/>
+					<toolbarbutton id="btnDelete" label="Delete" disabled="true"/>
+				</toolbar>
+			</vlayout>
 		</north>
 		<center>
 			<borderlayout>

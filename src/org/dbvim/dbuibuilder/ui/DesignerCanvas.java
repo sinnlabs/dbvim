@@ -5,12 +5,22 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dbvim.dbuibuilder.rules.engine.RulesEngine;
+import org.dbvim.dbuibuilder.zk.model.ComponentFactory;
 import org.dbvim.dbuibuilder.zk.model.DeveloperFactory;
+import org.dbvim.dbuibuilder.zk.model.ElementInfo;
+import org.dbvim.dbuibuilder.zk.model.IElementDesc;
 import org.dbvim.dbuibuilder.zk.model.ZUMLModel;
 import org.zkoss.idom.Document;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
+import org.zkoss.zk.ui.event.DropEvent;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zul.Absolutechildren;
+import org.zkoss.zul.Absolutelayout;
 
 public class DesignerCanvas extends DesignerWindow {
 
@@ -36,6 +46,8 @@ public class DesignerCanvas extends DesignerWindow {
 	 * Flag that indicates if the canvas is in editable mode
 	 */
 	private boolean bIsEditable = false;
+	
+	private Absolutelayout layout;
 
 	// Getters / Setters
 	public boolean isCanvasDirty() {
@@ -58,40 +70,55 @@ public class DesignerCanvas extends DesignerWindow {
 		setHeight("100%");
 		setBorder("normal");
 		setDroppable("false");
+		
+		layout = new Absolutelayout();
+		layout.setVflex("1");
+		layout.setHflex("1");
+		layout.setDroppable("true");
+		//this.appendChild(layout);
+		final Absolutelayout al = layout;
+		final DesignerCanvas tmp = this;
+		layout.addEventListener(Events.ON_DROP, new EventListener<DropEvent>() {
 
-		//final DesignerCanvas tmp = this;
-		//this.addEventListener(Events.ON_DROP, new EventListener<DropEvent>() {
-
-		//	@Override
-		//	public void onEvent(DropEvent evnt) throws Exception {
-				/*if (evnt.getDragged() instanceof IElementDesc) {
-					Messagebox.show(
+			@Override
+			public void onEvent(DropEvent evnt) throws Exception {
+				if (evnt.getDragged() instanceof IElementDesc) {
+					/*Messagebox.show(
 							"Element dragged: "
 									+ ((IElementDesc) evnt.getDragged())
 											.getElementInfo().getClassName(),
-							"Warning", Messagebox.OK, Messagebox.EXCLAMATION);
+							"Warning", Messagebox.OK, Messagebox.EXCLAMATION);*/
 					ElementInfo info = ((IElementDesc) evnt.getDragged())
 							.getElementInfo();
 					HtmlBasedComponent comp = (HtmlBasedComponent) ComponentFactory
 							.createComponent(info.getClassName());
 
-					comp.setDroppable("true");
+					/*comp.setDroppable("true");
 					comp.addEventListener(Events.ON_DROP,
 							new EventListener<Event>() {
 								public void onEvent(Event event)
 										throws Exception {
 									onEvent((DropEvent) event);
 								}
-							});
-					evnt.getTarget().appendChild(comp);
+							}); */
+					Absolutechildren child = new Absolutechildren();
+					child.setX(evnt.getX());
+					child.setY(evnt.getY());
+					child.appendChild(comp);
+					child.setDraggable("true");
+					al.appendChild(child);
 					RulesEngine.applyRules(comp, RulesEngine.CREATION_RULES);
+				} else if (evnt.getDragged() instanceof Absolutechildren) {
+					Absolutechildren ac = (Absolutechildren) evnt.getDragged();
+					ac.setX(evnt.getX());
+					ac.setY(evnt.getY());
 				}
 				DeveloperFactory.getInstance().getSynchronizer()
 						.synchronizeTreeWithCanvas(tmp);
-				setDirty(true);*/
-		//	}
+				setDirty(true);
+			}
 
-		//});
+		});
 	}
 
 	/**
@@ -108,8 +135,7 @@ public class DesignerCanvas extends DesignerWindow {
 	/**
 	 * Get component by UUID
 	 * 
-	 * @param sId
-	 *            - component UUID
+	 * @param sId component UUID
 	 * @return component reference
 	 */
 	public Component getCanvasComponent(String sId) {

@@ -23,6 +23,7 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Idspace;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -88,6 +89,15 @@ public class SearchComposer extends SelectorComposer<Component> {
 	
 	@Wire("#lstFooterTotal")
 	Listfooter lstFooter;
+	
+	@Wire("#divSearch")
+	Hlayout divSearch;
+	
+	@Wire("#divNewEntry")
+	Hlayout divNewEntry;
+	
+	@Wire("#divModify")
+	Hlayout divModify;
 
 	Form form;
 	
@@ -351,6 +361,9 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(true);
 			btnCopy.setDisabled(true);
 			btnDelete.setDisabled(true);
+			divSearch.setVisible(true);
+			divNewEntry.setVisible(false);
+			divModify.setVisible(false);
 		}
 		if (mode == MODE_RESULT) {
 			searchResults.setVisible(true);
@@ -360,6 +373,9 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(false);
 			btnCopy.setDisabled(false);
 			btnDelete.setDisabled(false);
+			divSearch.setVisible(false);
+			divNewEntry.setVisible(false);
+			divModify.setVisible(true);
 		}
 		if (mode == MODE_CREATE) {
 			searchResults.setVisible(false);
@@ -369,6 +385,9 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(true);
 			btnCopy.setDisabled(true);
 			btnDelete.setDisabled(true);
+			divSearch.setVisible(false);
+			divNewEntry.setVisible(true);
+			divModify.setVisible(false);
 		}
 	}
 }
