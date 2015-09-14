@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sinnlabs/dbvim.svg?branch=master)](https://travis-ci.org/sinnlabs/dbvim)
+
 #Database Visual Interface Maker
 DBVIM allows you to quickly and easily create a web interface for any database that is supported by JDBC.
 
