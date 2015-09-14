@@ -1,3 +1,17 @@
 language: java
 jdk:
   - openjdk7
+
+env:
+  global:
+   - secure: "b9TGmpG9NWoUd/YJQoBrQMJ+YOJX9h5zIQtHMwnqMCK6kCRmRpy0TxiH02soEOmJ5+AoHNX2Ep47RCZ66kmM8+NCU3xipcnufm5yGQl0t58Q8FoJf6bosUZ+rK8pdAj5egLg1hbBmiBT+tfAgKUj9P+cfaKel/YNY4obMEe0SHZyw/N2ueEwsfPvKnI4LKA+4X2zl3cDNaXFnkpVkOLNBMu24wGgRLEcJhsfNdcDDH61MyTPncQix8rAxRG8PjEqz//rlgS+LY512K1nNitr6LVQNNGTfOXyUjnWKny/Yd3YRp/uUHndeMIOdzdeJf51+EdZfXtIB4ydvPBUp5MjKK5TzgUN87ucXGrNcl4HAKQem7KgCq/FFc2h0jA+odn2kHgbmGCEgEsOu1ywhPvc5y1nKqEEObZSLtPMdLT6+gYr3/H9ZcK5jLd5SqtqGzpcTdnlE7e/VlaXZv1/PHTafd7YSLSR5MMv1NX3Ptl7zHjs3mKWWi+1w3urJbR/RzowNSvpR5AwcidDEyeuf/I1eTYdxixdzjc/lky83ZQhhzxJCSAlDoTmsCyYks9Q4Nb7MeEBWuG94IATir63wPnfFxACIdZZUoM6vY+fHLkGL4HUpDhMlU52FtCjowgf8YXV41NCb5cQV1M3gbMpfTVY2PbjFkCc4bBczFpVcetvMqQ="
+
+addons:
+  coverity_scan:
+    project:
+      name: "sinnlabs/dbvim"
+      description: "DBVIM"
+    notification_email: the.krio@gmail.com
+    build_command_prepend: "mvn clean"
+    build_command:   "mvn -DskipTests=true compile"
+    branch_pattern: coverity_scan
