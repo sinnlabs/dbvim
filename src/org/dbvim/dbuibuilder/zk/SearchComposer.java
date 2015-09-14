@@ -107,6 +107,8 @@ public class SearchComposer extends SelectorComposer<Component> {
 	
 	List<Component> fieldList;
 	
+	List<Component> readonlyFields;
+	
 	Database db;
 	
 	List<Value<?>> lastSearch;
@@ -132,6 +134,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 				results.getListhead().appendChild(header);
 			}
 		}
+		setFieldsMode(IField.MODE_SEARCH);
 	}
 	
 	@Listen("onClick = #btnSearch")
@@ -381,6 +384,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divSearch.setVisible(true);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(false);
+			setFieldsMode(IField.MODE_SEARCH);
 		}
 		if (mode == MODE_RESULT) {
 			searchResults.setVisible(true);
@@ -393,6 +397,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(true);
+			setFieldsMode(IField.MODE_MODIFY);
 		}
 		if (mode == MODE_CREATE) {
 			searchResults.setVisible(false);
@@ -405,6 +410,14 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(true);
 			divModify.setVisible(false);
+			setFieldsMode(IField.MODE_MODIFY);
+		}
+	}
+	
+	private void setFieldsMode(int mode) {
+		for(Component c : fieldList){
+			IField<?> f = (IField<?>)c;
+			f.setFieldMode(mode);
 		}
 	}
 }

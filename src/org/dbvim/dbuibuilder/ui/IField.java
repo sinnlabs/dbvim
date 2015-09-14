@@ -11,6 +11,11 @@ import org.dbvim.dbuibuilder.db.model.DBField;
  *
  */
 public interface IField<T> {
+	
+	public static final int MODE_SEARCH=0;
+	
+	public static final int MODE_MODIFY=1;
+	
 	/**
 	 * Use to set mapping
 	 * @param field
@@ -50,4 +55,10 @@ public interface IField<T> {
 	 * Clear error on the client
 	 */
 	public void clearErrorMessage();
+	
+	/**
+	 * Sets the field mode
+	 * @param mode - Field mode (search, modify)
+	 */
+	public void setFieldMode(int mode);
 }

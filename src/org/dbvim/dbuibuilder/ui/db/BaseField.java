@@ -49,6 +49,8 @@ public class BaseField<T, E extends InputElement> extends Idspace implements IFi
 	
 	protected boolean isChildable = true;
 	
+	private boolean readOnly;
+	
 
 	protected BaseField(String zulUrl, DBField field) {
 		isChildable = true;
@@ -59,6 +61,7 @@ public class BaseField<T, E extends InputElement> extends Idspace implements IFi
 		Selectors.wireComponents(this, this, false);
 		// lock the component to avoid to create new child elements.
 		isChildable = false;
+		readOnly = value.isReadonly();
 		final BaseField<T, E> t = this;
 		
 		value.addEventListener(Events.ON_CHANGE, new EventListener<InputEvent>() {
@@ -212,6 +215,7 @@ public class BaseField<T, E extends InputElement> extends Idspace implements IFi
 	
 	public void setReadonly(boolean val) {
 		value.setReadonly(val);
+		readOnly = val;
 	}
 	
 	public String getSpace() {
@@ -253,5 +257,14 @@ public class BaseField<T, E extends InputElement> extends Idspace implements IFi
 	@Override
 	protected boolean isChildable() {
 		return isChildable;
+	}
+
+	@Override
+	public void setFieldMode(int mode) {
+		if (mode == IField.MODE_SEARCH) {
+			value.setReadonly(false);
+		} else if (mode == IField.MODE_MODIFY) {
+			value.setReadonly(readOnly);
+		}
 	}
 }
