@@ -1,6 +1,6 @@
 <zk>
-	<listbox id="lstFields" vflex="1">
-	<listhead>
+	<listbox id="lstFields" vflex="1" multiple="true">
+	<listhead sizable="true">
 		<listheader label="Name" sort="auto" />
 		<listheader label="Type" sort="auto" />
 	</listhead>

@@ -18,6 +18,8 @@ import org.dbvim.dbuibuilder.ui.IField;
 import org.dbvim.dbuibuilder.zk.model.CurrentForm;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -121,6 +123,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 		currentEntry = null;
 		// build search result headers
 		results.getListhead().setSizable(true);
+		results.setMultiple(true);
 		if (form.getResultList() != null) {
 			for(String fname : form.getResultList()) {
 				Listheader header = new Listheader();
@@ -216,14 +219,28 @@ public class SearchComposer extends SelectorComposer<Component> {
 	@Listen("onClick = #btnDelete")
 	public void btnDelete_onClick() {
 		if (currentEntry != null) {
-			try {
-				db.deleteEntry(currentEntry);
-			} catch (DatabaseOperationException e) {
-				Messagebox.show("Unable to delte entry.", "Error", 
-						Messagebox.OK, Messagebox.ERROR);
-				e.printStackTrace();
-			}
-			search(lastSearch);
+			Messagebox.show("You are shure that you want to delete entries?", "Delete",
+					Messagebox.YES|Messagebox.NO, Messagebox.QUESTION, new EventListener<Event>() {
+
+						@Override
+						public void onEvent(Event evnt) throws Exception {
+							if (evnt.getName().equals(Messagebox.ON_YES)) {
+								try {
+									for(Listitem i : results.getSelectedItems()) {
+										Entry e = i.getValue();
+										db.deleteEntry(e);
+									}
+								} catch (DatabaseOperationException e) {
+									Messagebox.show("Unable to delte entry.", "Error", 
+											Messagebox.OK, Messagebox.ERROR);
+									e.printStackTrace();
+								}
+								search(lastSearch);
+							}
+						}
+				
+			});
+			
 		}
 	}
 	
