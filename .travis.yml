@@ -2,4 +2,4 @@ language: java
 jdk:
   - openjdk7
 
-script: mvn -DskipTests=true compile
+script: mvn -DskipTests=true clean install
