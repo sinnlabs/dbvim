@@ -13,6 +13,6 @@ addons:
       description: "DBVIM"
     notification_email: the.krio@gmail.com
     build_command_prepend: "mvn clean"
-    build_command:   "mvn -DskipTests=true compile"
+    build_command:   "mvn -DskipTests=true install"
     branch_pattern: coverity_scan
     
