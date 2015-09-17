@@ -1,9 +1,14 @@
 <?page title="new page title" contentType="text/html;charset=UTF-8"?>
 <zk>
+	
 	<borderlayout id="border"
 		apply="org.dbvim.dbuibuilder.zk.SearchComposer">
 		<north>
 			<vlayout>
+				<hlayout>
+ 					<div hflex="1"></div>
+ 					<a href="/logout" label="Logout"></a>
+				</hlayout>
 				<hlayout id="divSearch" hflex="1"><div hflex="1" style="background-color: #89afdc;">
 					<label style="font-size: 8pt;">Current mode: </label>
 					<label style="font-size: 8pt; font-weight: bold;">Search</label>

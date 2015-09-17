@@ -1,0 +1,59 @@
+<?page title="CRUD UI Maker"?>
+<?component name="modeltree" class="org.dbvim.dbuibuilder.ui.ModelTree" ?>
+<?component name="designertree" class="org.dbvim.dbuibuilder.ui.DesignerTree" ?>
+<?component name="designerlist" class="org.dbvim.dbuibuilder.ui.DesignerElements" ?>
+<?component name="designerproperties" class="org.dbvim.dbuibuilder.ui.DesignerProperties" ?>
+<?component name="designerevents" class="org.dbvim.dbuibuilder.ui.DesignerEvents" ?>
+
+<window height="100%" border="normal" width="100%" droppable="true"
+	id="wndDesigner"
+	apply="org.dbvim.dbuibuilder.zk.BuilderComposer"
+	use="org.dbvim.dbuibuilder.ui.Designer">
+	
+	<borderlayout id="tVpC4a" droppable="false">
+		<north>
+			<toolbar>
+				<toolbarbutton id="tbbNewForm" label="New form"/>
+				<toolbarbutton id="tbbSaveForm" label="Save form" />
+				<toolbarbutton id="tbbCloseForm" label="Close form" />
+				<toolbarbutton id="tbbFormProperties" label="Form properties" />
+			</toolbar>
+		</north>
+		<west size="250px" splittable="true">
+			<borderlayout droppable="false">
+				<north splittable="true">
+					<vlayout id="tVpCfb" vflex="1">
+						<modeltree id="modeltree" vflex="1"
+							height="100%" />
+					</vlayout>
+				</north>
+				<center>
+					<tabbox height="100%">
+						<tabs>
+							<tab label="Model Tree"/>
+							<tab label="Properties"/>
+							<tab label="Events" />
+						</tabs>
+					<tabpanels height="100%">
+						<tabpanel>
+							<designertree id="designerTree" vflex="1"></designertree>
+						</tabpanel>
+						<tabpanel>
+							<designerproperties id="properties" vflex="1"></designerproperties>
+						</tabpanel>
+						<tabpanel>
+							<designerevents id="events" vflex="1" />
+						</tabpanel>
+					</tabpanels>
+					</tabbox>
+				</center>
+			</borderlayout>
+		</west>
+		<center id="blCenter">
+			<window use="org.dbvim.dbuibuilder.ui.DesignerCanvas" id="designerCanvas"></window>
+		</center>
+		<east size="145px" splittable="true">
+			<designerlist id="elements" vflex="1"></designerlist>
+		</east>
+	</borderlayout>
+</window>
