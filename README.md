@@ -20,3 +20,12 @@ Step by step guide:
 3. Create the interface by dragging components from toolbox to the Model tree.
 4. Save form.
 5. End users can access the form by url appname/data/< formname >
+
+####Default Users
+Generic user:<br/>
+Login: user
+Password: user
+
+Generic admin:<br/>
+Login: admin
+Password: admin
