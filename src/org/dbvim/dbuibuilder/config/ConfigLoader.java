@@ -176,8 +176,8 @@ public class ConfigLoader {
 		if (!roles.isTableExists()) {
 			TableUtils.createTableIfNotExists(connectionSource, Role.class);
 			// create default roles
-			roles.create(new Role(Role.ROLE_USER));
-			roles.create(new Role(Role.ROLE_ADMIN));
+			roles.create(new Role(Role.ROLE_USER, "Has access to all data forms"));
+			roles.create(new Role(Role.ROLE_ADMIN, "Full access."));
 		}
 		
 		users = DaoManager.createDao(connectionSource, User.class);

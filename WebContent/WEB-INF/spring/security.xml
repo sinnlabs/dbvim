@@ -7,6 +7,7 @@
 
 	<http auto-config='true'>
 		<intercept-url pattern="/developer.zul" access="hasRole('ROLE_ADMIN')"/>
+		<intercept-url pattern="/administration.zul" access="hasRole('ROLE_ADMIN')"/>
 		<intercept-url pattern="/*" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')" />
 		<csrf disabled="true" />
 		<logout logout-url="/logout" />

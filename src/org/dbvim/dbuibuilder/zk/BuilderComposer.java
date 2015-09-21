@@ -41,6 +41,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Messagebox;
 
 /**
+ * Composer represents Developer Studio
  * @author peter.liverovsky
  *
  */
@@ -192,6 +193,7 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 			currentForm = new Form();
 			currentForm.setDBConnection(table.getConnection());
 			currentForm.setName("New untitled form");
+			currentForm.setTitle("Untitled Form");
 			currentForm.setTableName(table.getTable().getName());
 			currentForm.setCatalog(table.getTable().getCatalog());
 			currentForm.setView("");

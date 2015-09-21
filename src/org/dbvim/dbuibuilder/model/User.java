@@ -24,6 +24,9 @@ public class User {
 	@DatabaseField(id = true)
 	protected String login_name;
 	
+	@DatabaseField
+	protected String fullName;
+	
 	@DatabaseField(width = 1024, canBeNull = false)
 	protected String password_hash;
 	
@@ -66,6 +69,10 @@ public class User {
 	}
 	
 	public boolean isEnabled() { return isEnabled; }
+	
+	public void setFullName(String fName) { fullName = fName; }
+	
+	public String getFullName() { return fullName; }
 	
 	public List<Role> getRoles() throws SQLException {
 		QueryBuilder<UserRole, Integer> userRoleQb = 

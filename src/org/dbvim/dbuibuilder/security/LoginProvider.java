@@ -135,4 +135,26 @@ public class LoginProvider {
 
 		return usr;
 	}
+	
+	public static User updatePassword(User user, String newPassword) 
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		
+		if (StringUtils.isBlank(newPassword)) {
+			throw new IllegalArgumentException("User name or password can not be empty.");
+		}
+
+		// uses a secure random
+		SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
+
+		// Salt generation 512 bits long
+		byte[] bSalt = new byte[64];
+		rand.nextBytes(bSalt);
+
+		byte[] hash = getHash(newPassword, bSalt);
+
+		user.setPassword_hash(byteToBase64(hash));
+		user.setSalt(byteToBase64(bSalt));
+
+		return user;
+	}
 }

@@ -1,0 +1,114 @@
+<?page title="Administrator Console" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window id="wndMain" title="Administrator Console" border="normal" vflex="1"
+		hflex="1" apply="org.dbvim.dbuibuilder.zk.AdministrationConsoleComposer">
+		<groupbox vflex="1" title="Users" closable="false">
+			<hlayout vflex="1" hflex="1">
+				<vlayout vflex="1" hflex="1">
+				<listbox vflex="1" id="lstUsers" hflex="1">
+					<listhead>
+						<listheader label="User Name" sort="auto" />
+					</listhead>
+					<listitem>
+						<listcell label="User1" />
+					</listitem>
+					<listitem>
+						<listcell label="Admin" />
+					</listitem>
+				</listbox>
+				<hlayout><button id="btnAddUser" label="New" /><button id="btnDeleteUser" label="Delete"/></hlayout>
+				</vlayout>
+				<groupbox vflex="1" hflex="3" title="Details"
+					closable="false">
+					<vlayout vflex="1">
+						<grid hflex="1">
+							<columns>
+								<column hflex="min" />
+								<column hflex="1" />
+							</columns>
+							<rows>
+								<row>
+									<cell>Login</cell>
+									<cell>
+										<textbox id="txtLogin" hflex="1"
+											readonly="true" />
+									</cell>
+								</row>
+								<row>
+									<cell>Password</cell>
+									<cell>
+										<textbox id="txtPassword"
+											hflex="1" type="password" />
+									</cell>
+								</row>
+								<row>
+									<cell>Full name</cell>
+									<cell>
+										<textbox id="txtFullName"
+											hflex="1" />
+									</cell>
+								</row>
+								<row>
+									<cell>Roles</cell>
+									<cell>
+										<textbox id="txtRoles"
+											readonly="true" hflex="1" />
+										<button id="btnChangeRoles"
+											label="Add/Remove" />
+									</cell>
+								</row>
+								<row>
+									<cell></cell>
+									<cell>
+										<checkbox id="chbEnabled"
+											label="Enabled" checked="false" />
+									</cell>
+								</row>
+							</rows>
+						</grid>
+						<hlayout>
+							<div hflex="1" />
+							<button id="btnUpdate" label="Save" />
+							<div />
+						</hlayout>
+					</vlayout>
+				</groupbox>
+			</hlayout>
+		</groupbox>
+		<groupbox vflex="1" title="Roles" closable="false">
+			<hlayout vflex="1" hflex="1">
+				<vlayout vflex="1" hflex="1">
+				<listbox vflex="1" id="lstRoles" hflex="1">
+					<listhead>
+						<listheader label="Role Name" sort="auto" />
+					</listhead>
+					<listitem>
+						<listcell label="Role1" />
+					</listitem>
+					<listitem>
+						<listcell label="Admin Role" />
+					</listitem>
+				</listbox>
+				<hlayout><button id="btnAddRole" label="New" /><button id="btnDeleteRole" label="Delete"/></hlayout>
+				</vlayout>
+				<groupbox vflex="1" hflex="3" title="Details">
+					<grid>
+						<columns>
+							<column hflex="min" />
+						</columns>
+						<rows>
+							<row>
+								<cell>Name</cell>
+								<cell><textbox id="txtRoleName" readonly="true" hflex="1" /></cell>
+							</row>
+							<row>
+								<cell>Description</cell>
+								<cell><textbox id="txtRoleDesc" hflex="1" /></cell>
+							</row>
+						</rows>
+					</grid>
+				</groupbox>
+			</hlayout>
+		</groupbox>
+	</window>
+</zk>

@@ -3,6 +3,8 @@
  */
 package org.dbvim.dbuibuilder.model;
 
+import java.io.Serializable;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -12,7 +14,12 @@ import com.j256.ormlite.table.DatabaseTable;
  */
 
 @DatabaseTable(tableName = "jdbcConnections")
-public class DBConnection {
+public class DBConnection implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4402828179976378473L;
+
 	@DatabaseField(id = true)
 	private String name;
 	

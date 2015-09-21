@@ -15,6 +15,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Row;
 
 /**
+ * Composer for startup page (index.zul)
  * @author peter.liverovsky
  *
  */
@@ -39,7 +40,10 @@ public class StartPageComposer extends SelectorComposer<Component> {
 			Row row = new Row();
 			Cell nameCell = new Cell();
 			Cell linkCell = new Cell();
-			nameCell.appendChild(new Label(form.getName()));
+			// Create table name cell
+			nameCell.appendChild(new Label(form.getTitle()));
+			
+			// Create table link cell
 			A link = new A();
 			link.setTarget("_blank");
 			link.setHref("/data/" + form.getName());

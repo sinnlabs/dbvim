@@ -1,0 +1,37 @@
+<zk>
+	<vlayout hflex="1" vflex="1">
+		<hlayout vflex="1" hflex="1">
+			<listbox id="lstAvailable" vflex="1" hflex="1">
+				<listhead>
+					<listheader label="Available Roles" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="Role1" />
+				</listitem>
+				<listitem>
+					<listcell label="Role2" />
+				</listitem>
+			</listbox>
+			<vlayout>
+				<button id="btnAdd" label="&gt;&gt;" />
+				<button id="btnRemove" label="&lt;&lt;" />
+			</vlayout>
+			<listbox id="lstGranted" vflex="1" hflex="1">
+				<listhead>
+					<listheader label="Granted Roles" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="Role3" />
+				</listitem>
+				<listitem>
+					<listcell label="Role4" />
+				</listitem>
+			</listbox>
+		</hlayout>
+		<hlayout>
+			<div hflex="1" />
+			<button id="btnOK" label="OK" /><button id="btnCancel" label="Cancel" />
+			<div></div>
+		</hlayout>
+	</vlayout>
+</zk>

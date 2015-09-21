@@ -23,6 +23,9 @@ public class Role {
 	@DatabaseField(id = true, columnName = ROLE_NAME_COLUMN)
 	protected String role_name;
 	
+	@DatabaseField(width=256)
+	protected String roleDescription;
+	
 	public Role() {
 		
 	}
@@ -31,5 +34,14 @@ public class Role {
 		role_name = name;
 	}
 	
+	public Role(String name, String desc) {
+		this(name);
+		roleDescription = desc;
+	}
+	
 	public String getName() { return role_name; }
+	
+	public String getDescription() { return roleDescription; }
+	
+	public void setDescription(String desc) { roleDescription = desc; }
 }
