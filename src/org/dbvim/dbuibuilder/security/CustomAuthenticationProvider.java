@@ -41,7 +41,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider, App
 		try {
 			if (LoginProvider.checkCredantials(username, password)) {
 				User user = ConfigLoader.getInstance().getUsers().queryForId(username.toLowerCase().trim());
-				if (user != null) {
+				if (user != null && user.isEnabled()) {
 					List<GrantedAuthority> grantedAuths = new ArrayList<>();
 					for(Role r : user.getRoles()) {
 						grantedAuths.add(new SimpleGrantedAuthority(r.getName()));
