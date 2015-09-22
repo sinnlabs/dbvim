@@ -10,6 +10,8 @@ import org.dbvim.dbuibuilder.config.ConfigLoader;
 import org.dbvim.dbuibuilder.model.Role;
 import org.dbvim.dbuibuilder.model.User;
 import org.dbvim.dbuibuilder.security.LoginProvider;
+import org.dbvim.dbuibuilder.ui.AddRoleDialog;
+import org.dbvim.dbuibuilder.ui.AddUserDialog;
 import org.dbvim.dbuibuilder.ui.ChangeUserRoleDialog;
 import org.dbvim.dbuibuilder.ui.RetypePasswordDialog;
 import org.zkoss.zk.ui.Component;
@@ -46,6 +48,9 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 	@Wire
 	Listbox lstUsers;
 	
+	@Wire 
+	Listbox lstRoles;
+	
 	@Wire
 	Textbox txtLogin;
 	
@@ -61,10 +66,18 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 	@Wire
 	Checkbox chbEnabled;
 	
+	@Wire
+	Textbox txtRoleName;
+	
+	@Wire
+	Textbox txtRoleDesc;
+	
 	User selectedUser;
+	Role selectedRole;
 	
 	boolean isUserDirty = false;
 	boolean isPasswordDirty = false;
+	boolean isRoleDirty = false;
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -72,6 +85,8 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 		
 		// fill users list
 		refreshUserList();
+		// fill roles list
+		refreshRoleList();
 	}
 	
 	@Listen("onSelect = #lstUsers")
@@ -96,6 +111,29 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 			userSelected();
 		}
 		
+	}
+	
+	@Listen("onSelect = #lstRoles")
+	public void lstRoles_onSelect() {
+		if (isRoleDirty) {
+			Messagebox.show("Role was modified. Save changes?", "Role", 
+					Messagebox.YES | Messagebox.NO
+					, Messagebox.QUESTION, new EventListener<Event>() {
+
+						@Override
+						public void onEvent(Event e) throws Exception {
+							if(Messagebox.ON_YES.equals(e.getName())){
+								UpdateRole();
+								roleSelected();
+							}else if(Messagebox.ON_NO.equals(e.getName())){
+								roleSelected();
+							}
+						}
+			});
+			return;
+		} else {
+			roleSelected();
+		}
 	}
 	
 	@Listen("onClick = #btnChangeRoles")
@@ -135,6 +173,16 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 		}
 	}
 	
+	private void roleSelected() {
+		Role r = lstRoles.getSelectedItem().getValue();
+		if (r != null || r != selectedRole) {
+			selectedRole = r;
+			txtRoleName.setValue(r.getName());
+			txtRoleDesc.setValue(r.getDescription());
+			isRoleDirty = false;
+		}
+	}
+	
 	private void refreshRoles() throws SQLException {
 		List<Role> roles = selectedUser.getRoles();
 		String r = "";
@@ -159,11 +207,39 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 		}
 	}
 	
+	private void refreshRoleList() throws SQLException {
+		lstRoles.getItems().clear();
+		for(Role r : ConfigLoader.getInstance().getRoles().queryForAll()) {
+			Listitem item = new Listitem();
+			Listcell cell = new Listcell();
+			item.setValue(r);
+			cell.appendChild(new Label(r.getName()));
+			item.appendChild(cell);
+			lstRoles.getItems().add(item);
+		}
+	}
+	
+	/**
+	 * if user has been changed, set dirty flag
+	 * @param event
+	 */
 	@Listen("onChange = #txtLogin, #txtPassword, #txtFullName; onCheck = #chbEnabled")
 	public void onUserChange(Event event) {
+		if (selectedUser == null)
+			return;
 		isUserDirty = true;
 		if (event.getTarget().getId().equals("txtPassword"))
 			isPasswordDirty = true;
+	}
+	
+	/**
+	 * if role has been changed set dirty flag
+	 */
+	@Listen("onChange = #txtRoleDesc, #txtRoleName")
+	public void onRoleChange() {
+		if (selectedRole == null)
+			return;
+		isRoleDirty = true;
 	}
 	
 	@Listen("onClick = #btnUpdate")
@@ -171,10 +247,128 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 		UpdateUser();
 	}
 	
+	@Listen("onClick = #btnUpdateRole")
+	public void btnUpdateRole_onClick() {
+		UpdateRole();
+	}
+	
+	@Listen("onClick = #btnDeleteUser")
+	public void btnDeleteUser_onClick() {
+		if (selectedUser == null)
+			return;
+
+		Messagebox.show("You are shure, that you want to delete user?", "User delete", 
+				Messagebox.YES | Messagebox.NO
+				, Messagebox.QUESTION, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event e) throws Exception {
+				if(Messagebox.ON_YES.equals(e.getName())){
+					ConfigLoader.getInstance().getUsers().delete(selectedUser);
+					selectedUser = null;
+					refreshUserList();
+				}
+			}
+		});
+	}
+	
+	@Listen("onClick = #btnDeleteRole")
+	public void btnDeleteRole_onClick() {
+		if (selectedRole == null)
+			return;
+		
+		Messagebox.show("You are shure, that you want to delete role?", "Role delete", 
+				Messagebox.YES | Messagebox.NO
+				, Messagebox.QUESTION, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event e) throws Exception {
+				if(Messagebox.ON_YES.equals(e.getName())){
+					ConfigLoader.getInstance().getRoles().delete(selectedRole);
+					selectedRole = null;
+					refreshRoleList();
+				}
+			}
+		});
+	}
+	
+	@Listen("onClick = #btnAddRole")
+	public void btnAddRole_onClick() {
+		final AddRoleDialog dialog = new AddRoleDialog();
+		wndMain.appendChild(dialog);
+		
+		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event arg0) throws Exception {
+				// ok button clicked
+				if (dialog.getSelectedAction() == AddUserDialog.DD_OK) {
+					Role r = dialog.getRole();
+					// save new role
+					ConfigLoader.getInstance().getRoles().create(r);
+					// update UI
+					refreshRoleList();
+				}
+			}
+			
+		});
+		dialog.setWidth("50%");
+		// show dialog window
+		dialog.doModal();
+	}
+	
+	@Listen("onClick = #btnAddUser")
+	public void btnAddUser_onClick() {
+		final AddUserDialog dialog = new AddUserDialog();
+		wndMain.appendChild(dialog);
+		
+		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event arg0) throws Exception {
+				if (dialog.getSelectedAction() == AddUserDialog.DD_OK) {
+					User user = dialog.getUser();
+					// save new user
+					ConfigLoader.getInstance().getUsers().create(user);
+					// refresh UI
+					refreshUserList();
+				}
+			}
+			
+		});
+		dialog.setWidth("50%");
+		dialog.doModal();
+	}
+	
+	/**
+	 * Updates selected role
+	 */
+	private void UpdateRole() {
+		if (selectedRole == null)
+			return;
+		
+		// if role has been changed
+		if (isRoleDirty) {
+			selectedRole.setDescription(txtRoleDesc.getText());
+			try {
+				ConfigLoader.getInstance().getRoles().update(selectedRole);
+				isRoleDirty = false;
+			} catch (SQLException e) {
+				Messagebox.show("Unable to save role.", "ERROR", Messagebox.OK, Messagebox.ERROR);
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Updates user
+	 */
 	private void UpdateUser() {
 		if (isUserDirty) {
 			selectedUser.setFullName(txtFullName.getText());
 			selectedUser.setEnabled(chbEnabled.isChecked());
+			
+			// if password has been changed
 			if (isPasswordDirty) {
 				// retype password
 				final RetypePasswordDialog dialog = new RetypePasswordDialog(txtPassword.getText());

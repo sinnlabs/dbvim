@@ -1,0 +1,31 @@
+<zk>
+	<groupbox vflex="1" title="User Information" closable="false">
+		<grid>
+		<columns>
+			<column hflex="min"/>
+			<column />
+		</columns>
+		<rows>
+			<row>
+				<cell><label value="Login"/></cell>
+				<cell><textbox id="txtLogin" hflex="1"/></cell>
+			</row>
+			<row>
+				<cell><label value="Password"/></cell>
+				<cell><textbox id="txtPassword" hflex="1" type="password"/></cell>
+			</row>
+			<row>
+				<cell><label value="Full Name"/></cell>
+				<cell><textbox id="txtFullName" hflex="1"/></cell>
+			</row>
+		</rows>
+	</grid>
+	</groupbox>
+	<div height="4px" />
+	<hlayout>
+		<div hflex="1" />
+		<button id="btnOK" label="OK" />
+		<button id="btnCancel" label="Cancel" />
+		<div />
+	</hlayout>
+</zk>

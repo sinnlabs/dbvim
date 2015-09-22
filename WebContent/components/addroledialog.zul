@@ -1,0 +1,27 @@
+<zk>
+	<groupbox title="Role">
+		<grid>
+			<columns>
+				<column hflex="min" />
+				<column />
+			</columns>
+			<rows>
+				<row>
+					<cell><label value="Name"/></cell>
+					<cell><textbox id="txtName" hflex="1"/></cell>
+				</row>
+				<row>
+					<cell><label value="Description"/></cell>
+					<cell><textbox id="txtDesc" hflex="1"/></cell>
+				</row>
+			</rows>
+		</grid>
+		<div height="4px" />
+		<hlayout>
+			<div hflex="1" />
+			<button id="btnOK" label="OK" />
+			<button id="btnCancel" label="Cancel" />
+			<div />
+		</hlayout>
+	</groupbox>
+</zk>

@@ -16,7 +16,9 @@
 						<listcell label="Admin" />
 					</listitem>
 				</listbox>
-				<hlayout><button id="btnAddUser" label="New" /><button id="btnDeleteUser" label="Delete"/></hlayout>
+				<hlayout>
+					<button id="btnAddUser" label="New" /><button id="btnDeleteUser" label="Delete"/>
+				</hlayout>
 				</vlayout>
 				<groupbox vflex="1" hflex="3" title="Details"
 					closable="false">
@@ -107,6 +109,11 @@
 							</row>
 						</rows>
 					</grid>
+					<hlayout>
+						<div hflex="1" />
+						<button id="btnUpdateRole" label="Save" />
+						<div />
+					</hlayout>
 				</groupbox>
 			</hlayout>
 		</groupbox>
