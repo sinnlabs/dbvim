@@ -5,7 +5,7 @@
  <a href="/logout"> Logout</a>
 </hlayout>
 <window title="DBVIM Start Page" border="normal" vflex="1" 
-						apply="org.dbvim.dbuibuilder.zk.StartPageComposer">
+						apply="org.sinnlabs.dbvim.zk.StartPageComposer">
 	<style>   
         .nav_toolbar .z-toolbarbutton-content i { font-size: 20px;}
         .nav_tabs .z-tabpanel { padding: 0; border-bottom: 0 none;}

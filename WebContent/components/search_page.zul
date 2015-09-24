@@ -2,7 +2,7 @@
 <zk>
 	
 	<borderlayout id="border"
-		apply="org.dbvim.dbuibuilder.zk.SearchComposer">
+		apply="org.sinnlabs.dbvim.zk.SearchComposer">
 		<north>
 			<vlayout>
 				<hlayout>

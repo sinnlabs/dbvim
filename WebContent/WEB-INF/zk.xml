@@ -18,7 +18,7 @@
 	</language-config>
 	<richlet>
 		<richlet-name>DataRichlet</richlet-name>
-		<richlet-class>org.dbvim.dbuibuilder.ui.DataRichlet</richlet-class>
+		<richlet-class>org.sinnlabs.dbvim.ui.DataRichlet</richlet-class>
 	</richlet>
 	<richlet-mapping>
 		<richlet-name>DataRichlet</richlet-name>

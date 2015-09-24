@@ -720,7 +720,7 @@
 		</tab>
 		<tab name="DB Fields">
 			<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.CharacterField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.CharacterField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>CharacterField - represents all character fields from db table</tooltip>
@@ -728,7 +728,7 @@
 	  			<name>CharacterField</name>
 	  		</component>
 	  		<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.IntegerField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.IntegerField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>IntegerField - represents all integer fields from db table</tooltip>
@@ -736,7 +736,7 @@
 	  			<name>IntegerField</name>
 	  		</component>
 	  		<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.DecimalField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.DecimalField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DecimalField - represents all decimal fields from db table</tooltip>
@@ -744,7 +744,7 @@
 	  			<name>DecimalField</name>
 	  		</component>
 	  		<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.LongField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.LongField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>LongField - represents all long fields from db table</tooltip>
@@ -752,7 +752,7 @@
 	  			<name>LongField</name>
 	  		</component>
 	  		<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.DatetimeField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.DatetimeField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DatetimeField - represents all timestamp fields from db table</tooltip>
@@ -760,7 +760,7 @@
 	  			<name>DatetimeField</name>
 	  		</component>
 	  		<component>
-	  			<class>org.dbvim.dbuibuilder.ui.db.DoubleField</class>
+	  			<class>org.sinnlabs.dbvim.ui.db.DoubleField</class>
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DoubleField - represents all double fields from db table</tooltip>

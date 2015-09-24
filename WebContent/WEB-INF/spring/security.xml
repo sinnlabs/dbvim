@@ -17,5 +17,5 @@
 		<authentication-provider ref="customAuthenticationProvider" />
 	</authentication-manager>
 	
-	<beans:bean id="customAuthenticationProvider" class="org.dbvim.dbuibuilder.security.CustomAuthenticationProvider" />
+	<beans:bean id="customAuthenticationProvider" class="org.sinnlabs.dbvim.security.CustomAuthenticationProvider" />
 </beans:beans>

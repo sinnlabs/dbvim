@@ -1,7 +1,7 @@
 <?page title="Administrator Console" contentType="text/html;charset=UTF-8"?>
 <zk>
 	<window id="wndMain" title="Administrator Console" border="normal" vflex="1"
-		hflex="1" apply="org.dbvim.dbuibuilder.zk.AdministrationConsoleComposer">
+		hflex="1" apply="org.sinnlabs.dbvim.zk.AdministrationConsoleComposer">
 		<groupbox vflex="1" title="Users" closable="false">
 			<hlayout vflex="1" hflex="1">
 				<vlayout vflex="1" hflex="1">

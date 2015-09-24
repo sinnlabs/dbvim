@@ -1,14 +1,14 @@
 <?page title="CRUD UI Maker"?>
-<?component name="modeltree" class="org.dbvim.dbuibuilder.ui.ModelTree" ?>
-<?component name="designertree" class="org.dbvim.dbuibuilder.ui.DesignerTree" ?>
-<?component name="designerlist" class="org.dbvim.dbuibuilder.ui.DesignerElements" ?>
-<?component name="designerproperties" class="org.dbvim.dbuibuilder.ui.DesignerProperties" ?>
-<?component name="designerevents" class="org.dbvim.dbuibuilder.ui.DesignerEvents" ?>
+<?component name="modeltree" class="org.sinnlabs.dbvim.ui.ModelTree" ?>
+<?component name="designertree" class="org.sinnlabs.dbvim.ui.DesignerTree" ?>
+<?component name="designerlist" class="org.sinnlabs.dbvim.ui.DesignerElements" ?>
+<?component name="designerproperties" class="org.sinnlabs.dbvim.ui.DesignerProperties" ?>
+<?component name="designerevents" class="org.sinnlabs.dbvim.ui.DesignerEvents" ?>
 
 <window height="100%" border="normal" width="100%" droppable="true"
 	id="wndDesigner"
-	apply="org.dbvim.dbuibuilder.zk.BuilderComposer"
-	use="org.dbvim.dbuibuilder.ui.Designer">
+	apply="org.sinnlabs.dbvim.zk.BuilderComposer"
+	use="org.sinnlabs.dbvim.ui.Designer">
 	
 	<borderlayout id="tVpC4a" droppable="false">
 		<north>
@@ -50,7 +50,7 @@
 			</borderlayout>
 		</west>
 		<center id="blCenter">
-			<window use="org.dbvim.dbuibuilder.ui.DesignerCanvas" id="designerCanvas"></window>
+			<window use="org.sinnlabs.dbvim.ui.DesignerCanvas" id="designerCanvas"></window>
 		</center>
 		<east size="145px" splittable="true">
 			<designerlist id="elements" vflex="1"></designerlist>
