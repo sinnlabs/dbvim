@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/sinnlabs/dbvim.svg?branch=master)](https://travis-ci.org/sinnlabs/dbvim) 
+[![Build Status](https://travis-ci.org/sinnlabs/dbvim.svg?branch=master)](https://travis-ci.org/sinnlabs/dbvim) [![Coverity Scan Build Status](https://scan.coverity.com/projects/6355/badge.svg)](https://scan.coverity.com/projects/sinnlabs-dbvim)
 
 [![Contribute](https://rawgit.com/slemeur/4a900bb68300a2643679/raw/1ad2c6d784c92fc21886c765bc6315a1f2ee690c/codenvy-contribute.svg)](https://codenvy.com/f?id=9guh1zr7gc0kuprd) 
+
 
 #Database Visual Interface Maker
 DBVIM allows you to quickly and easily create a web interface for any database that is supported by JDBC.
