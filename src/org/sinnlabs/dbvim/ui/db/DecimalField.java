@@ -4,7 +4,7 @@
 package org.sinnlabs.dbvim.ui.db;
 
 import java.math.BigDecimal;
-
+import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.zkoss.zul.Decimalbox;
 
@@ -26,6 +26,17 @@ public class DecimalField extends BaseField<BigDecimal, Decimalbox> {
 	
 	public DecimalField() {
 		super("/components/decimalfield.zul", null);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromString(java.lang.String)
+	 */
+	@Override
+	public Value<BigDecimal> fromString(String string) {
+		if (string == null)
+			return new Value<BigDecimal>(null, dbField);
+		return new Value<BigDecimal>(new BigDecimal(string), dbField);
 	}
 	
 

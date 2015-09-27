@@ -13,11 +13,13 @@ import org.sinnlabs.dbvim.db.Entry;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.IDBField;
+import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.zk.model.CurrentForm;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -34,6 +36,8 @@ import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.North;
+import org.zkoss.zul.South;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.impl.InputElement;
 
@@ -89,6 +93,9 @@ public class SearchComposer extends SelectorComposer<Component> {
 	@Wire("#btnNewEntry")
 	Toolbarbutton btnNewQuery;
 	
+	@Wire("#btnAdditionalSearch")
+	Toolbarbutton btnAdditionalSearch;
+	
 	@Wire("#lstFooterTotal")
 	Listfooter lstFooter;
 	
@@ -100,6 +107,12 @@ public class SearchComposer extends SelectorComposer<Component> {
 	
 	@Wire("#divModify")
 	Hlayout divModify;
+	
+	@Wire("#south")
+	South south;
+	
+	@Wire("#txtAdditionalSearch")
+	Textbox txtAdditionalSearch;
 
 	Form form;
 	
@@ -112,6 +125,8 @@ public class SearchComposer extends SelectorComposer<Component> {
 	Database db;
 	
 	List<Value<?>> lastSearch;
+
+	private boolean isAdditional = false;
 	
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
@@ -134,7 +149,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 				results.getListhead().appendChild(header);
 			}
 		}
-		setFieldsMode(IField.MODE_SEARCH);
+		setMode(MODE_SEARCH);
 	}
 	
 	@Listen("onClick = #btnSearch")
@@ -162,6 +177,11 @@ public class SearchComposer extends SelectorComposer<Component> {
 	public void btnNewSearch_onClick() {
 		setMode(MODE_SEARCH);
 		clearAllFields(detailsView);
+	}
+	
+	@Listen("onClick = #btnAdditionalSearch")
+	public void btnAdditionalSearch_onClick() {
+		setAdditionalSearch(!isAdditional);
 	}
 	
 	@Listen("onClick = #btnNewEntry")
@@ -251,17 +271,30 @@ public class SearchComposer extends SelectorComposer<Component> {
 		List<Entry> entries = null;
 		if (values == null)
 			return;
-		
 		try {
-			if (values.size() == 0)
+			if (isAdditional) {
+				List<IField<?>> fields = new ArrayList<IField<?>>();
+				for(Component c : fieldList) {
+					fields.add((IField<?>) c);
+				}
+				entries = db.query(txtAdditionalSearch.getText(), fields);
+			} else if (isAdditional == false && values.size() == 0) {
 				entries = db.queryAll();
-			else
+			} else
 				entries = db.query(values);
 		} catch(DatabaseOperationException e) {
 			Messagebox.show("DB Operation error: " + e.getMessage(), "ERROR",
 					Messagebox.OK, Messagebox.ERROR);
 			e.printStackTrace();
 			return;
+		} catch (WrongValueException e1) {
+			Messagebox.show(e1.getMessage(), "ERROR",
+					Messagebox.OK, Messagebox.ERROR);
+			e1.printStackTrace();
+		} catch (ParseException e1) {
+			Messagebox.show(e1.getMessage(), "ERROR",
+					Messagebox.OK, Messagebox.ERROR);
+			e1.printStackTrace();
 		}
 		results.getItems().clear();
 		if (entries == null || entries.size() == 0) {
@@ -381,10 +414,13 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(true);
 			btnCopy.setDisabled(true);
 			btnDelete.setDisabled(true);
+			btnAdditionalSearch.setDisabled(false);
+			south.setVisible(false);
 			divSearch.setVisible(true);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(false);
 			setFieldsMode(IField.MODE_SEARCH);
+			setAdditionalSearch(false);
 		}
 		if (mode == MODE_RESULT) {
 			searchResults.setVisible(true);
@@ -394,6 +430,8 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(false);
 			btnCopy.setDisabled(false);
 			btnDelete.setDisabled(false);
+			btnAdditionalSearch.setDisabled(true);
+			south.setVisible(false);
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(true);
@@ -407,11 +445,18 @@ public class SearchComposer extends SelectorComposer<Component> {
 			btnChange.setDisabled(true);
 			btnCopy.setDisabled(true);
 			btnDelete.setDisabled(true);
+			btnAdditionalSearch.setDisabled(true);
+			south.setVisible(false);
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(true);
 			divModify.setVisible(false);
 			setFieldsMode(IField.MODE_MODIFY);
 		}
+	}
+	
+	private void setAdditionalSearch(boolean b) {
+		south.setVisible(b);
+		isAdditional  = b;
 	}
 	
 	private void setFieldsMode(int mode) {

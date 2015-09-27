@@ -24,4 +24,5 @@ public class Value<T> {
 	public DBField getDBField() { return dbField; }
 	
 	public T getValue() { return value; }
+	
 }

@@ -61,4 +61,17 @@ public interface IField<T> {
 	 * @param mode - Field mode (search, modify)
 	 */
 	public void setFieldMode(int mode);
+	
+	/**
+	 * Returns field ID
+	 * @return
+	 */
+	public String getId();
+	
+	/**
+	 * Converts string to value
+	 * @param string String to be converted. If string is null then null value returned.
+	 * @return
+	 */
+	public Value<T> fromString(String string);
 }

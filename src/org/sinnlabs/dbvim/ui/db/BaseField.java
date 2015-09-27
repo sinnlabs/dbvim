@@ -27,7 +27,7 @@ import org.zkoss.zul.impl.InputElement;
  * @author peter.liverovsky
  *
  */
-public class BaseField<T, E extends InputElement> extends Idspace implements IField<T>, IDBField {
+public abstract class BaseField<T, E extends InputElement> extends Idspace implements IField<T>, IDBField {
 
 	/**
 	 * 

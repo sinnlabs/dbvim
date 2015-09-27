@@ -20,7 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.DBModel;
+import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
+import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.model.Form;
+import org.sinnlabs.dbvim.ui.IField;
 
 /**
  * Class that manages database operations.
@@ -42,6 +45,8 @@ public class Database {
 	
 	protected Form form;
 	
+	protected DatabaseConditionBuilder conditionBuilder;
+	
 	public Database(Form form) throws ClassNotFoundException, SQLException {
 		this.form = form;
 		DBModel model = new DBModel(form.getDBConnection().getConnectionString(), 
@@ -49,6 +54,7 @@ public class Database {
 		fields = model.getFields(form.getCatalog(),
 				form.getTableName());
 		formIds = findID(form);
+		conditionBuilder = new DatabaseConditionBuilder();
 	}
 	
 	/**
@@ -144,6 +150,48 @@ public class Database {
 			ResultSet res = ps.executeQuery();
 			
 			return readEntries(res, results);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseOperationException(
+					"Error while executing sql query.", e);
+		}
+	}
+	
+	/**
+	 * Search entries by additional search query
+	 * @param query - Query string
+	 * @param allFields - All IField on the form
+	 * @return List of entries
+	 * @throws ParseException 
+	 * @throws DatabaseOperationException 
+	 */
+	public List<Entry> query(String query, List<IField<?>> allFields) throws ParseException, DatabaseOperationException {
+		List<Value<?>> values = new ArrayList<Value<?>>();
+		String dbCondition = conditionBuilder.buildCondition(query, allFields, values);
+		
+		try {
+			Connection db = DriverManager.getConnection(form.getDBConnection()
+					.getConnectionString());
+
+			String[] results = form.getResultList();
+
+			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+					", ");
+
+			String dbQuery = "select " + fields
+					+ " from " + form.getQualifiedName();
+			if (!StringUtils.isBlank(dbCondition)) {
+				dbQuery += " where " + dbCondition;
+			}
+			
+			PreparedStatement ps = db.prepareStatement(dbQuery);
+			// populate parameters
+			setParameters(ps, values);
+
+			ResultSet res = ps.executeQuery();
+			
+			return readEntries(res, results);
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseOperationException(
@@ -492,13 +540,19 @@ public class Database {
 		case java.sql.Types.VARCHAR:
 		case java.sql.Types.LONGVARCHAR:
 			Value<String> str = (Value<String>) v;
-			ps.setString(id, str.getValue());
+			if (str.getValue() != null)
+				ps.setString(id, str.getValue());
+			else
+				ps.setNull(id, v.getDBField().getDBType());
 			break;
 		case java.sql.Types.NCHAR:
 		case java.sql.Types.NVARCHAR:
 		case java.sql.Types.LONGNVARCHAR:
 			Value<String> nstr = (Value<String>) v;
-			ps.setNString(id, nstr.getValue());
+			if (nstr.getValue() != null)
+				ps.setNString(id, nstr.getValue());
+			else
+				ps.setNull(id, v.getDBField().getDBType());
 			break;
 		case java.sql.Types.TINYINT:
 		case java.sql.Types.SMALLINT:
@@ -512,7 +566,10 @@ public class Database {
 		case java.sql.Types.DECIMAL:
 		case java.sql.Types.NUMERIC:
 			Value<BigDecimal> dec = (Value<BigDecimal>) v;
-			ps.setBigDecimal(id, dec.getValue());
+			if (dec.getValue() != null)
+				ps.setBigDecimal(id, dec.getValue());
+			else
+				ps.setNull(id, v.getDBField().getDBType());
 			break;
 		case java.sql.Types.REAL:
 		case java.sql.Types.FLOAT:

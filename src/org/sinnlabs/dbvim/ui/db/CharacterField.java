@@ -34,4 +34,12 @@ public class CharacterField extends BaseField<String, Textbox> {
 			return new Value<String>(null, dbField);
 		return new Value<String>(value.getValue(), dbField);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromString(java.lang.String)
+	 */
+	@Override
+	public Value<String> fromString(String string) {
+		return new Value<String>(string, dbField);
+	}
 }

@@ -27,7 +27,6 @@ public class DatetimeField extends BaseField<Timestamp, Datebox> {
 
 	public DatetimeField(DBField field) {
 		super("/components/datetime.zul", field);
-		this.value.setFormat("medium+medium");
 	}
 	
 	@Override
@@ -38,5 +37,16 @@ public class DatetimeField extends BaseField<Timestamp, Datebox> {
 			return new Value<Timestamp>(ts, dbField);
 		}
 		return new Value<Timestamp>(null, dbField);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromString(java.lang.String)
+	 */
+	@Override
+	public Value<Timestamp> fromString(String string) {
+		if (string == null) {
+			return new Value<Timestamp>(null, dbField);
+		}
+		return new Value<Timestamp>(Timestamp.valueOf(string), dbField);
 	}
 }
