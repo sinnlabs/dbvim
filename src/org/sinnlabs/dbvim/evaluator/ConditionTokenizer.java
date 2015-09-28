@@ -76,6 +76,14 @@ public class ConditionTokenizer {
 					tokens.add(token);
 					token = "";
 					state = DELIMETER_STATE;
+				} else if (c == '\\') {
+					if (i<string.length()-1) {
+						i++;
+						token += string.charAt(i);
+						continue;
+					} else {
+						throw new ParseException("Expected: \'.");
+					}
 				} else {
 					token += c;
 				}
@@ -129,7 +137,7 @@ public class ConditionTokenizer {
 						break;
 					}
 				}
-				if (!hasCandidate) {
+				if (!hasCandidate || Character.isWhitespace(c)) {
 					tokens.add(token);
 					i--;
 					state = DELIMETER_STATE;

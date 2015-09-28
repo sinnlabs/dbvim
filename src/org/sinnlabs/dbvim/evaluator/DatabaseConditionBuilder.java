@@ -81,7 +81,7 @@ public class DatabaseConditionBuilder {
 	private static final ThreadLocal<NumberFormat> FORMATTER = new ThreadLocal<NumberFormat>() {
 	  @Override
 	  protected NumberFormat initialValue() {
-	  	return NumberFormat.getNumberInstance(Locale.US);
+	  	return NumberFormat.getNumberInstance();
 	  }
 	};
 	
@@ -235,7 +235,8 @@ public class DatabaseConditionBuilder {
 			} else if (token.isOperator()) {
 				// If the token is an operator, op1, then:
 				condition+=" " + token.getOperator().getDbSymbol();
-				leftOperand = previous;
+				if (previous.isField())
+					leftOperand = previous;
 			} else if (token.isField()) {
 				// If token is a field
 				condition+=" " + token.getField().getMapping();
@@ -245,8 +246,23 @@ public class DatabaseConditionBuilder {
 					throw new IllegalArgumentException("A literal can't follow another literal");
 				}
 				Value<?> v = toValue(token, null, previous, leftOperand);
-				condition += " ?";
-				sorted.add(v);
+				if (v == null)
+					throw new IllegalArgumentException("Syntax error. Can't read value for: " + token.getLiteral());
+				if (v.getValue() == null) {
+					if (previous.getOperator().equals(EQ)) {
+						condition = condition.substring(0, condition.lastIndexOf(EQ.getDbSymbol()));
+						condition += " IS NULL";
+					} else if (previous.getOperator().equals(NOT_EQ)) {
+						condition = condition.substring(0, condition.lastIndexOf(NOT_EQ.getDbSymbol()));
+						condition += " IS NOT NULL";
+					} else {
+						condition += " ?";
+						sorted.add(v);
+					}
+				} else {
+					condition += " ?";
+					sorted.add(v);
+				}
 				//output(values, token, evaluationContext);
 			}
 			previous = token;
