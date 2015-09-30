@@ -4,16 +4,19 @@
 package org.sinnlabs.dbvim.ui;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.DBModel;
 import org.sinnlabs.dbvim.model.Form;
+import org.sinnlabs.dbvim.model.ResultColumn;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
@@ -25,6 +28,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 /**
+ * Class represents form properties dialog window
  * @author peter.liverovsky
  *
  */
@@ -55,6 +59,12 @@ public class FormPropertiesDialog extends Window {
 	
 	@Wire
 	Button btnCancel;
+	
+	@Wire
+	Button btnUpdateColumnLabel;
+	
+	@Wire
+	Textbox txtColumnLabel;
 	
 	Form form;
 	
@@ -88,32 +98,40 @@ public class FormPropertiesDialog extends Window {
 		
 		fields = model.getFields(form.getCatalog(), form.getTableName());
 		
-		String[] resList = form.getResultList();
+		List<ResultColumn> resList = form.getResultList();
 		
 		// clear listbox
 		lstAvailableFields.getItems().clear();
 		lstResultFields.getItems().clear();
 		
+		boolean contains = false;
 		for(DBField f : fields) {
 			Listitem item = new Listitem();
-			item.setValue(f.getName());
+			ResultColumn column = resContains(resList, f.getName());
+			if (column == null) {
+				column = new ResultColumn(f.getName());
+				contains = false;
+			} else
+				contains = true;
+			
+			item.setValue(column);
 			Listcell cell = new Listcell();
-			cell.setLabel(f.getName());
+			cell.setLabel(column.label + "(" + column.fieldName + ")");
 			item.appendChild(cell);
 			// if field in form result list
-			if (strContains(resList, f.getName()))
+			if (contains) {
 				lstResultFields.getItems().add(item);
-			else
+			} else
 				lstAvailableFields.getItems().add(item);
 		}
 	}
 	
-	private boolean strContains(String[] arr, String str) {
-		for (String s : arr) {
-			if (s.equals(str))
-				return true;
+	private ResultColumn resContains(List<ResultColumn> arr, String str) {
+		for (ResultColumn s : arr) {
+			if (s.fieldName.equals(str))
+				return s;
 		}
-		return false;
+		return null;
 	}
 	
 	private void addEventListeners() {
@@ -152,6 +170,24 @@ public class FormPropertiesDialog extends Window {
 			}
 			
 		});
+		
+		btnUpdateColumnLabel.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+			@Override
+			public void onEvent(MouseEvent arg0) throws Exception {
+				btnUpdateColumnLabel_onClick();
+			}
+			
+		});
+		
+		lstResultFields.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<?,?>>() {
+
+			@Override
+			public void onEvent(SelectEvent<?, ?> arg0) throws Exception {
+				lstResultFields_onSelect();
+			}
+			
+		});
 	}
 	
 	protected void btnRemove_onClick() {
@@ -159,6 +195,7 @@ public class FormPropertiesDialog extends Window {
 			Listitem item = lstResultFields.getSelectedItem();
 			lstResultFields.getItems().remove(item);
 			lstAvailableFields.getItems().add(item);
+			txtColumnLabel.setText("");
 		}
 	}
 
@@ -175,19 +212,33 @@ public class FormPropertiesDialog extends Window {
 		Events.postEvent(closeEvent);
 		detach();
 	}
+	
+	protected void lstResultFields_onSelect() {
+		if (lstResultFields.getSelectedItem() != null) {
+			txtColumnLabel.setText(
+					((ResultColumn)lstResultFields.getSelectedItem().getValue()).label);
+		}
+	}
+	
+	protected void btnUpdateColumnLabel_onClick() {
+		if (lstResultFields.getSelectedItem() != null) {
+			ResultColumn c = (ResultColumn)lstResultFields.getSelectedItem().getValue(); 
+			c.label = txtColumnLabel.getText();
+			((Listcell)lstResultFields.getSelectedItem().getFirstChild()).setLabel(c.label + 
+					"(" + c.fieldName + ")");
+		}
+	}
 
 	private void btnOK_onClick() {
 		if (lstResultFields.getItemCount() == 0) {
 			Messagebox.show("Result list can not be empty.");
 			return;
 		}
-		String resLst = "";
+		ArrayList<ResultColumn> resLst = new ArrayList<ResultColumn>();
 		for (int i=0; i<lstResultFields.getItemCount(); i++) {
-			resLst += (String) lstResultFields.getItems().get(i).getValue();
-			if (i!=lstResultFields.getItemCount()-1)
-				resLst += ";";
+			resLst.add((ResultColumn) lstResultFields.getItems().get(i).getValue());
 		}
-		form.setsResultList(resLst);
+		form.setResultList(resLst);
 		form.setTitle(txtFormName.getValue());
 		
 		// Close dialog

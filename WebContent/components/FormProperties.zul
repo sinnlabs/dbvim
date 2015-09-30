@@ -30,6 +30,13 @@
 				</listhead>
 			</listbox>
 		</hlayout>
+		<div height="3px"/>
+		<hlayout valign="middle">
+			<label value="Column label:" />
+			<textbox id="txtColumnLabel" hflex="1"/>
+			<button id="btnUpdateColumnLabel" label="OK" />
+			<div/>
+		</hlayout>
 	</groupbox>
 	<div height="4px"></div>
 	<hlayout>

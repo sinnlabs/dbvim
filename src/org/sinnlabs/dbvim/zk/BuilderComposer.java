@@ -5,6 +5,7 @@ package org.sinnlabs.dbvim.zk;
 
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.DBModel;
 import org.sinnlabs.dbvim.model.Form;
+import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.rules.engine.Rules;
 import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.ui.Designer;
@@ -197,6 +199,7 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 			currentForm.setTableName(table.getTable().getName());
 			currentForm.setCatalog(table.getTable().getCatalog());
 			currentForm.setView("");
+			currentForm.setJoin(false); // regular form
 			setDefaultResultList(currentForm);
 			checkStudioStates();
 		}
@@ -232,16 +235,14 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 			List<DBField> fields = model.getFields(form.getCatalog(),
 					form.getTableName());
 			
-			String res = "";
+			ArrayList<ResultColumn> res = new ArrayList<ResultColumn>();
 			for (DBField f : fields) {
 				if (f.isPrimaryKey()) {
-					res += f.getName() + ";";
+					res.add(new ResultColumn(f.getName()));
 				}
 			}
-			if (res.endsWith(";")) {
-				res = res.substring(0, res.length() - 1);
-			}
-			form.setsResultList(res);
+			
+			form.setResultList(res);
 		} catch (SQLException e) {
 			System.err.println("ERROR: Unable to get table field list: " + form);
 			e.printStackTrace();

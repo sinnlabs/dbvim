@@ -15,6 +15,7 @@ import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.IDBField;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.model.Form;
+import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.zk.model.CurrentForm;
 import org.zkoss.zk.ui.Component;
@@ -142,10 +143,10 @@ public class SearchComposer extends SelectorComposer<Component> {
 		results.getListhead().setSizable(true);
 		results.setMultiple(true);
 		if (form.getResultList() != null) {
-			for(String fname : form.getResultList()) {
+			for(ResultColumn column : form.getResultList()) {
 				Listheader header = new Listheader();
 				header.setSort("auto");
-				header.setLabel(fname);
+				header.setLabel(column.label);
 				results.getListhead().appendChild(header);
 			}
 		}

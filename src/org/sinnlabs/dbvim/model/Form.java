@@ -3,6 +3,10 @@
  */
 package org.sinnlabs.dbvim.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.mysql.jdbc.StringUtils;
@@ -30,8 +34,8 @@ public class Form {
 	@DatabaseField
 	protected String catalogName;
 	
-	@DatabaseField
-	protected String sResultList;
+	@DatabaseField(width = 1024*1024, dataType = DataType.SERIALIZABLE)
+	protected ArrayList<ResultColumn> resultList;
 	
 	@DatabaseField(width = 7999)
 	protected String view;
@@ -50,8 +54,8 @@ public class Form {
 	public void setCatalog(String catalog) { catalogName = catalog; }
 	public String getView() { return view; }
 	public void setView(String view) { this.view = view; }
-	public String getsResultList() { return sResultList; }
-	public void setsResultList(String sResultList) { this.sResultList = sResultList; }
+	public List<ResultColumn> getResultList() { return resultList; }
+	public void setResultList(ArrayList<ResultColumn> sResultList) { resultList = sResultList; }
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
 	

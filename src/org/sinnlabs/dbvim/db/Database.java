@@ -67,7 +67,7 @@ public class Database {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = form.getResultList();
+			String[] results = getResultList();
 
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
@@ -126,7 +126,7 @@ public class Database {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = form.getResultList();
+			String[] results = getResultList();
 
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
@@ -173,7 +173,7 @@ public class Database {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = form.getResultList();
+			String[] results = getResultList();
 
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
@@ -464,6 +464,14 @@ public class Database {
 		return null;
 	}
 
+	private String[] getResultList() {
+		String[] res = new String[form.getResultList().size()];
+		for (int i=0; i<res.length; i++) {
+			res[i] = form.getResultList().get(i).fieldName;
+		}
+		return res;
+	}
+	
 	/**
 	 * Reads column value
 	 * @param res - ResultSet contains data
