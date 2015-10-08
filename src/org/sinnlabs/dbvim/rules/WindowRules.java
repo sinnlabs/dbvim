@@ -62,7 +62,7 @@ public class WindowRules implements IRulable {
 
 	@Override
 	public String[] getExcludedProperties() {
-		return new DefaultRules().getModelToZUMLExcludedAttributes();
+		return new DefaultRules().getExcludedProperties();
 	}
 
 	@Override
@@ -72,6 +72,14 @@ public class WindowRules implements IRulable {
 
 	@Override
 	public boolean exportChildrenToZUML() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#exportChildToZUML(org.zkoss.zk.ui.Component)
+	 */
+	@Override
+	public boolean exportChildToZUML(Component child) {
 		return true;
 	}
 

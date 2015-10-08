@@ -3,17 +3,18 @@
  */
 package org.sinnlabs.dbvim.evaluator;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.sinnlabs.dbvim.db.Value;
+import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
+import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.ui.IField;
 
 /**
@@ -78,12 +79,6 @@ public class DatabaseConditionBuilder {
 
 	
 	private static Parameters DEFAULT_PARAMETERS;
-	private static final ThreadLocal<NumberFormat> FORMATTER = new ThreadLocal<NumberFormat>() {
-	  @Override
-	  protected NumberFormat initialValue() {
-	  	return NumberFormat.getNumberInstance();
-	  }
-	};
 	
 	private static Parameters getParameters() {
 		if (DEFAULT_PARAMETERS == null) {
@@ -176,16 +171,32 @@ public class DatabaseConditionBuilder {
 			throw new IllegalArgumentException();
 		}
 	}
+	
+	public String buildCondition(String expression, AbstractVariableSet<Value<?>> environment, 
+			FormFieldResolver resolver, List<Value<?>> sorted) throws ParseException {
+		return buildCondition(expression, environment, 
+				resolver, sorted, null, null, null, null, false);
+	}
 
 	/**
 	 * Builds condition expression for prepared statement
 	 * @param expression - Expression to be processed
-	 * @param values - List of all form values
-	 * @param sorted - Prepared sorted list of values for PreparedStatement
-	 * @return - where clause string
-	 * @throws ParseException 
+	 * @param environment - Environment variables
+	 * @param resolver - FormFieldResolver for the form
+	 * @param sorted - [Out] Prepared sorted list of values for PreparedStatement
+	 * @param leftAlias - left form alias
+	 * @param rightAlias - right form alias
+	 * @param leftFieldAlias - map contains left form field aliases
+	 * @param rightFieldAlias - map contains right form field aliases
+	 * @param isJoinClause - true if expression is join form condition, otherwise false
+	 * @return
+	 * @throws ParseException
 	 */
-	public String buildCondition(String expression, List<IField<?>> fields, List<Value<?>> sorted) throws ParseException {
+	public String buildCondition(String expression, AbstractVariableSet<Value<?>> environment, 
+			FormFieldResolver resolver, List<Value<?>> sorted, String leftAlias, String rightAlias, 
+			Map<DBField, String> leftFieldAlias, Map<DBField, String> rightFieldAlias, 
+			boolean isJoinClause) throws ParseException {
+		
 		String condition = "";
 		final Iterator<String> tokens = tokenize(expression);
 		Token previous = null;
@@ -195,7 +206,7 @@ public class DatabaseConditionBuilder {
 		while (tokens.hasNext()) {
 			// read one token from the input stream
 			String strToken = tokens.next();
-			final Token token = toToken(previous, strToken, fields);
+			final Token token = toToken(previous, strToken, resolver, isJoinClause);
 			if (token.isOpenBracket()) {
 				// If the token is a left parenthesis, then push it onto the stack.
 				condition += "(";
@@ -239,13 +250,14 @@ public class DatabaseConditionBuilder {
 					leftOperand = previous;
 			} else if (token.isField()) {
 				// If token is a field
-				condition+=" " + token.getField().getMapping();
+				condition += convertFieldToSqlStatement(token, leftAlias, rightAlias, 
+						leftFieldAlias, rightFieldAlias, isJoinClause, resolver);
 			} else {
 				// If the token is a number (identifier), a constant or a variable, then add its value to the output queue.
 				if ((previous!=null) && previous.isLiteral()) {
 					throw new IllegalArgumentException("A literal can't follow another literal");
 				}
-				Value<?> v = toValue(token, null, previous, leftOperand);
+				Value<?> v = toValue(token, environment, previous, leftOperand);
 				if (v == null)
 					throw new IllegalArgumentException("Syntax error. Can't read value for: " + token.getLiteral());
 				if (v.getValue() == null) {
@@ -271,6 +283,78 @@ public class DatabaseConditionBuilder {
 			throw new IllegalArgumentException("Invalid bracket in expression.");
 		}
 		return condition;
+	}
+	
+	/**
+	 * 
+	 * @param token
+	 * @param leftAlias
+	 * @param rightAlias
+	 * @param leftFieldAlias
+	 * @param rightFieldAlias
+	 * @param rightFields
+	 * @return
+	 */
+	private String convertFieldToSqlStatement(Token token, String leftAlias, String rightAlias, 
+			Map<DBField, String> leftFieldAlias, Map<DBField, String> rightFieldAlias, 
+			boolean isJoinClause, FormFieldResolver resolver) {
+		String res = null;
+		/*
+		 *  У нас могут быть три варианта развития событий:
+		 *  1. Это обычная форма
+		 *  2. Это джоин форма и where условие к ней
+		 *  3. Это джоин форма и join условие к ней
+		 */
+		// not a join condition
+		if (!isJoinClause) {
+			// basic form
+			if (!resolver.getForm().isJoin())
+				res=" " + token.getField().getDBField().getName();
+			else { // join form
+				// if field mapped to the left form
+				if (resolver.getLeftResolver().getForm().getName().equals(
+						token.getField().getForm())) {
+					res = " " + leftAlias + ".";
+					// if left form is join, it can have field alias
+					if (leftFieldAlias != null) {
+						String alias = leftFieldAlias.get(token.getField().getDBField());
+						if (alias != null)
+							res += alias;
+						else // if alias not found
+							res += token.getField().getDBField().getName();
+					} else // if alias map not specified, use table column name
+						res += token.getField().getDBField().getName();
+				} else {
+					res = " " + rightAlias + ".";
+					if (rightFieldAlias != null) {
+						String alias = rightFieldAlias.get(token.getField().getDBField());
+						if (alias != null)
+							res += alias;
+						else // if alias not found
+							res += token.getField().getDBField().getName();
+					} else // if alias map not specified, use table column name
+						res += token.getField().getDBField().getName();
+				}
+			}
+		}
+		else { // if form is a join form
+			if (token.isJoinField()) { // if field from the right form
+				res=" " + rightAlias + ".";
+				String alias = rightFieldAlias.get(token.getField().getDBField());
+				if (alias == null)
+					res += token.getField().getDBField().getName();
+				else
+					res += alias;
+			} else { // if field from the left form
+				res=" " + leftAlias + ".";
+				String alias = leftFieldAlias.get(token.getField().getDBField());
+				if (alias == null)
+					res += token.getField().getDBField().getName();
+				else
+					res += alias;
+			}
+		}
+		return res;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -312,7 +396,9 @@ public class DatabaseConditionBuilder {
 		return null;
 	}
 
-	protected Token toToken(Token previous, String token, List<IField<?>> fields) {
+	protected Token toToken(Token previous, String token, FormFieldResolver resolver, 
+			boolean isJoinClause) {
+		
 		if (token.equals(functionArgumentSeparator)) {
 			return Token.FUNCTION_ARG_SEPARATOR;
 		} else if (functions.containsKey(token)) {
@@ -329,12 +415,27 @@ public class DatabaseConditionBuilder {
 					return Token.buildCloseToken(brackets);
 				}
 			} else if (token.startsWith("'") && token.endsWith("'")) {
-					String fname = token.substring(1, token.length()-1);
-					for (IField<?> f : fields) {
-						if (f.getId().equals(fname))
-							return Token.buildFieldToken(f);
-					}
-					throw new IllegalArgumentException("Field not found: " + fname);
+				// it can be basic form field or left join form field
+				String fname = token.substring(1, token.length()-1);
+				Collection<IField<?>> fields = null;
+				// if it is join condition, we need resolve fields separately for each form
+				if (isJoinClause)
+					fields = resolver.getLeftResolver().getFields().values();
+				else
+					fields = resolver.getFields().values();
+				
+				for (IField<?> f : fields) {
+					if (f.getId().equals(fname))
+						return Token.buildFieldToken(f);
+				}
+				throw new IllegalArgumentException("Field not found: " + fname);
+			} else if (token.startsWith("`") && token.endsWith("`")) {
+				String fname = token.substring(1, token.length()-1);
+				for (IField<?> f : resolver.getRightResolver().getFields().values()) {
+					if (f.getId().equals(fname))
+						return Token.buildJoinFieldToken(f);
+				}
+				throw new IllegalArgumentException("Field not found: " + fname);
 			} else if (token.startsWith("\"") && token.endsWith("\"")) {
 				String lit = token.substring(1, token.length()-1);
 				return Token.buildLiteral(lit);

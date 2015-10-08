@@ -3,12 +3,16 @@
  */
 package org.sinnlabs.dbvim.ui.db;
 
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.IDBField;
+import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.ui.IField;
-import org.sinnlabs.dbvim.zk.model.CurrentForm;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.CreateEvent;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -38,6 +42,8 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	protected String map;
 	
+	protected String formName;
+	
 	@Wire
 	protected Label label;
 	
@@ -53,9 +59,20 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 
 	protected BaseField(String zulUrl, DBField field) {
+		super();
 		isChildable = true;
 		dbField = field;
 		
+		// initialize component after all attributes are loaded
+		addEventListener(Events.ON_CREATE, new EventListener<CreateEvent>() {
+
+			@Override
+			public void onEvent(CreateEvent e) throws Exception {
+				onCreate(e.getArg());
+			}
+
+		});
+
 		/* Create the ui */
 		Executions.createComponents(zulUrl, this, null);
 		Selectors.wireComponents(this, this, false);
@@ -135,6 +152,21 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	public String getName() {
 		return dbField.getName();
 	}
+	
+	@Override
+	public String getTableName() {
+		return dbField.getTableName();
+	}
+	
+	@Override
+	public String getCatalogName() {
+		return dbField.getCatalogName();
+	}
+	
+	@Override
+	public String getFullName() {
+		return dbField.getFullName();
+	}
 
 	/* (non-Javadoc)
 	 * @see com.asd.dbuibuilder.db.model.IDBField#getDBTypeName()
@@ -181,7 +213,16 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	@Override
 	public void setMapping(String map) {
 		this.map = map;
-		dbField = CurrentForm.getInstance().getDBFieldByMapping(map);
+	}
+	
+	@Override
+	public String getForm() {
+		return formName;
+	}
+	
+	@Override
+	public void setForm(String form) {
+		formName = form;
 	}
 
 	/* (non-Javadoc)
@@ -265,6 +306,21 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 			value.setReadonly(false);
 		} else if (mode == IField.MODE_MODIFY) {
 			value.setReadonly(readOnly);
+		}
+	}
+	
+	@Override
+	public DBField getDBField() {
+		return dbField;
+	}
+	
+	@Override
+	public void onCreate(Map<?,?> args) throws ClassNotFoundException, SQLException {
+		if (args != null) {
+			FormFieldResolver f = (FormFieldResolver) args.get("resolver");
+			if (f != null) {
+				dbField = f.getFieldByMapping(formName, map);
+			}
 		}
 	}
 }

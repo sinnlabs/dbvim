@@ -9,6 +9,7 @@ import org.sinnlabs.dbvim.rules.engine.RulesResult;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.SelectFieldDialog;
+import org.sinnlabs.dbvim.ui.SelectJoinFieldDialog;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
@@ -37,35 +38,71 @@ public class BaseFieldRules implements IRulable {
 		final IField<?> field = (IField<?>) cmp;
 
 		Form current = dev.getCurrentForm();
-		try {
-			final SelectFieldDialog dialog = new SelectFieldDialog(current,
-					fType);
+		if (!current.isJoin()) {
+			try {
+				final SelectFieldDialog dialog = new SelectFieldDialog(current,
+						fType);
 
-			dialog.addEventListener(Events.ON_CLOSE,
-					new EventListener<Event>() {
+				dialog.addEventListener(Events.ON_CLOSE,
+						new EventListener<Event>() {
 
-						@Override
-						public void onEvent(Event arg0) throws Exception {
-							if (dialog.getSelectedAction() == SelectFieldDialog.DD_OK) {
-								field.setDBField(dialog.getSelectedField());
-							} else {
-								throw new RulesException(new RulesResult(
-										RulesResult.ERR_UNSPECIFIED,
-										"no field selected."));
-							}
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if (dialog.getSelectedAction() == SelectFieldDialog.DD_OK) {
+							field.setDBField(dialog.getSelectedField());
+						} else {
+							throw new RulesException(new RulesResult(
+									RulesResult.ERR_UNSPECIFIED,
+									"no field selected."));
 						}
+					}
 
-					});
-			dev.getDesigner().appendChild(dialog);
+				});
+				dev.getDesigner().appendChild(dialog);
 
-			dialog.doModal();
+				dialog.doModal();
 
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			final SelectJoinFieldDialog dialog;
+			try {
+				dialog = new SelectJoinFieldDialog(current,
+						cmp.getClass().getName());
+
+
+				dialog.addEventListener(Events.ON_CLOSE,
+						new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if (dialog.getSelectedAction() == SelectFieldDialog.DD_OK) {
+							field.setForm(dialog.getSelectedField().formName);
+							field.setMapping(dialog.getSelectedField().id);
+						} else {
+							throw new RulesException(new RulesResult(
+									RulesResult.ERR_UNSPECIFIED,
+									"no field selected."));
+						}
+					}
+
+				});
+				dev.getDesigner().appendChild(dialog);
+
+				dialog.doModal();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 		return new RulesResult(RulesResult.SUCCESS, "");
 
@@ -105,7 +142,7 @@ public class BaseFieldRules implements IRulable {
 
 	@Override
 	public String[] getExcludedProperties() {
-		return new DefaultRules().getModelToZUMLExcludedAttributes();
+		return new DefaultRules().getExcludedProperties();
 	}
 
 	@Override
@@ -117,6 +154,15 @@ public class BaseFieldRules implements IRulable {
 	@Override
 	public boolean exportChildrenToZUML() {
 		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#exportChildToZUML(org.zkoss.zk.ui.Component)
+	 */
+	@Override
+	public boolean exportChildToZUML(Component child) {
+		// TODO Auto-generated method stubs
 		return false;
 	}
 

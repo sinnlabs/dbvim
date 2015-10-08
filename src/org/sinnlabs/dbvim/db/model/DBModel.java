@@ -53,7 +53,7 @@ public class DBModel {
 			if (columns.getInt("NULLABLE") == DatabaseMetaData.columnNoNulls) {
 				nullable = false;
 			}
-			list.add(new DBField(columns.getString("COLUMN_NAME"),
+			list.add(new DBField(columns.getString("COLUMN_NAME"), tablename, catalog,
 					columns.getString("TYPE_NAME"), columns.getInt("DATA_TYPE"), 
 					isGenerated(columns), isPrimaryKey(catalog, 
 							tablename, columns.getString("COLUMN_NAME")), nullable));
@@ -90,7 +90,7 @@ public class DBModel {
 			if (columns.getInt("NULLABLE") == DatabaseMetaData.columnNoNulls) {
 				nullable = false;
 			}
-			return new DBField(columns.getString("COLUMN_NAME"),
+			return new DBField(columns.getString("COLUMN_NAME"), tableName, catalog,
 					columns.getString("TYPE_NAME"), columns.getInt("DATA_TYPE"), 
 					isGenerated(columns), isPrimaryKey(catalog, 
 							tableName, columns.getString("COLUMN_NAME")), nullable);

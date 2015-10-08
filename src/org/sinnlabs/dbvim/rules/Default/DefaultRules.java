@@ -105,4 +105,12 @@ public class DefaultRules implements IRulable {
 	public boolean exportChildrenToZUML() {
 		return true;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#exportChildToZUML(org.zkoss.zk.ui.Component)
+	 */
+	@Override
+	public boolean exportChildToZUML(Component child) {
+		return true;
+	}
 }

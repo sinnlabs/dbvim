@@ -22,6 +22,7 @@ public class ConditionTokenizer {
 	protected static final int LITERAL_STATE = 3;
 	protected static final int NUMBER_STATE = 4;
 	protected static final int OPERATOR_STATE = 5;
+	protected static final int JOIN_FIELD_STATE = 6;
 	
 	private char decimalSeparator = '.';
 	private List<String> delimeters;
@@ -50,6 +51,10 @@ public class ConditionTokenizer {
 				} else if (c=='\'') { // field name start
 					state = FIELD_STATE;
 					token = "'";
+					continue;
+				} else if (c=='`') { // join field name start
+					state = JOIN_FIELD_STATE;
+					token = "`";
 					continue;
 				} else if (c == '"') {
 					state = VALUE_STATE;
@@ -83,6 +88,24 @@ public class ConditionTokenizer {
 						continue;
 					} else {
 						throw new ParseException("Expected: \'.");
+					}
+				} else {
+					token += c;
+				}
+				break;
+			case JOIN_FIELD_STATE:
+				if (c == '`') {
+					token += "`";
+					tokens.add(token);
+					token = "";
+					state = DELIMETER_STATE;
+				} else if (c == '\\') {
+					if (i<string.length()-1) {
+						i++;
+						token += string.charAt(i);
+						continue;
+					} else {
+						throw new ParseException("Expected: \\`.");
 					}
 				} else {
 					token += c;

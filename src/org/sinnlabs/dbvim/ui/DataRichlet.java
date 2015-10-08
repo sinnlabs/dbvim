@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.sinnlabs.dbvim.config.ConfigLoader;
-import org.sinnlabs.dbvim.db.model.DBField;
-import org.sinnlabs.dbvim.db.model.DBModel;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.zk.model.ICurrentForm;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
@@ -34,8 +32,6 @@ import com.j256.ormlite.stmt.Where;
 public class DataRichlet extends GenericRichlet implements ICurrentForm {
 
 	protected Form form;
-
-	protected DBModel dbModel;
 
 	protected IFormComposer composer;
 
@@ -77,9 +73,6 @@ public class DataRichlet extends GenericRichlet implements ICurrentForm {
 
 		page.setTitle(form.getTitle());
 
-		dbModel = new DBModel(form.getDBConnection().getConnectionString(),
-				form.getDBConnection().getClassName());
-
 		buildSearch(root, formName);
 	}
 
@@ -115,18 +108,5 @@ public class DataRichlet extends GenericRichlet implements ICurrentForm {
 	@Override
 	public Form getForm() {
 		return form;
-	}
-
-	@Override
-	public DBField getDBFieldByMapping(String name) {
-		try {
-			DBField dbField = dbModel.getField(form.getCatalog(),
-					form.getTableName(), name);
-			return dbField;
-		} catch (SQLException e) {
-			System.err.println("ERROR: Unable to map field to:" + name);
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

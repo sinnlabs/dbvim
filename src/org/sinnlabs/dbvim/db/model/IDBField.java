@@ -13,6 +13,12 @@ public interface IDBField {
 	
 	public String getDBTypeName();
 	
+	public String getTableName();
+	
+	public String getCatalogName();
+	
+	public String getFullName();
+	
 	public int getDBType();
 	
 	public boolean isGenerated();

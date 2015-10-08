@@ -6,16 +6,13 @@ package org.sinnlabs.dbvim.zk;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.config.ConfigLoader;
-import org.sinnlabs.dbvim.db.model.DBField;
-import org.sinnlabs.dbvim.db.model.DBModel;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.rules.engine.Rules;
 import org.sinnlabs.dbvim.rules.engine.RulesEngine;
+import org.sinnlabs.dbvim.ui.CreateJoinFormDialog;
 import org.sinnlabs.dbvim.ui.Designer;
 import org.sinnlabs.dbvim.ui.DesignerCanvas;
 import org.sinnlabs.dbvim.ui.DesignerElements;
@@ -205,10 +202,49 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 		}
 	}
 	
+	@Listen("onClick = #tbbNewJoinForm")
+	public void tbbNewJoinForm_onClick() {
+		if (currentForm != null) {
+			Messagebox.show("Close form before creating the new one.");
+		}
+		if (currentForm == null) {
+			final Form form = new Form();
+			form.setName("New untitled form");
+			form.setTitle("Untitled Form");
+			form.setView("");
+			form.setJoin(true); //join regular form
+			try {
+				final CreateJoinFormDialog dialog = new CreateJoinFormDialog(form);
+				dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if (dialog.getSelectedAction() == CreateJoinFormDialog.DD_OK) {
+							currentForm = form;
+							checkStudioStates();
+						}
+					}
+					
+				});
+				designer.appendChild(dialog);
+				dialog.setWidth("50%");
+				dialog.setHeight("70%");
+				dialog.doModal();
+			} catch (Exception e) {
+				Messagebox.show("Unable to create join form dialog. " + e.getMessage());
+				e.printStackTrace();
+			}
+			//setDefaultResultList(currentForm);
+			checkStudioStates();
+		}
+	}
+	
 	@Listen("onClick = #tbbFormProperties")
 	public void tbbFormProperties_onClick() {
 		if (currentForm != null) {
 			try {
+				// update current form view definition
+				updateViewDefinition();
 				FormPropertiesDialog dialog = new FormPropertiesDialog(currentForm);
 				designer.appendChild(dialog);
 				dialog.doModal();
@@ -222,34 +258,39 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 						"ERROR", Messagebox.OK, Messagebox.ERROR);
 				System.err.println("ERROR: Unable to create form properties dialog.");
 				e.printStackTrace();
+			} catch (Exception e) {
+				Messagebox.show("Unable to open form properties: " + e.getMessage(), 
+						"ERROR", Messagebox.OK, Messagebox.ERROR);
+				System.err.println("ERROR: Unable to create form properties dialog.");
+				e.printStackTrace();
 			}
 			designerCanvas.setDirty(true);
 		}
 	}
 
 	private void setDefaultResultList(Form form) {
-		try {
-			DBModel model = new DBModel(form.getDBConnection()
-					.getConnectionString(), form.getDBConnection().getClassName());
+		//try {
+			//DBModel model = new DBModel(form.getDBConnection()
+			//		.getConnectionString(), form.getDBConnection().getClassName());
 			
-			List<DBField> fields = model.getFields(form.getCatalog(),
-					form.getTableName());
+			//List<DBField> fields = model.getFields(form.getCatalog(),
+			//		form.getTableName());
 			
 			ArrayList<ResultColumn> res = new ArrayList<ResultColumn>();
-			for (DBField f : fields) {
-				if (f.isPrimaryKey()) {
-					res.add(new ResultColumn(f.getName()));
-				}
-			}
+			//for (DBField f : fields) {
+			//	if (f.isPrimaryKey()) {
+			//		res.add(new ResultColumn(f.getName()));
+			//	}
+			//}
 			
 			form.setResultList(res);
-		} catch (SQLException e) {
+		/*} catch (SQLException e) {
 			System.err.println("ERROR: Unable to get table field list: " + form);
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			System.err.println("ERROR: Unable to get table field list: " + form);
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	@Listen("onClick = #tbbSaveForm")
@@ -309,8 +350,7 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 
 	private void saveForm() {
 		try {
-			ZUMLModel model = designerCanvas.getZUMLRepresentation();
-			currentForm.setView(model.getZUML());
+			updateViewDefinition();
 			ConfigLoader.getInstance().getForms().createOrUpdate(currentForm);
 			designerCanvas.setDirty(false);
 		} catch (SQLException e) {
@@ -320,6 +360,11 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 			Messagebox.show("Unable to save form into db: " + e.getMessage(),
 					"ERROR", Messagebox.OK, Messagebox.ERROR);
 		}
+	}
+	
+	private void updateViewDefinition() {
+		ZUMLModel model = designerCanvas.getZUMLRepresentation();
+		currentForm.setView(model.getZUML());
 	}
 
 	@Override
@@ -341,23 +386,5 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 	@Override
 	public Form getForm() {
 		return currentForm;
-	}
-
-	@Override
-	public DBField getDBFieldByMapping(String name) {
-		try {
-			DBModel model = new DBModel(currentForm.getDBConnection().getConnectionString(), 
-					currentForm.getDBConnection().getClassName());
-			DBField field = model.getField(currentForm.getCatalog(),
-					currentForm.getTableName(), name);
-			return field;
-		} catch (ClassNotFoundException | SQLException e) {
-			Messagebox.show("Unable to set mapping for db field name: " + name
-					+ " db table: " + currentForm.getName());
-			System.err.println("Unable to set mapping for db field name: "
-					+ name + " db table: " + currentForm.getName());
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

@@ -22,6 +22,7 @@ import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.DBModel;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
+import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.ui.IField;
 
@@ -43,17 +44,24 @@ public class Database {
 	 */
 	protected String[] formIds;
 	
+	protected FormFieldResolver resolver;
+	
 	protected Form form;
 	
 	protected DatabaseConditionBuilder conditionBuilder;
 	
-	public Database(Form form) throws ClassNotFoundException, SQLException {
+	public Database() {
+		
+	}
+	
+	public Database(Form form, FormFieldResolver resolver) throws ClassNotFoundException, SQLException, DatabaseOperationException {
 		this.form = form;
 		DBModel model = new DBModel(form.getDBConnection().getConnectionString(), 
 				form.getDBConnection().getClassName());
 		fields = model.getFields(form.getCatalog(),
 				form.getTableName());
 		formIds = findID(form);
+		this.resolver = resolver;
 		conditionBuilder = new DatabaseConditionBuilder();
 	}
 	
@@ -62,7 +70,7 @@ public class Database {
 	 * @return List of entries
 	 * @throws DatabaseOperationException 
 	 */
-	public List<Entry> queryAll() throws DatabaseOperationException {
+	public List<Entry> queryAll(int limit) throws DatabaseOperationException {
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
@@ -72,12 +80,14 @@ public class Database {
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			PreparedStatement q = db.prepareStatement("select " + fields
-					+ " from " + form.getQualifiedName());
+			PreparedStatement q = db.prepareStatement("SELECT " + fields
+					+ " FROM " + form.getQualifiedName());
 
 			ResultSet res = q.executeQuery();
 			
-			return readEntries(res, results);
+			List<Entry> entries = readEntries(res, results, limit);
+			res.close();
+			return entries;
 		} catch (SQLException e) {
 			System.err.println("ERROR: while executing sql query: "
 					+ e.getMessage());
@@ -93,7 +103,7 @@ public class Database {
 	 * @return list of Entry objects
 	 * @throws SQLException 
 	 */
-	private List<Entry> readEntries(ResultSet res, String[] results) throws SQLException {
+	private List<Entry> readEntries(ResultSet res, String[] results, int limit) throws SQLException {
 		List<Entry> entries = new ArrayList<Entry>();
 		while (res.next()) {
 			Entry entry = new Entry();
@@ -121,7 +131,7 @@ public class Database {
 	 * @return List of entries
 	 * @throws DatabaseOperationException
 	 */
-	public List<Entry> query(List<Value<?>> condition) throws DatabaseOperationException {
+	public List<Entry> query(List<Value<?>> condition, int limit) throws DatabaseOperationException {
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
@@ -131,15 +141,15 @@ public class Database {
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			String query = "select " + fields
-					+ " from " + form.getQualifiedName() + " where ";
+			String query = "SELECT " + fields
+					+ " FROM " + form.getQualifiedName() + " WHERE ";
 			// build condition
 			for(int i=0; i<condition.size(); i++) {
 				Value<?> v = condition.get(i);
 				query += v.getDBField().getName() + " ";
 				query += getOperator(v.getDBField()) + " ?";
 				if (i<condition.size()-1) {
-					query += " and ";
+					query += " AND ";
 				}
 			}
 			
@@ -149,7 +159,9 @@ public class Database {
 
 			ResultSet res = ps.executeQuery();
 			
-			return readEntries(res, results);
+			List<Entry> entries = readEntries(res, results, limit);
+			res.close();
+			return entries;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new DatabaseOperationException(
@@ -165,9 +177,9 @@ public class Database {
 	 * @throws ParseException 
 	 * @throws DatabaseOperationException 
 	 */
-	public List<Entry> query(String query, List<IField<?>> allFields) throws ParseException, DatabaseOperationException {
+	public List<Entry> query(String query, List<IField<?>> allFields, int limit) throws ParseException, DatabaseOperationException {
 		List<Value<?>> values = new ArrayList<Value<?>>();
-		String dbCondition = conditionBuilder.buildCondition(query, allFields, values);
+		String dbCondition = conditionBuilder.buildCondition(query, null, resolver, values);
 		
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
@@ -178,10 +190,10 @@ public class Database {
 			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			String dbQuery = "select " + fields
-					+ " from " + form.getQualifiedName();
+			String dbQuery = "SELECT " + fields
+					+ " FROM " + form.getQualifiedName();
 			if (!StringUtils.isBlank(dbCondition)) {
-				dbQuery += " where " + dbCondition;
+				dbQuery += " WHERE " + dbCondition;
 			}
 			
 			PreparedStatement ps = db.prepareStatement(dbQuery);
@@ -190,7 +202,10 @@ public class Database {
 
 			ResultSet res = ps.executeQuery();
 			
-			return readEntries(res, results);
+			List<Entry> entries = readEntries(res, results, limit);
+			
+			res.close();
+			return entries;
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -199,7 +214,7 @@ public class Database {
 		}
 	}
 	
-	private static String getOperator(DBField field) {
+	protected static String getOperator(DBField field) {
 		switch(field.getDBType()) {
 		case java.sql.Types.CHAR:
 		case java.sql.Types.VARCHAR:
@@ -236,15 +251,15 @@ public class Database {
 					.getConnectionString());
 
 			// prepare sql query
-			String query = "select * from " + form.getQualifiedName();
-			query += " where ";
+			String query = "SELECT * FROM " + form.getQualifiedName();
+			query += " WHERE ";
 			
 			// build qualification
 			for(int i=0; i<e.getID().size(); i++) {
 				query += e.getID().get(i).getDBField().getName();
 				query += " = ?";
 				if (i<e.getID().size()-1) {
-					query += " and ";
+					query += " AND ";
 				}
 			}
 			
@@ -303,8 +318,8 @@ public class Database {
 					.getConnectionString());
 		
 			// build update query
-			String query = "update " + form.getQualifiedName()
-					+ " set ";
+			String query = "UPDATE " + form.getQualifiedName()
+					+ " SET ";
 			// add values to the query
 			for (int i=0; i<newValues.size(); i++) {
 				query += newValues.get(i).getDBField().getName() + " = ?";
@@ -315,12 +330,12 @@ public class Database {
 			}
 			
 			// build query qualification
-			query += " where ";
+			query += " WHERE ";
 			for(int i=0; i<e.getID().size(); i++) {
 				query += e.getID().get(i).getDBField().getName();
 				query += " = ?";
 				if (i<e.getID().size()-1) {
-					query += " and ";
+					query += " AND ";
 				}
 			}
 			
@@ -353,14 +368,14 @@ public class Database {
 	 */
 	public void insertEntry(Entry e) throws DatabaseOperationException {
 		// build query
-		String query = "insert into " + form.getQualifiedName() + " (";
+		String query = "INSERT INTO " + form.getQualifiedName() + " (";
 		
 		for (int i=0; i<e.getValues().size(); i++) {
 			query += e.getValues().get(i).getDBField().getName();
 			if (i<e.getValues().size()-1)
 				query += ", ";
 		}
-		query += ") values (";
+		query += ") VALUES (";
 		for (int i=0; i<e.getValues().size(); i++) {
 			query += "?";
 			if (i<e.getValues().size()-1)
@@ -395,14 +410,14 @@ public class Database {
 	 */
 	public void deleteEntry(Entry e) throws DatabaseOperationException {
 		// build query
-		String query = "delete from " + form.getQualifiedName() + " where ";
+		String query = "DELETE FROM " + form.getQualifiedName() + " WHERE ";
 		
 		// build qualification
 		for(int i=0; i<e.getID().size(); i++) {
 			query += e.getID().get(i).getDBField().getName();
 			query += " = ?";
 			if (i<e.getID().size()-1)
-				query += " and ";
+				query += " AND ";
 		}
 
 		try {
@@ -467,7 +482,7 @@ public class Database {
 	private String[] getResultList() {
 		String[] res = new String[form.getResultList().size()];
 		for (int i=0; i<res.length; i++) {
-			res[i] = form.getResultList().get(i).fieldName;
+			res[i] = resolver.getFields().get(form.getResultList().get(i).fieldName).getDBField().getName();
 		}
 		return res;
 	}
@@ -481,60 +496,84 @@ public class Database {
 	 */
 	public static Value<?> getColumnValue(ResultSet res, DBField field)
 			throws SQLException {
+		return getColumnValue(res, field, field.getName());
+	}
+	
+	/**
+	 * Get the value for the column
+	 * @param res ResultSet contains query results
+	 * @param field DBField describes column value
+	 * @param alias alias for the column in the query (select ID field1, ...)
+	 * @return Value<?> for the column
+	 * @throws SQLException
+	 */
+	protected static Value<?> getColumnValue(ResultSet res, DBField field, String alias) throws SQLException {
 		switch (field.getDBType()) {
 		case java.sql.Types.CHAR:
 		case java.sql.Types.VARCHAR:
 		case java.sql.Types.LONGVARCHAR:
 			Value<String> val = new Value<String>(
-					res.getString(field.getName()), field);
+					res.getString(alias), field);
 			return val;
 		case java.sql.Types.NCHAR:
 		case java.sql.Types.NVARCHAR:
 		case java.sql.Types.LONGNVARCHAR:
 			Value<String> nval = new Value<String>(
-					res.getNString(field.getName()), field);
+					res.getNString(alias), field);
 			return nval;
 		case java.sql.Types.TINYINT:
 		case java.sql.Types.SMALLINT:
 		case java.sql.Types.INTEGER:
-			Integer ival = res.getInt(field.getName());
+			Integer ival = res.getInt(alias);
 			if (res.wasNull())
 				return new Value<Integer>(null, field);
 			return new Value<Integer>(ival, field);
 		case java.sql.Types.DECIMAL:
 		case java.sql.Types.NUMERIC:
-			return new Value<BigDecimal>(res.getBigDecimal(field.getName()),
+			return new Value<BigDecimal>(res.getBigDecimal(alias),
 					field);
 		case java.sql.Types.REAL:
 		case java.sql.Types.FLOAT:
 		case java.sql.Types.DOUBLE:
-			Double dval = res.getDouble(field.getName());
+			Double dval = res.getDouble(alias);
 			if (res.wasNull())
 				return new Value<Double>(null, field);
 			return new Value<Double>(dval, field);
 		case java.sql.Types.BIGINT:
-			Long lval = res.getLong(field.getName());
+			Long lval = res.getLong(alias);
 			if (res.wasNull())
 				return new Value<Long>(null, field);
 			return new Value<Long>(lval, field);
 		case java.sql.Types.DATE:
-			return new Value<Date>(res.getDate(field.getName()), field);
+			return new Value<Date>(res.getDate(alias), field);
 		case java.sql.Types.TIME:
-			return new Value<Time>(res.getTime(field.getName()), field);
+			return new Value<Time>(res.getTime(alias), field);
 		case java.sql.Types.TIMESTAMP:
-			return new Value<Timestamp>(res.getTimestamp(field.getName()), field);
+			return new Value<Timestamp>(res.getTimestamp(alias), field);
 		default:
-			return new Value<Object>(res.getObject(field.getName()), field);
+			return new Value<Object>(res.getObject(alias), field);
 		}
 	}
 	
-	private static void setParameters(PreparedStatement ps, Entry e) throws SQLException {
+	/**
+	 * Set PreparedStatement parameters by Entry ID
+	 * @param ps PreparedStatement with parameters ('?')
+	 * @param e Entry with valid IDs.
+	 * @throws SQLException
+	 */
+	protected static void setParameters(PreparedStatement ps, Entry e) throws SQLException {
 		for(int i=0; i<e.getID().size(); i++) {
 			setParameter(ps, i+1, e.getID().get(i));
 		}
 	}
 	
-	private static void setParameters(PreparedStatement ps, List<Value<?>> values) 
+	/**
+	 * Set PreparedStatement parameters
+	 * @param ps PreparedStatement with parameters
+	 * @param values Value<?> list sorted in the order of the parameters 
+	 * @throws SQLException
+	 */
+	protected static void setParameters(PreparedStatement ps, List<Value<?>> values) 
 			throws SQLException {
 		for(int i=0; i<values.size(); i++) {
 			setParameter(ps, i+1, values.get(i));

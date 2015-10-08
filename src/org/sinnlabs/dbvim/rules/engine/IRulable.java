@@ -83,4 +83,13 @@ public interface IRulable
 	 * representation.
 	 */
 	public boolean exportChildrenToZUML();
+	
+	/**
+	 * Returns a boolean indicating whether the componen's 
+	 * child should be exported or not to the ZUML 
+	 * representation
+	 * @param child Child component to export
+	 * @return
+	 */
+	public boolean exportChildToZUML(Component child);
 }

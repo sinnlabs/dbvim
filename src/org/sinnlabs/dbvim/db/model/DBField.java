@@ -13,6 +13,10 @@ public class DBField implements IDBField {
 	
 	protected String dbType;
 	
+	protected String tableName;
+	
+	protected String catalogName;
+	
 	protected int type;
 	
 	protected boolean isGenerated;
@@ -23,6 +27,10 @@ public class DBField implements IDBField {
 	
 	public String getName() { return name; }
 	
+	public String getTableName() { return tableName; }
+	
+	public String getCatalogName() { return catalogName; }
+	
 	public String getDBTypeName() { return dbType; }
 	
 	public int getDBType() { return type; }
@@ -31,9 +39,11 @@ public class DBField implements IDBField {
 	
 	public boolean isPrimaryKey() { return isPrimaryKey; }
 	
-	public DBField(String name, String type, int dbtype, boolean generated, 
+	public DBField(String name, String tableName, String catalogName, String type, int dbtype, boolean generated, 
 			boolean primarykey, boolean nullable) {
 		this.name = name;
+		this.tableName = tableName;
+		this.catalogName = catalogName;
 		dbType = type;
 		this.type = dbtype;
 		isGenerated = generated;
@@ -44,5 +54,17 @@ public class DBField implements IDBField {
 	@Override
 	public boolean isNullable() {
 		return isNullable;
+	}
+	
+	@Override
+	public String getFullName() {
+		String full = "";
+		if (catalogName != null)
+			full += catalogName + ".";
+		if (tableName != null) {
+			full += tableName + ".";
+		}
+		full += name;
+		return full;
 	}
 }

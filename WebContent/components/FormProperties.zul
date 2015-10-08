@@ -1,43 +1,109 @@
 <?page title="Form Properties" contentType="text/html;charset=UTF-8"?>
 <zk>
-	<hlayout valign="middle">
-		<label value="Form Title: " />
-		<textbox hflex="1" id="txtFormName" />
-	</hlayout>
-	<groupbox vflex="1">
-		<caption label="Result List" />
-		<hlayout vflex="1">
-			<listbox id="lstAvailableFields" hflex="1" vflex="1">
-				<listhead>
-					<listheader label="Available Fields" sort="auto" />
-				</listhead>
-				<listitem>
-					<listcell label="ID" />
-					<listcell label="int" />
-				</listitem>
-				<listitem>
-					<listcell label="Name" />
-					<listcell label="varchar" />
-				</listitem>
-			</listbox>
-			<vlayout>
-				<button id="btnAdd" label="&gt;&gt;" />
-				<button id="btnRemove" label="&lt;&lt;" />
-			</vlayout>
-			<listbox id="lstResultFields" hflex="1" vflex="1">
-				<listhead>
-					<listheader label="Result Fields" sort="auto" />
-				</listhead>
-			</listbox>
-		</hlayout>
-		<div height="3px"/>
-		<hlayout valign="middle">
-			<label value="Column label:" />
-			<textbox id="txtColumnLabel" hflex="1"/>
-			<button id="btnUpdateColumnLabel" label="OK" />
-			<div/>
-		</hlayout>
-	</groupbox>
+	<tabbox vflex="1">
+		<tabs>
+			<tab label="General" />
+			<tab id="tabJoin" visible="false" label="Join Information" />
+		</tabs>
+		<tabpanels>
+			<tabpanel vflex="1">
+				<hlayout valign="middle">
+					<label value="Form Title: " />
+					<textbox hflex="1" id="txtFormName" />
+				</hlayout>
+				<groupbox vflex="1">
+					<caption label="Result List" />
+					<hlayout vflex="1">
+						<listbox id="lstAvailableFields" hflex="1"
+							vflex="1">
+							<listhead>
+								<listheader label="Available Fields"
+									sort="auto" />
+							</listhead>
+							<listitem>
+								<listcell label="ID" />
+								<listcell label="int" />
+							</listitem>
+							<listitem>
+								<listcell label="Name" />
+								<listcell label="varchar" />
+							</listitem>
+						</listbox>
+						<vlayout>
+							<button id="btnAdd" label="&gt;&gt;" />
+							<button id="btnRemove" label="&lt;&lt;" />
+						</vlayout>
+						<listbox id="lstResultFields" hflex="1"
+							vflex="1">
+							<listhead>
+								<listheader label="Result Fields"
+									sort="auto" />
+							</listhead>
+						</listbox>
+					</hlayout>
+					<div height="3px" />
+					<hlayout valign="middle">
+						<label value="Column label:" />
+						<textbox id="txtColumnLabel" hflex="1" />
+						<button id="btnUpdateColumnLabel" label="OK" />
+						<div />
+					</hlayout>
+				</groupbox>
+			</tabpanel>
+			<tabpanel vflex="1">
+			<hlayout vflex="1" hflex="1">
+				<tabbox mold="accordion" vflex="1" hflex="1">
+					<tabs>
+						<tab id="tabFirst" label="First form fields" />
+						<tab id="tabSecond" label="Second form fields" />
+					</tabs>
+					<tabpanels>
+						<tabpanel>
+							<listbox vflex="1" id="lstFirstFields">
+								<listhead>
+									<listheader label="Id" sort="auto" />
+									<listheader label="Title"
+										sort="auto" />
+								</listhead>
+								<listitem>
+									<listcell label="id-3" />
+									<listcell label="Name" />
+								</listitem>
+								<listitem>
+									<listcell label="id-4" />
+									<listcell label="ID" />
+								</listitem>
+							</listbox>
+						</tabpanel>
+						<tabpanel>
+							<listbox vflex="1" id="lstSecondFields">
+								<listhead>
+									<listheader label="Id" sort="auto" />
+									<listheader label="Title"
+										sort="auto" />
+								</listhead>
+								<listitem>
+									<listcell label="id-3" />
+									<listcell label="Name" />
+								</listitem>
+								<listitem>
+									<listcell label="id-4" />
+									<listcell label="ID" />
+								</listitem>
+							</listbox>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+				<vlayout vflex="1" hflex="3">
+					<textbox id="txtCondition" vflex="1" hflex="1"
+						multiline="true" />
+					<checkbox id="chbOuterJoin" label="Is Outer"
+						checked="false" />
+				</vlayout>
+			</hlayout>
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
 	<div height="4px"></div>
 	<hlayout>
 		<div hflex="1"></div>

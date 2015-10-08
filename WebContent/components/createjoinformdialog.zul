@@ -1,0 +1,90 @@
+<zk>
+	<vlayout vflex="1">
+		<hlayout id="stage0" hflex="1" vflex="1" valign="middle" visible="false">
+			<label value="Select connection: " />
+			<listbox id="lstConnection" mold="select">
+				<listitem>
+					<listcell label="" />
+				</listitem>
+				<listitem>
+					<listcell label="" />
+				</listitem>
+			</listbox>
+		</hlayout>
+		<hlayout id="stage1" vflex="1" visible="false">
+			<listbox id="lstFirst" hflex="1" vflex="1">
+				<listhead>
+					<listheader label="First form" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="form1" />
+				</listitem>
+				<listitem>
+					<listcell label="form2" />
+				</listitem>
+			</listbox>
+			<listbox id="lstSecond" hflex="1" vflex="1">
+				<listhead>
+					<listheader label="Second form" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="form1" />
+				</listitem>
+				<listitem>
+					<listcell label="form2" />
+				</listitem>
+			</listbox>
+		</hlayout>
+		<hlayout id="stage2" vflex="1" hflex="1" visible="true">
+			<tabbox mold="accordion" vflex="1" hflex="1">
+				<tabs>
+					<tab id="tabFirst" label="First form fields" />
+					<tab id="tabSecond" label="Second form fields" />
+				</tabs>
+				<tabpanels>
+					<tabpanel>
+						<listbox vflex="1" id="lstFirstFields">
+							<listhead>
+								<listheader label="Id" sort="auto" />
+								<listheader label="Title" sort="auto" />
+							</listhead>
+							<listitem>
+								<listcell label="id-3" />
+								<listcell label="Name" />
+							</listitem>
+							<listitem>
+								<listcell label="id-4" />
+								<listcell label="ID" />
+							</listitem>
+						</listbox>
+					</tabpanel>
+					<tabpanel>
+						<listbox vflex="1" id="lstSecondFields">
+							<listhead>
+								<listheader label="Id" sort="auto" />
+								<listheader label="Title" sort="auto" />
+							</listhead>
+							<listitem>
+								<listcell label="id-3" />
+								<listcell label="Name" />
+							</listitem>
+							<listitem>
+								<listcell label="id-4" />
+								<listcell label="ID" />
+							</listitem>
+						</listbox>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+			<vlayout vflex="1" hflex="3">
+				<textbox id="txtCondition" vflex="1" hflex="1" multiline="true"/>
+				<checkbox id="chbOuterJoin" label="Is Outer" checked="false"/>
+			</vlayout>
+		</hlayout>
+		<hlayout>
+			<div hflex="1" />
+			<button id="btnNext" label="Next" />
+			<button id="btnCancel" label="Cancel" />
+		</hlayout>
+	</vlayout>
+</zk>

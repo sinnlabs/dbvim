@@ -3,6 +3,8 @@
  */
 package org.sinnlabs.dbvim.ui;
 
+import java.util.Map;
+
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 
@@ -23,6 +25,11 @@ public interface IField<T> {
 	public void setDBField(DBField field);
 	
 	/**
+	 * Returns DBField object
+	 */
+	public DBField getDBField();
+	
+	/**
 	 * Used for set mapping when component loaded from ZUML
 	 * @return
 	 */
@@ -32,7 +39,19 @@ public interface IField<T> {
 	 * Used for set mapping when component loaded from ZUML
 	 * @param map
 	 */
-	public void setMapping(String map);
+	public void setMapping(String map) throws Exception;
+	
+	/**
+	 * Used to set mapping to Join forms
+	 * @param form Join form name
+	 */
+	public void setForm(String form);
+	
+	/**
+	 * Used to set mapping to Join forms
+	 * @return
+	 */
+	public String getForm();
 
 	/**
 	 * Set the field value
@@ -74,4 +93,16 @@ public interface IField<T> {
 	 * @return
 	 */
 	public Value<T> fromString(String string);
+	
+	/**
+	 * Returns field label
+	 */
+	public String getLabel();
+	
+	/**
+	 * Calls when all components attributes are loaded
+	 * @param args - Creation parameters
+	 * @throws Exception
+	 */
+	public void onCreate(Map<?,?> args) throws Exception;
 }

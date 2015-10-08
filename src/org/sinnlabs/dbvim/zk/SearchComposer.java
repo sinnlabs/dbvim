@@ -3,17 +3,19 @@
  */
 package org.sinnlabs.dbvim.zk;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.sinnlabs.dbvim.db.Database;
+import org.sinnlabs.dbvim.db.DatabaseJoin;
 import org.sinnlabs.dbvim.db.Entry;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.IDBField;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
+import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.ui.IField;
@@ -117,6 +119,8 @@ public class SearchComposer extends SelectorComposer<Component> {
 
 	Form form;
 	
+	FormFieldResolver resolver;
+	
 	Entry currentEntry;
 	
 	List<Component> fieldList;
@@ -133,8 +137,13 @@ public class SearchComposer extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 
 		form = CurrentForm.getInstance().getForm();
+		resolver = new FormFieldResolver(form);
 		fieldList = new ArrayList<Component>();
-		db = new Database(form);
+		
+		if (form.isJoin())
+			db = new DatabaseJoin(form, resolver);
+		else
+			db = new Database(form, resolver);
 		
 		loadForm();
 		
@@ -278,11 +287,11 @@ public class SearchComposer extends SelectorComposer<Component> {
 				for(Component c : fieldList) {
 					fields.add((IField<?>) c);
 				}
-				entries = db.query(txtAdditionalSearch.getText(), fields);
+				entries = db.query(txtAdditionalSearch.getText(), fields, 0);
 			} else if (isAdditional == false && values.size() == 0) {
-				entries = db.queryAll();
+				entries = db.queryAll(0);
 			} else
-				entries = db.query(values);
+				entries = db.query(values, 0);
 		} catch(DatabaseOperationException e) {
 			Messagebox.show("DB Operation error: " + e.getMessage(), "ERROR",
 					Messagebox.OK, Messagebox.ERROR);
@@ -344,10 +353,11 @@ public class SearchComposer extends SelectorComposer<Component> {
 		return ret;
 	}
 	
-	private void loadForm() throws IOException {
-		StringReader r = new StringReader(CurrentForm.getInstance().getForm().getView());
-		Executions.createComponentsDirectly(r,
-				 null, detailsView, null);
+	private void loadForm() throws Exception {
+		StringReader r = new StringReader(form.getView());
+		HashMap<String, Object> args = new HashMap<String, Object>();
+		args.put("resolver", resolver);
+		Executions.createComponentsDirectly(r, null, detailsView, args);
 		Selectors.wireVariables(detailsView, this, null);
 		
 		// Find all DB fields of the form
@@ -399,7 +409,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 			IField<Object> field = (IField<Object>) c;
 			for(Value<?> v : currentEntry.getValues()) {
 				// find value for the field
-				if (dbField.getName().equals(v.getDBField().getName())) {
+				if (dbField.getFullName().equals(v.getDBField().getFullName())) {
 					field.setDBValue((Value<Object>) v);
 				}
 			}
@@ -451,6 +461,10 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(true);
 			divModify.setVisible(false);
+			if (form.isJoin())
+				btnCreate.setDisabled(true);
+			else
+				btnCreate.setDisabled(false);
 			setFieldsMode(IField.MODE_MODIFY);
 		}
 	}

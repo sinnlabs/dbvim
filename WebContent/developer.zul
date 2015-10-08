@@ -12,12 +12,19 @@
 	
 	<borderlayout id="tVpC4a" droppable="false">
 		<north>
-			<toolbar>
-				<toolbarbutton id="tbbNewForm" label="New form"/>
-				<toolbarbutton id="tbbSaveForm" label="Save form" />
-				<toolbarbutton id="tbbCloseForm" label="Close form" />
-				<toolbarbutton id="tbbFormProperties" label="Form properties" />
-			</toolbar>
+			<menubar>
+					<menu label="New">
+						<menupopup>
+							<menuitem id="tbbNewForm"
+								label="New Basic form" />
+							<menuseparator />
+							<menuitem id="tbbNewJoinForm" label="New Join form" />
+						</menupopup>
+					</menu>
+					<menuitem id="tbbSaveForm" label="Save form" />
+					<menuitem id="tbbCloseForm" label="Close form" />
+				<menuitem id="tbbFormProperties" label="Form properties" />
+			</menubar>
 		</north>
 		<west size="250px" splittable="true">
 			<borderlayout droppable="false">

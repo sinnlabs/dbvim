@@ -149,6 +149,10 @@ public class ZUMLModel {
 				if (child == null)
 					continue;
 				
+				// check if component child should be exported
+				if ( !RulesEngine.exportChildToZuml(component, child) )
+					continue;
+				
 				/*** RECURSION ***/
 				convertModelToZUML(child);
 			}

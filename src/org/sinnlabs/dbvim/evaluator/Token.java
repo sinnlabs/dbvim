@@ -15,7 +15,8 @@ public class Token {
 		FUNCTION,
 		OPERATOR,
 		LITERAL,
-		FIELD
+		FIELD,
+		JOIN_FIELD
 	}
 	static final Token FUNCTION_ARG_SEPARATOR = new Token(Kind.FUNCTION_SEPARATOR, null);
 	
@@ -44,6 +45,10 @@ public class Token {
 	
 	static Token buildFieldToken(IField<?> field) {
 		return new Token(Kind.FIELD, field);
+	}
+	
+	static Token buildJoinFieldToken(IField<?> field) {
+		return new Token(Kind.JOIN_FIELD, field);
 	}
 
 	private Token(Kind kind, Object content) {
@@ -124,7 +129,15 @@ public class Token {
 	 * @return true if token is a field
 	 */
 	public boolean isField() {
-		return kind.equals(Kind.FIELD);
+		return kind.equals(Kind.FIELD) || kind.equals(Kind.JOIN_FIELD);
+	}
+	
+	/**
+	 * Tests whether the token is a join field (field from right form)
+	 * @return true if token is a join field
+	 */
+	public boolean isJoinField() {
+		return kind.equals(Kind.JOIN_FIELD);
 	}
 
 	Operator.Associativity getAssociativity() {

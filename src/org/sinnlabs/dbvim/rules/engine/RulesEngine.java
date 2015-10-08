@@ -193,6 +193,32 @@ public class RulesEngine {
 			return null;
 		}
 	}
+	
+	/**
+	 * Returns a boolean indicating whether the componen's 
+	 * child should be exported or not to the ZUML 
+	 * representation
+	 * @param cmp The component to be resolved
+	 * @param child Child component to export
+	 * @return true if component should be exported otherwise false
+	 */
+	public static boolean exportChildToZuml(Component cmp, Component child) {
+		// get the rules class of the given component
+		IRulable rulable = getRulesClassInstance(cmp);
+
+		if (rulable == null)
+			return true;
+
+		try
+		{
+			return rulable.exportChildToZUML(child);
+		}
+		catch (Exception e)
+		{
+		}
+
+		return true;
+	}
 
 	/**
 	 * Returns the requested flag's value
