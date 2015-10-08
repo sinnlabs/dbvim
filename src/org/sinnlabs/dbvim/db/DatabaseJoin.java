@@ -21,6 +21,7 @@ import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.ui.IField;
 
 /**
+ * Class that manages database operations for the join form.
  * @author peter.liverovsky
  *
  */
@@ -33,7 +34,7 @@ public class DatabaseJoin extends Database {
 	private DatabaseConditionBuilder conditionBuilder;
 	
 	/**
-	 * List of primary id
+	 * List of primary id's for each form
 	 */
 	private List<DBField> leftId;
 	private List<DBField> rightId;
@@ -47,17 +48,27 @@ public class DatabaseJoin extends Database {
 	public DatabaseJoin(Form form, FormFieldResolver resolver) throws DatabaseOperationException, ClassNotFoundException, SQLException {
 		if (!form.isJoin())
 			throw new IllegalArgumentException("Form should be join.");
+		
 		this.form = form;
 		conditionBuilder = new DatabaseConditionBuilder();
 		this.resolver = resolver;
 		
+		// Get rimary id's for each form
 		leftId = findId(resolver.getLeftResolver());
 		rightId = findId(resolver.getRightResolver());
 	}
 	
+	/**
+	 * Finds primary id fields
+	 * @param resolver - FormFieldResolver for the form
+	 * @return List of DBField that are primary id
+	 */
 	private List<DBField> findId(FormFieldResolver resolver) {		
 		ArrayList<DBField> id = new ArrayList<DBField>();
+		
+		// walk through all DBFields of the form
 		for(DBField f: resolver.getDBFields()) {
+			// Checks if the field is Primary id
 			if (f.isPrimaryKey())
 				id.add(f);
 		}
@@ -67,16 +78,23 @@ public class DatabaseJoin extends Database {
 	
 	@Override
 	public List<Entry> queryAll(int limit) throws DatabaseOperationException {
+		// List of result fields.
 		List<DBField> resultFields = new ArrayList<DBField>();
+		
 		// Add result list columns to select expression
 		for(ResultColumn r : form.getResultList()) {
 			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
 		}
-		// List of values for join condition
+		
+		// List of sorted values for join condition
+		// This values filled by the DatabaseConditionBuilder
 		List<Value<?>> values = new ArrayList<Value<?>>();
-		// field aliases
+		
+		// result field aliases
 		HashMap<DBField, String> aliases = new HashMap<DBField, String>();
+		// left join sub query field aliases (select field alias, ...)
 		HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
+		// right join sub query field aliases
 		HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
 		
 		String query;
@@ -97,6 +115,7 @@ public class DatabaseJoin extends Database {
 			// set query parameters
 			setParameters(ps, values);
 			
+			// execute query
 			ResultSet res = ps.executeQuery();
 			
 			List<Entry> result = readEntries(res, resultFields, aliases, limit);
@@ -113,17 +132,23 @@ public class DatabaseJoin extends Database {
 	public List<Entry> query(List<Value<?>> condition, int limit) 
 			throws DatabaseOperationException {
 		List<DBField> resultFields = new ArrayList<DBField>();
+		
 		// Add result list columns to select expression
 		for(ResultColumn r : form.getResultList()) {
 			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
 		}
-		// List of values for join condition
-		List<Value<?>> values = new ArrayList<Value<?>>();
-		// field aliases
-		HashMap<DBField, String> aliases = new HashMap<DBField, String>();
-		HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
-		HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
 		
+		// List of sorted values for join condition
+		// This values filled by the DatabaseConditionBuilder
+		List<Value<?>> values = new ArrayList<Value<?>>();
+
+		// result field aliases
+		HashMap<DBField, String> aliases = new HashMap<DBField, String>();
+		// left join sub query field aliases (select field alias, ...)
+		HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
+		// right join sub query field aliases
+		HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
+
 		JoinQuery query;
 		try {
 			query = buildJoinQuery(resultFields, aliases, values, leftAliases, rightAliases);
@@ -134,11 +159,15 @@ public class DatabaseJoin extends Database {
 		// build where condition
 		query.query += " WHERE ";
 
+		// Walk through all condition values
 		for(int i=0; i<condition.size(); i++) {
+			// if condition value sets the left field
 			if (isDBFieldsContains(resolver.getLeftResolver().getDBFields(), 
 					condition.get(i).getDBField())) {
-				
+				// build where qualification like: formAlias.{DBField Name|FieldAlias}
 				query.query += query.leftFormAlias + ".";
+				
+				// check if the field alias exists
 				String alias = leftAliases.get(condition.get(i).getDBField());
 				if (alias != null)
 					query.query += alias;
@@ -146,7 +175,10 @@ public class DatabaseJoin extends Database {
 					query.query += condition.get(i).getDBField().getName();
 				
 				query.query += " " + getOperator(condition.get(i).getDBField()) + " ?";
+			
+			// if condition value sets the right field
 			} else {
+				// same as for the left form
 				query.query += query.rightFormAlias + ".";
 				String alias = rightAliases.get(condition.get(i).getDBField());
 				if (alias != null)
@@ -156,7 +188,10 @@ public class DatabaseJoin extends Database {
 				
 				query.query += " " + getOperator(condition.get(i).getDBField()) + " ?";
 			}
+			// add value to the end of the condition values list
 			values.add(condition.get(i));
+			
+			// add AND to the query if the condition value is not last 
 			if ( i< condition.size()-1) {
 				query.query += " AND ";
 			}
@@ -189,17 +224,23 @@ public class DatabaseJoin extends Database {
 	public List<Entry> query(String query, List<IField<?>> allFields, int limit) 
 			throws ParseException, DatabaseOperationException {
 		List<DBField> resultFields = new ArrayList<DBField>();
+
 		// Add result list columns to select expression
 		for(ResultColumn r : form.getResultList()) {
 			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
 		}
-		// List of values for join condition
-		List<Value<?>> values = new ArrayList<Value<?>>();
-		// field aliases
-		HashMap<DBField, String> aliases = new HashMap<DBField, String>();
-		HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
-		HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
 		
+		// List of sorted values for join condition
+		// This values filled by the DatabaseConditionBuilder
+		List<Value<?>> values = new ArrayList<Value<?>>();
+
+		// result field aliases
+		HashMap<DBField, String> aliases = new HashMap<DBField, String>();
+		// left join sub query field aliases (select field alias, ...)
+		HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
+		// right join sub query field aliases
+		HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
+
 		JoinQuery joinQuery;
 		try {
 			joinQuery = buildJoinQuery(resultFields, aliases, values, leftAliases, rightAliases);
@@ -214,6 +255,7 @@ public class DatabaseJoin extends Database {
 				joinQuery.leftFormAlias, joinQuery.rightFormAlias, 
 				leftAliases, rightAliases, false);
 		
+		// Add where qualification to the end of the join query
 		joinQuery.query += dbCondition;
 		
 		try {
@@ -227,6 +269,7 @@ public class DatabaseJoin extends Database {
 			// set query parameters
 			setParameters(ps, values);
 			
+			// execute query
 			ResultSet res = ps.executeQuery();
 			
 			List<Entry> result = readEntries(res, resultFields, aliases, limit);
@@ -257,16 +300,21 @@ public class DatabaseJoin extends Database {
 			HashMap<DBField, String> rightAliases) throws ParseException {
 		// функция строит основной джоин запрос вида:
 		// select [все primary id], [филды которые хочет видеть юзер] from left form join right form on [join condition]
+		
 		// alias generator for tables
 		NameGenerator generator = new NameGenerator("t");
+		
 		// alias generator for fields
 		NameGenerator fieldAliasGenerator = new NameGenerator("f");
+		
+		// The query string
 		String query = "SELECT ";
 
-		// Create select expression
+		/*** Create the select expression ***/
 		List<DBField> selectFields = new ArrayList<DBField>();
 		
-		// fill lists
+		// First add all primary id's to the select expression
+		// And save field alias in the field alias map
 		for (DBField f : leftId) {
 			selectFields.add(f);
 			aliases.put(f, fieldAliasGenerator.getNext());
@@ -276,12 +324,13 @@ public class DatabaseJoin extends Database {
 			aliases.put(f, fieldAliasGenerator.getNext());
 		}
 
-		// Add result columns to select expression
+		// Then add all payload fields (result fields) to the select expression
 		for(DBField f : resultFields) {
 			selectFields.add(f);
 			aliases.put(f, fieldAliasGenerator.getNext());
 		}
 		
+		/*** build join sub queries for the left and right forms ***/
 		SubQuery leftSubQuery;
 		leftSubQuery = buildSubQuery(selectFields, generator, fieldAliasGenerator, 
 				resolver.getLeftResolver(), leftAliases);
@@ -290,43 +339,65 @@ public class DatabaseJoin extends Database {
 		rightSubQuery = buildSubQuery(selectFields, generator, fieldAliasGenerator, 
 				resolver.getRightResolver(), rightAliases);
 		
-		// create select statement
+		
+		/*** Create the select statement ***/
+		// Walk through select expression fields and add each field to the select statement
 		for (int i=0; i<selectFields.size(); i++) {
+			// Get the DBField
 			DBField f = selectFields.get(i);
+			
+			// If the DBField belongs to the left form
 			if (isDBFieldsContains(resolver.getLeftResolver().getDBFields(), f)) {
+				// Build field statement like: leftFormAlias.{DBFieldName|FieldAlias}
+				// Get the field alias
 				String alias = leftAliases.get(f);
-				if (alias == null)
+				if (alias == null){ // If the field alias does not exists (this means that left form is a basic form)
+					// Build select statement using DBField name
 					query += leftSubQuery.alias + "." + f.getName() + " " + aliases.get(f);
-				else
+				} else {
+					// Build select statement using DBField alias name
 					query += leftSubQuery.alias + "." + alias + " " + aliases.get(f);
+				}
+			// If the field belongs to the right form
 			} else if (isDBFieldsContains(resolver.getRightResolver().getDBFields(), f)) {
+				// Build select statement same as for the left form
 				String alias = rightAliases.get(f);
 				if (alias == null)
 					query += rightSubQuery.alias + "." + f.getName() + " " + aliases.get(f);
 				else
 					query += rightSubQuery.alias + "." + alias + " " + aliases.get(f);
 			}
+			
+			// add ', ' to the end of the select statement if the DBField is not last
 			if (i<selectFields.size()-1)
 				query += ", ";
-			else
+			else // otherwise add ' '
 				query += " ";
 		}
+		
+		/*** build FROM statement ***/
 		query += " FROM ";
-		// add join sub queries
+		
+		// add join sub queries to the statement
+		query += leftSubQuery.query + getJoinString(resolver) + rightSubQuery.query + " ON ";
+		
+		// build join on qualification
 		List<Value<?>> conditionValues = new ArrayList<Value<?>>();
-		query += leftSubQuery.query + getJoinString() + rightSubQuery.query + " ON ";
-		// build join on condition
 		query += conditionBuilder.buildCondition(form.getJoinClause(), null, 
 				resolver, conditionValues, leftSubQuery.alias, 
 				rightSubQuery.alias, leftAliases, rightAliases, true);
 
-		// build all values for the query
+		
+		// Add all conditions values to values list
+		// Order should be from left to the right
+		// select .. from leftSubQuery join rightSubQuery on qualification
 		if (leftSubQuery.sorted != null)
 			values.addAll(leftSubQuery.sorted);
 		if (rightSubQuery.sorted != null)
 			values.addAll(rightSubQuery.sorted);
 		values.addAll(conditionValues);
 		
+		// return the builded join query
 		JoinQuery res = new JoinQuery();
 		res.query = query;
 		res.leftFormAlias = leftSubQuery.alias;
@@ -336,11 +407,16 @@ public class DatabaseJoin extends Database {
 	
 	private SubQuery buildSubQuery(List<DBField> fields, NameGenerator generator, NameGenerator aliasGenerator,
 			FormFieldResolver resolver, HashMap<DBField, String> aliases) throws ParseException {
+		// if the form is a join form
 		if (resolver.getForm().isJoin()) {
+			
+			// select statement
 			String query = "SELECT ";
+			
 			// prepare left and right form fields list
 			List<DBField> leftFields = new ArrayList<DBField>();
 			List<DBField> rightFields = new ArrayList<DBField>();
+			
 			// determine which form field belongs (left or right)
 			for(DBField f : fields) {
 				if ( isDBFieldsContains(resolver.getLeftResolver().getDBFields(), f) ) {
@@ -350,16 +426,21 @@ public class DatabaseJoin extends Database {
 					rightFields.add(f);
 				}
 			}
+			
+			// prepare left and right forms field aliases
 			HashMap<DBField, String> leftAliases = new HashMap<DBField, String>();
 			HashMap<DBField, String> rightAliases = new HashMap<DBField, String>();
+			
 			// get sub queries for each form
 			SubQuery leftSubQuery = buildSubQuery(fields, generator, aliasGenerator, 
 					resolver.getLeftResolver(), leftAliases);
 			SubQuery rightSubQuery = buildSubQuery(fields, generator, aliasGenerator, 
 					resolver.getRightResolver(), rightAliases);
+			
 			// create condition values list
 			List<Value<?>> conditionValues = new ArrayList<Value<?>>();
-			String tmp = " FROM " + leftSubQuery.query + getJoinString() + rightSubQuery.query + " ON ";
+			String tmp = " FROM " + leftSubQuery.query + getJoinString(resolver) + rightSubQuery.query + " ON ";
+			
 			// build condition
 			tmp += conditionBuilder.buildCondition(resolver.getForm().getJoinClause(), null, 
 					resolver, conditionValues, leftSubQuery.alias,
@@ -390,18 +471,28 @@ public class DatabaseJoin extends Database {
 				else
 					query += " ";
 			}
+			
 			query += tmp;
+			
 			SubQuery res = new SubQuery();
 			res.alias = generator.getNext();
 			res.query = "(" + query + ") " + res.alias;
 			res.sorted = new ArrayList<Value<?>>();
+			
+			// add condition values
+			// order should be left to the right
 			if (leftSubQuery.sorted != null)
 				res.sorted.addAll(leftSubQuery.sorted);
 			if (rightSubQuery.sorted != null)
 				res.sorted.addAll(rightSubQuery.sorted);
 			res.sorted.addAll(conditionValues);
+			
+			// return builded sub query
 			return res;
 		} else {
+			// if the form is not a join form
+			// then we do not add full query (with select statement)
+			// just add the form alias
 			SubQuery q = new SubQuery();
 			q.alias = generator.getNext();
 			q.query = resolver.getForm().getQualifiedName() + " " + q.alias;
@@ -409,8 +500,8 @@ public class DatabaseJoin extends Database {
 		}
 	}
 	
-	private String getJoinString() {
-		if (form.isOuterJoin())
+	private String getJoinString(FormFieldResolver resolver) {
+		if (resolver.getForm().isOuterJoin())
 			return " LEFT OUTER JOIN ";
 		return " INNER JOIN ";
 	}
