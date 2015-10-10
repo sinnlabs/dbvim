@@ -77,14 +77,10 @@ public class DatabaseJoin extends Database {
 	}
 	
 	@Override
-	public List<Entry> queryAll(int limit) throws DatabaseOperationException {
+	public List<Entry> queryAll(List<IField<?>> fields, int limit) throws DatabaseOperationException {
 		// List of result fields.
-		List<DBField> resultFields = new ArrayList<DBField>();
-		
 		// Add result list columns to select expression
-		for(ResultColumn r : form.getResultList()) {
-			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
-		}
+		List<DBField> resultFields = getPayloadFields(fields);
 		
 		// List of sorted values for join condition
 		// This values filled by the DatabaseConditionBuilder
@@ -129,14 +125,11 @@ public class DatabaseJoin extends Database {
 	}
 	
 	@Override
-	public List<Entry> query(List<Value<?>> condition, int limit) 
+	public List<Entry> query(List<IField<?>> fields, List<Value<?>> condition, int limit) 
 			throws DatabaseOperationException {
-		List<DBField> resultFields = new ArrayList<DBField>();
-		
 		// Add result list columns to select expression
-		for(ResultColumn r : form.getResultList()) {
-			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
-		}
+		List<DBField> resultFields = getPayloadFields(fields);
+		
 		
 		// List of sorted values for join condition
 		// This values filled by the DatabaseConditionBuilder
@@ -221,14 +214,11 @@ public class DatabaseJoin extends Database {
 	}
 	
 	@Override
-	public List<Entry> query(String query, List<IField<?>> allFields, int limit) 
-			throws ParseException, DatabaseOperationException {
-		List<DBField> resultFields = new ArrayList<DBField>();
-
+	public List<Entry> query(List<IField<?>> fields, String query, List<IField<?>> allFields, 
+			int limit) throws ParseException, DatabaseOperationException {
 		// Add result list columns to select expression
-		for(ResultColumn r : form.getResultList()) {
-			resultFields.add(resolver.getFields().get(r.fieldName).getDBField());
-		}
+		List<DBField> resultFields = getPayloadFields(fields);
+
 		
 		// List of sorted values for join condition
 		// This values filled by the DatabaseConditionBuilder
@@ -282,6 +272,27 @@ public class DatabaseJoin extends Database {
 		}
 	}
 	
+	/**
+	 * Build pay load DBField list
+	 * @param fields payload fields
+	 * @return List of DBField
+	 */
+	private List<DBField> getPayloadFields(List<IField<?>> fields) {
+		List<DBField> res = new ArrayList<DBField>();
+		// if payload fields not sepcified
+		if (fields == null) {
+			// Add result list columns to select expression
+			for(ResultColumn r : form.getResultList()) {
+				res.add(resolver.getFields().get(r.fieldName).getDBField());
+			}
+		} else {
+			for (IField<?> f : fields) {
+				res.add(f.getDBField());
+			}
+		}
+		return res;
+	}
+	
 	
 	
 	/**
@@ -330,6 +341,16 @@ public class DatabaseJoin extends Database {
 			aliases.put(f, fieldAliasGenerator.getNext());
 		}
 		
+		// Remeber payload fields size
+		int selectFieldsSize = selectFields.size();
+		// Then add all fields from the condition.
+		// for example select t1.ID from f1 t1 inner join (select ID f2 from f2 t2) on t2.Name = t1.Name
+		// In this case we need to add the condition field t2.Name to the sub query select statement
+		for (IField<?> f : conditionBuilder.getConditionFields(form.getJoinClause(), 
+				resolver, true)) {
+			selectFields.add(f.getDBField());
+		}
+		
 		/*** build join sub queries for the left and right forms ***/
 		SubQuery leftSubQuery;
 		leftSubQuery = buildSubQuery(selectFields, generator, fieldAliasGenerator, 
@@ -342,7 +363,7 @@ public class DatabaseJoin extends Database {
 		
 		/*** Create the select statement ***/
 		// Walk through select expression fields and add each field to the select statement
-		for (int i=0; i<selectFields.size(); i++) {
+		for (int i=0; i<selectFieldsSize; i++) {
 			// Get the DBField
 			DBField f = selectFields.get(i);
 			
@@ -369,7 +390,7 @@ public class DatabaseJoin extends Database {
 			}
 			
 			// add ', ' to the end of the select statement if the DBField is not last
-			if (i<selectFields.size()-1)
+			if (i<selectFieldsSize-1)
 				query += ", ";
 			else // otherwise add ' '
 				query += " ";

@@ -172,6 +172,32 @@ public class DatabaseConditionBuilder {
 		}
 	}
 	
+	/**
+	 * Returns all fields that contains in the condition
+	 * @param expression Condition expression
+	 * @param resolver FormFieldResolver for the form
+	 * @param isJoinClause indicates that condition is a join qualification
+	 * @return List of IField
+	 * @throws ParseException
+	 */
+	public List<IField<?>> getConditionFields(String expression, FormFieldResolver resolver,
+			boolean isJoinClause) throws ParseException {
+		
+		List<IField<?>> fields = new ArrayList<IField<?>>();
+		
+		final Iterator<String> tokens = tokenize(expression);
+		Token previous = null;
+		while (tokens.hasNext()) {
+			// read one token from the input stream
+			String strToken = tokens.next();
+			final Token token = toToken(previous, strToken, resolver, isJoinClause);
+			
+			if (token.isField())
+				fields.add(token.getField());
+		}
+		return fields;
+	}
+	
 	public String buildCondition(String expression, AbstractVariableSet<Value<?>> environment, 
 			FormFieldResolver resolver, List<Value<?>> sorted) throws ParseException {
 		return buildCondition(expression, environment, 

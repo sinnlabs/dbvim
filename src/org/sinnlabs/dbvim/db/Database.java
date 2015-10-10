@@ -67,20 +67,22 @@ public class Database {
 	
 	/**
 	 * Query for all of the rows in the table
+	 * @param fields Field list to be selected
+	 * @param limit Maximum number of entries to be returned, 0 - means no limit
 	 * @return List of entries
 	 * @throws DatabaseOperationException 
 	 */
-	public List<Entry> queryAll(int limit) throws DatabaseOperationException {
+	public List<Entry> queryAll(List<IField<?>> fields, int limit) throws DatabaseOperationException {
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = getResultList();
+			String[] results = getResultList(fields);
 
-			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			PreparedStatement q = db.prepareStatement("SELECT " + fields
+			PreparedStatement q = db.prepareStatement("SELECT " + sFields
 					+ " FROM " + form.getQualifiedName());
 
 			ResultSet res = q.executeQuery();
@@ -127,21 +129,24 @@ public class Database {
 	/**
 	 * Query rows from the form table width condition
 	 * Condition uses like operator if possible, otherwise equal (=)
+	 * @param fields List of fields to be selected. 
+	 * Can be null, then form result list will be use.
 	 * @param condition - List of Values for the condition
+	 * @param limit Maximum number of rows to read or 0 if no max specified
 	 * @return List of entries
 	 * @throws DatabaseOperationException
 	 */
-	public List<Entry> query(List<Value<?>> condition, int limit) throws DatabaseOperationException {
+	public List<Entry> query(List<IField<?>> fields, List<Value<?>> condition, int limit) throws DatabaseOperationException {
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = getResultList();
+			String[] results = getResultList(fields);
 
-			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			String query = "SELECT " + fields
+			String query = "SELECT " + sFields
 					+ " FROM " + form.getQualifiedName() + " WHERE ";
 			// build condition
 			for(int i=0; i<condition.size(); i++) {
@@ -171,13 +176,16 @@ public class Database {
 	
 	/**
 	 * Search entries by additional search query
+	 * @param fields List of fields to be selected. 
+	 * Can be null, then form result list will be use.
 	 * @param query - Query string
 	 * @param allFields - All IField on the form
+	 * @param limit Maximum number of rows to read or 0 if no max specified
 	 * @return List of entries
 	 * @throws ParseException 
 	 * @throws DatabaseOperationException 
 	 */
-	public List<Entry> query(String query, List<IField<?>> allFields, int limit) throws ParseException, DatabaseOperationException {
+	public List<Entry> query(List<IField<?>> fields, String query, List<IField<?>> allFields, int limit) throws ParseException, DatabaseOperationException {
 		List<Value<?>> values = new ArrayList<Value<?>>();
 		String dbCondition = conditionBuilder.buildCondition(query, null, resolver, values);
 		
@@ -185,12 +193,12 @@ public class Database {
 			Connection db = DriverManager.getConnection(form.getDBConnection()
 					.getConnectionString());
 
-			String[] results = getResultList();
+			String[] results = getResultList(fields);
 
-			String fields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
 					", ");
 
-			String dbQuery = "SELECT " + fields
+			String dbQuery = "SELECT " + sFields
 					+ " FROM " + form.getQualifiedName();
 			if (!StringUtils.isBlank(dbCondition)) {
 				dbQuery += " WHERE " + dbCondition;
@@ -214,6 +222,11 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Returns operator string
+	 * @param field
+	 * @return
+	 */
 	protected static String getOperator(DBField field) {
 		switch(field.getDBType()) {
 		case java.sql.Types.CHAR:
@@ -479,10 +492,18 @@ public class Database {
 		return null;
 	}
 
-	private String[] getResultList() {
-		String[] res = new String[form.getResultList().size()];
+	private String[] getResultList(List<IField<?>> fields) {
+		if (fields == null) {
+			String[] res = new String[form.getResultList().size()];
+			for (int i=0; i<res.length; i++) {
+				res[i] = resolver.getFields().get(
+						form.getResultList().get(i).fieldName).getDBField().getName();
+			}
+			return res;
+		}
+		String[] res = new String[fields.size()];
 		for (int i=0; i<res.length; i++) {
-			res[i] = resolver.getFields().get(form.getResultList().get(i).fieldName).getDBField().getName();
+			res[i] = fields.get(i).getDBField().getName();
 		}
 		return res;
 	}

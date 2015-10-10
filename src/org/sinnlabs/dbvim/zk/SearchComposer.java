@@ -287,11 +287,11 @@ public class SearchComposer extends SelectorComposer<Component> {
 				for(Component c : fieldList) {
 					fields.add((IField<?>) c);
 				}
-				entries = db.query(txtAdditionalSearch.getText(), fields, 0);
+				entries = db.query(null, txtAdditionalSearch.getText(), fields, 0);
 			} else if (isAdditional == false && values.size() == 0) {
-				entries = db.queryAll(0);
+				entries = db.queryAll(null, 0);
 			} else
-				entries = db.query(values, 0);
+				entries = db.query(null, values, 0);
 		} catch(DatabaseOperationException e) {
 			Messagebox.show("DB Operation error: " + e.getMessage(), "ERROR",
 					Messagebox.OK, Messagebox.ERROR);
