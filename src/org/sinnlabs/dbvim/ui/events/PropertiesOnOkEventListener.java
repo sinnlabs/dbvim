@@ -3,7 +3,7 @@
  */
 package org.sinnlabs.dbvim.ui.events;
 
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 
@@ -14,15 +14,17 @@ import org.zkoss.zk.ui.event.EventListener;
  */
 public class PropertiesOnOkEventListener implements EventListener<Event> {
 	
-	public PropertiesOnOkEventListener() {
-		
+	private IDeveloperStudio developer;
+	
+	public PropertiesOnOkEventListener(IDeveloperStudio developer) {
+		this.developer = developer;
 	}
 	
 	@Override
 	public void onEvent(Event event) throws Exception {
 		// update the property
-		DeveloperFactory.getInstance().getDesignerProperties().updateProperty(event.getTarget());
+		developer.getDesignerProperties().updateProperty(event.getTarget());
 		// set dirty flag
-		DeveloperFactory.getInstance().getDesignerCanvas().setDirty(true);
+		developer.getDesignerCanvas().setDirty(true);
 	}
 }

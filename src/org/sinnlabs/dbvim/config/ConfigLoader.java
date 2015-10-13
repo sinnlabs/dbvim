@@ -3,6 +3,7 @@
  */
 package org.sinnlabs.dbvim.config;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -14,7 +15,10 @@ import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.Role;
 import org.sinnlabs.dbvim.model.User;
 import org.sinnlabs.dbvim.model.UserRole;
+import org.sinnlabs.dbvim.rules.engine.Rules;
+import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.security.LoginProvider;
+import org.springframework.context.ApplicationContext;
 import org.zkoss.idom.Element;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.WebApp;
@@ -35,6 +39,8 @@ public class ConfigLoader {
 	
 	protected ConnectionSource connectionSource;
 	
+	protected Rules rules;
+	
 	protected Dao<DBConnection, String> dbConnectionDao;
 	
 	protected Dao<Form, String> forms;
@@ -49,8 +55,18 @@ public class ConfigLoader {
 
 	private ConfigLoader() {
 		WebApp webApp = Executions.getCurrent().getDesktop().getWebApp();
+		
 		// get the real path of the configuration file
-		String uri = webApp.getRealPath("/WEB-INF/config.xml");
+		String uri = webApp.getRealPath("/config/rules/rules.xml");
+
+		if (StringUtils.isEmpty(uri))
+			return;
+
+		// load the rules using the rules engine
+		rules = RulesEngine.loadComponentRules(uri);
+		
+		// get the real path of the configuration file
+		uri = webApp.getRealPath("/WEB-INF/config.xml");
 		
 		loadConfig(uri);
 		try {
@@ -61,9 +77,15 @@ public class ConfigLoader {
 		}
 	}
 	
-	private ConfigLoader(String config) {
+	private ConfigLoader(ApplicationContext context) throws IOException {
+		String config = context.getResource("/WEB-INF/config.xml").getFile().getAbsolutePath();
 		
 		loadConfig(config);
+		
+		String rulesPath = context.getResource("/config/rules/rules.xml").getFile().getAbsolutePath();
+		// load the rules using the rules engine
+		rules = RulesEngine.loadComponentRules(rulesPath);
+				
 		try {
 			initializeDB();
 		} catch (SQLException e) {
@@ -91,7 +113,7 @@ public class ConfigLoader {
 		return result;
 	}
 	
-	public static void initialize(String path) {
+	public static void initialize(ApplicationContext context) throws IOException {
 		ConfigLoader result = instance;
 		/* First check */
 		if (result == null) {
@@ -99,7 +121,7 @@ public class ConfigLoader {
 				result = instance;
 				/* second check with locking */
 				if (result == null)
-					instance = result = new ConfigLoader(path);
+					instance = result = new ConfigLoader(context);
 			}
 		}
 	}
@@ -126,6 +148,15 @@ public class ConfigLoader {
 	
 	public Dao<Role, String> getRoles() {
 		return roles;
+	}
+	
+	/**
+	 * Returns the Rules object that contains all
+	 * active component rules
+	 * 
+	 */
+	public Rules getRules() {
+		return rules;
 	}
 
 	protected void loadConfig(String uri) {

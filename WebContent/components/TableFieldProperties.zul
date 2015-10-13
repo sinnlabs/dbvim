@@ -1,0 +1,58 @@
+<zk>
+	<vlayout vflex="1" hflex="1">
+		<hlayout hflex="1" valign="middle">
+			<label value="Form Name: "/>
+			<textbox id="txtFormName" hflex="1" />
+			<button id="btnSelectForm" label="..." />
+		</hlayout>
+		<hlayout hflex="1" valign="middle">
+			<label value="Qualification: " />
+			<textbox id="txtQualification" hflex="1" />
+			<button id="btnQualification" label="..." />
+		</hlayout>
+		<label value="Fields from the remote form" />
+		<hlayout vflex="1" hflex="1">
+			<listbox id="lstAvailableFields" vflex="1" hflex="1">
+				<listhead>
+					<listheader label="ID" sort="auto" />
+					<listheader label="Label" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="eee" />
+					<listcell label="www" />
+				</listitem>
+				<listitem>
+					<listcell label="ww" />
+					<listcell label="eewe" />
+				</listitem>
+			</listbox>
+			<vlayout>
+				<button id="btnAdd" label="&gt;" />
+				<button id="btnRemove" label="&lt;" />
+			</vlayout>
+			<listbox id="lstTableFields" vflex="1" hflex="1">
+				<listhead>
+					<listheader label="ID" sort="auto" />
+					<listheader label="Label" sort="auto" />
+				</listhead>
+				<listitem>
+					<listcell label="eee" />
+					<listcell label="www" />
+				</listitem>
+				<listitem>
+					<listcell label="ww" />
+					<listcell label="eewe" />
+				</listitem>
+			</listbox>
+			<vlayout>
+				<button id="btnUp" label="Up" />
+				<button id="btnDown" label="Down" />
+			</vlayout>
+		</hlayout>
+		<hlayout hflex="1">
+			<div hflex="1" />
+			<button id="btnOK" label="OK" />
+			<button id="btnCancel" label="Cancel" />
+		</hlayout>
+	</vlayout>
+</zk>

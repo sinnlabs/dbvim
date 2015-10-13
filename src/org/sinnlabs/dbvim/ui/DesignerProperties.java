@@ -11,9 +11,11 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.ui.events.PropertiesOnOkEventListener;
 import org.sinnlabs.dbvim.zk.model.ComponentFactory;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.IdSpace;
@@ -48,11 +50,14 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 	 * A map that contains all the Properties values 
 	 */
 	protected HashMap<Component, String> mapProps = null;
+	
+	protected IDeveloperStudio developer;
 
 	@Wire("#gridProperties")
 	protected Grid gridProperties;
 
 	public DesignerProperties() {
+		developer = DeveloperFactory.getInstance();
 		// create the ui
 		Executions.createComponents("/components/ComponentProperties.zul", this, null);
 		Selectors.wireComponents(this, this, false);
@@ -96,7 +101,7 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 		mapProps = new HashMap<Component, String>();
 		
 		// create property event listener
-		PropertiesOnOkEventListener listener = new PropertiesOnOkEventListener();
+		PropertiesOnOkEventListener listener = new PropertiesOnOkEventListener(developer);
 
 		// loop through the component property descriptors
 		for (int i = 0; i < arrDescriptors.length; i++)
@@ -126,7 +131,7 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 
 				// create a new Grid row
 				Row row = new Row();
-				gridProperties.getRows().appendChild(row);
+				
 
 				// add the Property name at the 1st column
 				Label lblName = new Label();
@@ -137,9 +142,20 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 
 				// generic Component object
 				Component cmpValue = null;
+				
 
+				/*** Custom property ***/
+				if ((descriptor.getPropertyType() != String.class) && 
+					 (descriptor.getPropertyType() != String[].class) &&	
+					 (descriptor.getPropertyType() != boolean.class) && 
+					 (descriptor.getPropertyType() != int.class) &&
+					 (descriptor.getPropertyType() != long.class))
+				{
+					cmpValue = RulesEngine.getSpecialProperty(current, sName, developer);
+					row.appendChild(cmpValue);
+				}
 				/*** Boolean Values  ***/
-				if (descriptor.getPropertyType() == boolean.class)
+				else if (descriptor.getPropertyType() == boolean.class)
 				{
 					// for boolean properties, display
 					// a list box with the 'True' or 'False' 
@@ -206,10 +222,14 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 
 				// add the Textbox objects to the Hashmap, 
 				// using their Ids as the key
-				mapProps.put(cmpValue, sName);
-				cmpValue.addEventListener(Events.ON_OK, listener);
-				cmpValue.addEventListener(Events.ON_CHANGE, listener);
-				cmpValue.addEventListener(Events.ON_SELECT, listener);
+				if (cmpValue != null)
+				{
+					gridProperties.getRows().appendChild(row);
+					mapProps.put(cmpValue, sName);
+					cmpValue.addEventListener(Events.ON_OK, listener);
+					cmpValue.addEventListener(Events.ON_CHANGE, listener);
+					cmpValue.addEventListener(Events.ON_SELECT, listener);
+				}
 			}
 			catch (Exception e)
 			{
@@ -284,7 +304,6 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 			}
 		}
 		
-		DeveloperFactory.getInstance().getSynchronizer().synchronizeTreeWithCanvas(
-				DeveloperFactory.getInstance().getDesignerCanvas());
+		developer.getSynchronizer().synchronizeTreeWithCanvas(developer.getDesignerCanvas());
 	}
 }

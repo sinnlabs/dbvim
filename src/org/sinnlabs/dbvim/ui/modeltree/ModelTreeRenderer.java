@@ -6,6 +6,7 @@ package org.sinnlabs.dbvim.ui.modeltree;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.ui.events.DBConnectionOnDoubleClickEventListener;
 import org.sinnlabs.dbvim.ui.events.FormNodeOnDoubleClickEventListener;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Image;
@@ -21,6 +22,12 @@ import org.zkoss.zul.Treerow;
  */
 public class ModelTreeRenderer implements TreeitemRenderer<Object> {
 
+	protected IDeveloperStudio developer;
+	
+	public ModelTreeRenderer(IDeveloperStudio developer) {
+		this.developer = developer;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.zkoss.zul.TreeitemRenderer#render(org.zkoss.zul.Treeitem, java.lang.Object, int)
 	 */
@@ -43,7 +50,7 @@ public class ModelTreeRenderer implements TreeitemRenderer<Object> {
             //dataRow.appendChild(img);
             dataRow.appendChild(treeCell);
             item.addEventListener(Events.ON_DOUBLE_CLICK, 
-            		new DBConnectionOnDoubleClickEventListener());
+            		new DBConnectionOnDoubleClickEventListener(developer));
         }
         if (node instanceof TablesTreeNode) {
         	//Hlayout layout = new Hlayout();
@@ -93,7 +100,7 @@ public class ModelTreeRenderer implements TreeitemRenderer<Object> {
         	//dataRow.appendChild(img);
         	dataRow.appendChild(cell);
         	item.addEventListener(Events.ON_DOUBLE_CLICK, 
-        			new FormNodeOnDoubleClickEventListener());
+        			new FormNodeOnDoubleClickEventListener(developer));
         }
 	}
 

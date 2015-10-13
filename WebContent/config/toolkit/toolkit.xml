@@ -767,6 +767,14 @@
 	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
 	  			<name>DoubleField</name>
 	  		</component>
+	  		<component>
+	  			<class>org.sinnlabs.dbvim.ui.db.TableField</class>
+	  			<image16></image16>
+	  			<image32></image32>
+	  			<tooltip>TableField - Represents data from other form</tooltip>
+	  			<events></events>
+	  			<name>TableField</name>
+	  		</component>
 		</tab>
   </tabs>
 </toolkit>

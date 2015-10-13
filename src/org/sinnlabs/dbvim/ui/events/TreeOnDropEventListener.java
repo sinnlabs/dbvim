@@ -8,7 +8,6 @@ import org.sinnlabs.dbvim.ui.DesignerCanvas;
 import org.sinnlabs.dbvim.ui.DesignerTree;
 import org.sinnlabs.dbvim.ui.MoveItemDialog;
 import org.sinnlabs.dbvim.zk.model.ComponentFactory;
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.sinnlabs.dbvim.zk.model.IElementDesc;
 import org.zkoss.zk.ui.Component;
@@ -46,17 +45,12 @@ public class TreeOnDropEventListener implements EventListener<DropEvent> {
 	 */
 	protected DesignerCanvas canvas = null;
 	
-	public TreeOnDropEventListener() {
-		developer = DeveloperFactory.getInstance();
-	}
-	
 	public TreeOnDropEventListener(IDeveloperStudio ds) {
 		developer = ds;
 	}
 
 	@Override
 	public void onEvent(DropEvent event) throws Exception {
-		developer = DeveloperFactory.getInstance();
 		if (developer.getCurrentForm() == null) {
 			Messagebox.show("Create or open form first.");
 		}
@@ -148,7 +142,8 @@ public class TreeOnDropEventListener implements EventListener<DropEvent> {
 				return;
 			
 			// create a new component instance of this class
-			newComponent = ComponentFactory.createComponent(cmpDragged.getElementInfo().getClassName());		
+			newComponent = ComponentFactory.createComponent(
+					cmpDragged.getElementInfo().getClassName(), developer);		
 		
 			if (newComponent == null)
 				return;
@@ -168,7 +163,7 @@ public class TreeOnDropEventListener implements EventListener<DropEvent> {
 			cmpTarget.invalidate(); // avoid some side effect. add By Jumper
 			// apply the post creation rules of the component
 			/*RulesResult result =*/
-			RulesEngine.applyRules(newComponent, RulesEngine.CREATION_RULES);
+			RulesEngine.applyRules(newComponent, RulesEngine.CREATION_RULES, developer);
 
 			// clean up
 			//result = null;

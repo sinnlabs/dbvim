@@ -26,13 +26,6 @@ public interface IDeveloperStudio {
 	public DesignerTree getDesignerTree();
 
 	/**
-	 * Returns the Rules object that contains all
-	 * active component rules
-	 * 
-	 */
-	public Rules getRules();
-
-	/**
 	 * Returns the DesignerProperties object
 	 * 
 	 */

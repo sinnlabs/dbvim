@@ -7,6 +7,7 @@ import org.sinnlabs.dbvim.ui.events.TreeOnDropEventListener;
 import org.sinnlabs.dbvim.ui.events.TreeOnPopupEventListener;
 import org.sinnlabs.dbvim.ui.events.TreeOnSelectEventListener;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.IdSpace;
@@ -37,6 +38,8 @@ public class DesignerTree extends Groupbox implements IdSpace {
 	 * 
 	 */
 	private static final long serialVersionUID = 6825675684853642180L;
+	
+	protected IDeveloperStudio developer;
 
 	/**
 	 * The tree widget 
@@ -89,6 +92,7 @@ public class DesignerTree extends Groupbox implements IdSpace {
 	public void setElementToPasteId(String sId) { _sElementToPasteId = sId; }
 
 	public DesignerTree() {
+		developer = DeveloperFactory.getInstance();
 		// create the ui
 		Executions.createComponents("/components/DesignerTree.zul", this, null);
 		Selectors.wireComponents(this, this, false);
@@ -99,20 +103,20 @@ public class DesignerTree extends Groupbox implements IdSpace {
 		tree.setDroppable("true");
 		setClosable(false);
 		
-		TreeOnPopupEventListener mnuListener = new TreeOnPopupEventListener();
+		TreeOnPopupEventListener mnuListener = new TreeOnPopupEventListener(developer);
 		mnuCopy.addEventListener(Events.ON_CLICK, mnuListener);
 		mnuPaste.addEventListener(Events.ON_CLICK, mnuListener);
 		mnuDelete.addEventListener(Events.ON_CLICK, mnuListener);
 		
-		TreeOnSelectEventListener treeListener = new TreeOnSelectEventListener();
+		TreeOnSelectEventListener treeListener = new TreeOnSelectEventListener(developer);
 		tree.addEventListener(Events.ON_SELECT, treeListener);
-		TreeOnDropEventListener treeOnDrop = new TreeOnDropEventListener();
+		TreeOnDropEventListener treeOnDrop = new TreeOnDropEventListener(developer);
 		tree.addEventListener(Events.ON_DROP, treeOnDrop);
 		
 		btnRefresh.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
 			@Override
 	        public void onEvent(MouseEvent e) throws Exception {
-				DeveloperFactory.getInstance().getDesignerCanvas().refreshCanvas();
+				developer.getDesignerCanvas().refreshCanvas();
 	        }
 		});
 		
@@ -167,7 +171,7 @@ public class DesignerTree extends Groupbox implements IdSpace {
 		String sComponentId = ((DesignerTreeItem)item).getComponentId();
 
 		// get the corresponding Component from the canvas
-		DesignerCanvas canvas = DeveloperFactory.getInstance().getDesignerCanvas();
+		DesignerCanvas canvas = developer.getDesignerCanvas();
 		Component selectedComponent = canvas.getCanvasComponent(sComponentId);
 
 		// return the component from the canvas

@@ -1,0 +1,16 @@
+<zk>
+	<listbox id="lstData">
+		<listhead>
+			
+		</listhead>
+		
+		<listfoot>
+			<listfooter>
+				<label id="lblFoot" value="17 entries" />
+			</listfooter>
+			<listfooter align="right">
+				<button id="btnRefresh" label="Refresh" />
+			</listfooter>
+		</listfoot>
+	</listbox>
+</zk>

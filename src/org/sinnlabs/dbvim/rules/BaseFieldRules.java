@@ -10,7 +10,6 @@ import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.SelectFieldDialog;
 import org.sinnlabs.dbvim.ui.SelectJoinFieldDialog;
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -26,14 +25,13 @@ public class BaseFieldRules implements IRulable {
 	}
 
 	@Override
-	public RulesResult applyPreCreationRules() throws RulesException {
+	public RulesResult applyPreCreationRules(IDeveloperStudio developer) throws RulesException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public RulesResult applyCreationRules(Component cmp) throws RulesException {
-		IDeveloperStudio dev = DeveloperFactory.getInstance();
+	public RulesResult applyCreationRules(Component cmp, IDeveloperStudio dev) throws RulesException {
 
 		final IField<?> field = (IField<?>) cmp;
 
@@ -164,6 +162,24 @@ public class BaseFieldRules implements IRulable {
 	public boolean exportChildToZUML(Component child) {
 		// TODO Auto-generated method stubs
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#getSpecialProperties()
+	 */
+	@Override
+	public String[] getSpecialProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#getSpecialProperty(java.lang.String)
+	 */
+	@Override
+	public Component getSpecialProperty(Component cmp, String name, IDeveloperStudio dev) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

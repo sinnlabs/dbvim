@@ -6,12 +6,10 @@ package org.sinnlabs.dbvim.zk;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.commons.lang3.StringUtils;
+
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
-import org.sinnlabs.dbvim.rules.engine.Rules;
-import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.ui.CreateJoinFormDialog;
 import org.sinnlabs.dbvim.ui.Designer;
 import org.sinnlabs.dbvim.ui.DesignerCanvas;
@@ -29,11 +27,12 @@ import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.sinnlabs.dbvim.zk.model.ZUMLModel;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.WebApp;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -84,11 +83,6 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 	protected WebApp webApp = null;
 
 	/**
-	 * The component's rules object
-	 */
-	protected Rules rules = null;
-
-	/**
 	 * The canvas tree synchronizer object
 	 */
 	protected CanvasTreeSynchronizer sync;
@@ -97,11 +91,6 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 	@Override
 	public DesignerTree getDesignerTree() {
 		return designerTree;
-	}
-
-	@Override
-	public Rules getRules() {
-		return rules;
 	}
 
 	@Override
@@ -133,6 +122,13 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 	public Form getCurrentForm() {
 		return currentForm;
 	}
+	
+	public ComponentInfo doBeforeCompose(Page page,
+            Component parent,
+            ComponentInfo compInfo) {
+		Executions.getCurrent().setAttribute("composer", this);
+		return compInfo;
+	}
 
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
@@ -141,31 +137,12 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 
 		/* save current instance */
 		/* DeveloperFactory will use this */
-		Sessions.getCurrent().setAttribute("DEVELOPER", this);
-		Sessions.getCurrent().setAttribute("CURRENTFORM", this);
-
+		Executions.getCurrent().setAttribute("composer", this);
+		
 		// create the model synchronizer
-		sync = new CanvasTreeSynchronizer();
-
-		loadRules();
+		sync = new CanvasTreeSynchronizer(this);
 
 		designerCanvas.setEditable(false);
-	}
-
-	/**
-	 * Loads all predefined rules that apply to certain components from the
-	 * 'rules.xml' configuration file.
-	 */
-	private void loadRules() {
-		// get the real path of the configuration file
-		String uri = webApp.getRealPath("/config/rules/rules.xml");
-
-		if (StringUtils.isEmpty(uri))
-			return;
-
-		// load the rules using the rules engine
-		rules = RulesEngine.loadComponentRules(uri);
-
 	}
 
 	private void checkStudioStates() {

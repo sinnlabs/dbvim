@@ -11,8 +11,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.DBField;
+import org.sinnlabs.dbvim.evaluator.AbstractVariableSet;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
@@ -214,8 +216,8 @@ public class DatabaseJoin extends Database {
 	}
 	
 	@Override
-	public List<Entry> query(List<IField<?>> fields, String query, List<IField<?>> allFields, 
-			int limit) throws ParseException, DatabaseOperationException {
+	public List<Entry> query(List<IField<?>> fields, String query, 
+			int limit, AbstractVariableSet<Value<?>> context) throws ParseException, DatabaseOperationException {
 		// Add result list columns to select expression
 		List<DBField> resultFields = getPayloadFields(fields);
 
@@ -241,7 +243,7 @@ public class DatabaseJoin extends Database {
 		// build where condition
 		joinQuery.query += " WHERE ";
 		
-		String dbCondition = conditionBuilder.buildCondition(query, null, resolver, values, 
+		String dbCondition = conditionBuilder.buildCondition(query, context, resolver, values, 
 				joinQuery.leftFormAlias, joinQuery.rightFormAlias, 
 				leftAliases, rightAliases, false);
 		

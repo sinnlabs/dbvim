@@ -1,6 +1,7 @@
 package org.sinnlabs.dbvim.rules.engine;
 
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 
 public interface IRulable
@@ -10,7 +11,7 @@ public interface IRulable
 	 * is created by the designer. If the resulting value
 	 * is <b>false</b>, the component is not created.
 	 */
-	public RulesResult applyPreCreationRules() throws RulesException;
+	public RulesResult applyPreCreationRules(IDeveloperStudio developer) throws RulesException;
 	
 	/**
 	 * This method is called right after a visual component
@@ -18,7 +19,7 @@ public interface IRulable
 	 * adds a new component onto the canvas.
 	 * @param comp The newly created component
 	 */
-	public RulesResult applyCreationRules(Component cmp) throws RulesException;
+	public RulesResult applyCreationRules(Component cmp, IDeveloperStudio developer) throws RulesException;
 	
 	/**
 	 * This method is called just before a component
@@ -65,9 +66,17 @@ public interface IRulable
 	/**
 	 * The method returns a String array of all
 	 * the component's properties that should not
-	 * be displayed in the property view dialog.
+	 * be displayed in the property view.
 	 */
 	public String[] getExcludedProperties();
+	
+	/**
+	 * The method returns a String array of all
+	 * the component custom properties that should 
+	 * be displayed in the property view. 
+	 * @return
+	 */
+	public String[] getSpecialProperties();
 	
 	
 	/**
@@ -89,7 +98,13 @@ public interface IRulable
 	 * child should be exported or not to the ZUML 
 	 * representation
 	 * @param child Child component to export
-	 * @return
 	 */
 	public boolean exportChildToZUML(Component child);
+	
+	/**
+	 * Returns component that represent the custom property
+	 * attribute.
+	 * @return
+	 */
+	public Component getSpecialProperty(Component cmp, String name, IDeveloperStudio developer);
 }

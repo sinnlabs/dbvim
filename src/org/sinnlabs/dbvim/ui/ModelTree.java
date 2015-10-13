@@ -12,6 +12,8 @@ import org.sinnlabs.dbvim.ui.modeltree.FormTreeNode;
 import org.sinnlabs.dbvim.ui.modeltree.ModelTreeNode;
 import org.sinnlabs.dbvim.ui.modeltree.ModelTreeRenderer;
 import org.sinnlabs.dbvim.ui.modeltree.TableTreeNode;
+import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -35,7 +37,7 @@ public class ModelTree extends Idspace {
 	 * 
 	 */
 	private static final long serialVersionUID = -5752242522968789687L;
-
+	
 	@Wire
 	protected Tree trModelTree;
 
@@ -50,13 +52,14 @@ public class ModelTree extends Idspace {
 
 	public ModelTree() throws SQLException {
 
+		IDeveloperStudio developer = DeveloperFactory.getInstance();
 		/* create the ui */
 		Executions.createComponents("/components/modeltree.zul", this, null);
 		Selectors.wireComponents(this, this, false);
 
 		this.trModelTree.clear();
 
-		this.trModelTree.setItemRenderer(new ModelTreeRenderer());
+		this.trModelTree.setItemRenderer(new ModelTreeRenderer(developer));
 		this.trModelTree.setModel(new ModelTreeNode());
 
 		addEventListeners();

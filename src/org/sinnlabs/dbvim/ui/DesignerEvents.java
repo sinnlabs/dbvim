@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.ui.events.EventsOnOkEventListener;
 import org.sinnlabs.dbvim.zk.model.ComponentFactory;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.sinnlabs.dbvim.zk.model.ZUMLModel;
 import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Component;
@@ -49,11 +50,16 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 	 * A map that contains all the Events values
 	 */
 	protected HashMap<Component, String> mapEvents = null;
+	
+	protected IDeveloperStudio developer;
 
 	@Wire("#gridEvents")
 	protected Grid gridEvents;
 
 	public DesignerEvents() {
+		
+		developer = DeveloperFactory.getInstance();
+		
 		// create the ui
 		Executions.createComponents("/components/ComponentEvents.zul", this,
 				null);
@@ -100,7 +106,7 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 			return;
 		
 		// create property event listener
-		EventsOnOkEventListener listener = new EventsOnOkEventListener();
+		EventsOnOkEventListener listener = new EventsOnOkEventListener(developer);
 
 		mapEvents = new HashMap<Component, String>();
 
@@ -167,8 +173,7 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 		try
 		{	
 			// get the ZUML representation of the current model
-			ZUMLModel model = DeveloperFactory.getInstance()
-					.getDesignerCanvas().getZUMLRepresentation();
+			ZUMLModel model = developer.getDesignerCanvas().getZUMLRepresentation();
 			
 			if (model == null)
 				return;
@@ -187,7 +192,7 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 			
 			// reload the model without refreshing the tree, 
 			// so that the updated event handlers will be activated
-			DeveloperFactory.getInstance().getDesignerCanvas().
+			developer.getDesignerCanvas().
 				loadModelFromDocument(model.getZUMLDocument(), false);
 		}
 		catch (Exception e)

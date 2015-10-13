@@ -1,0 +1,25 @@
+<zk>
+	<vlayout vflex="1" hflex="1">
+		<hlayout valign="middle" hflex="1">
+			<label value="Form name filter: " />
+			<textbox id="txtFormName" hflex="1" />
+		</hlayout>
+		<listbox vflex="1" id="lstForms">
+			<listhead>
+				<listheader label="Name" sort="auto" />
+				<listheader label="Type" sort="auto" />
+				<listheader label="Connection" sort="auto" />
+			</listhead>
+			<listitem>
+				<listcell label="form name" />
+				<listcell label="Join" />
+				<listcell label="connection" />
+			</listitem>
+		</listbox>
+		<hlayout hflex="1">
+			<div hflex="1" />
+			<button id="btnOK" label="OK" />
+			<button id="btnCancel" label="Cancel" />
+		</hlayout>
+	</vlayout>
+</zk>

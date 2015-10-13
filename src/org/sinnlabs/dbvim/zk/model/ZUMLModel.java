@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
+import org.sinnlabs.dbvim.ui.DesignerCanvas;
 import org.zkoss.idom.Attribute;
 import org.zkoss.idom.Document;
 import org.zkoss.idom.Element;
@@ -37,13 +38,16 @@ public class ZUMLModel {
 	
 	private Element locatedElement;
 	
+	private IDeveloperStudio developer;
+	
 	
 	/**
 	 * single argument constructor
 	 * @param cmpRoot root component whose encompassed
 	 */
-	public ZUMLModel(Component cmpRoot)
+	public ZUMLModel(Component cmpRoot, IDeveloperStudio developer)
 	{
+		this.developer = developer;
 		// convert model directly
 		convertModelToZUML(cmpRoot);
 	}
@@ -99,7 +103,7 @@ public class ZUMLModel {
 		{
 			// apply the Model-to-ZUML rules of the component
 			// before creating its ZUML definition
-			RulesEngine.applyRules(component, RulesEngine.MODEL_TO_ZUML_RULES);
+			RulesEngine.applyRules(component, RulesEngine.MODEL_TO_ZUML_RULES, developer);
 		}
 		catch (RulesException re)
 		{ 
@@ -110,7 +114,7 @@ public class ZUMLModel {
 		
 		/* do not add designer canvas to the model
 		 * if root component is the designer canvas */
-		if (component != DeveloperFactory.getInstance().getDesignerCanvas()) {
+		if (! (component instanceof DesignerCanvas)) {
 			// create iDOM Element
 			Element domElement = createElement((AbstractComponent) component);
 		

@@ -3,7 +3,7 @@ package org.sinnlabs.dbvim.ui.events;
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.ui.AddConnectionDialog;
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -12,6 +12,11 @@ import org.zkoss.zul.Treeitem;
 
 public class DBConnectionOnDoubleClickEventListener implements
 		EventListener<MouseEvent> {
+	IDeveloperStudio developer;
+	
+	public DBConnectionOnDoubleClickEventListener(IDeveloperStudio developer) {
+		this.developer = developer;
+	}
 
 	@Override
 	public void onEvent(MouseEvent evnt) throws Exception {
@@ -20,7 +25,7 @@ public class DBConnectionOnDoubleClickEventListener implements
 		
 		final AddConnectionDialog dialog = new AddConnectionDialog(dbc);
 		
-		DeveloperFactory.getInstance().getDesigner().appendChild(dialog);
+		developer.getDesigner().appendChild(dialog);
 		
 		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
 

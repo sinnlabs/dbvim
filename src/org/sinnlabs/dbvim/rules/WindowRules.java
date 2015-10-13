@@ -4,6 +4,7 @@ import org.sinnlabs.dbvim.rules.Default.DefaultRules;
 import org.sinnlabs.dbvim.rules.engine.IRulable;
 import org.sinnlabs.dbvim.rules.engine.RulesResult;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Window;
 
@@ -12,13 +13,13 @@ public class WindowRules implements IRulable {
 	private static final String title = "Untitled";
 
 	@Override
-	public RulesResult applyPreCreationRules() throws RulesException {
+	public RulesResult applyPreCreationRules(IDeveloperStudio developer) throws RulesException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public RulesResult applyCreationRules(Component cmp) throws RulesException {
+	public RulesResult applyCreationRules(Component cmp, IDeveloperStudio developer) throws RulesException {
 		if( cmp == null )
 			return null;
 		
@@ -81,6 +82,24 @@ public class WindowRules implements IRulable {
 	@Override
 	public boolean exportChildToZUML(Component child) {
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#getSpecialProperties()
+	 */
+	@Override
+	public String[] getSpecialProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#getSpecialProperty(java.lang.String)
+	 */
+	@Override
+	public Component getSpecialProperty(Component cmp, String name, IDeveloperStudio dev) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

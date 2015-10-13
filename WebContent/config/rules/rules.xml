@@ -17,5 +17,6 @@
 	<component class="org.sinnlabs.dbvim.ui.db.LongField" rulesClass="org.sinnlabs.dbvim.rules.LongFieldRules" />
 	<component class="org.sinnlabs.dbvim.ui.db.DatetimeField" rulesClass="org.sinnlabs.dbvim.rules.DatetimeFieldRules" />
 	<component class="org.sinnlabs.dbvim.ui.db.DoubleField" rulesClass="org.sinnlabs.dbvim.rules.DoubleFieldRules" />
+	<component class="org.sinnlabs.dbvim.ui.db.TableField" rulesClass="org.sinnlabs.dbvim.rules.TableFieldRules" />
 	<!-- Custom Components -->
 </rules>

@@ -11,6 +11,7 @@ import org.sinnlabs.dbvim.ui.DesignerTree;
 import org.sinnlabs.dbvim.ui.DesignerTreeItem;
 import org.sinnlabs.dbvim.zk.model.ComponentFactory;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.event.EventListener;
@@ -26,11 +27,17 @@ public class TreeOnPopupEventListener implements EventListener<MouseEvent> {
 
 	protected DesignerTree tree = null;
 	
+	protected IDeveloperStudio developer;
+	
+	public TreeOnPopupEventListener(IDeveloperStudio developer) {
+		this.developer = developer;
+	}
+	
 	@Override
 	public void onEvent(MouseEvent evt) throws Exception {
 		try
 		{
-			tree = DeveloperFactory.getInstance().getDesignerTree();
+			tree = developer.getDesignerTree();
 			if (tree == null)
 				return;
 
@@ -112,7 +119,7 @@ public class TreeOnPopupEventListener implements EventListener<MouseEvent> {
 			itemSelected.detach();
 			
 			// set dirty flag
-			DeveloperFactory.getInstance().getDesignerCanvas().setDirty(true);
+			developer.getDesignerCanvas().setDirty(true);
 		}
 		catch (Exception e)
 		{
@@ -140,7 +147,7 @@ public class TreeOnPopupEventListener implements EventListener<MouseEvent> {
 		try
 		{
 			// run any Copy rules
-			RulesEngine.applyRules(sourceComponent, RulesEngine.COPY_RULES);
+			RulesEngine.applyRules(sourceComponent, RulesEngine.COPY_RULES, developer);
 		}
 		catch (RulesException e)
 		{
@@ -220,11 +227,11 @@ public class TreeOnPopupEventListener implements EventListener<MouseEvent> {
 			targetComponent.appendChild(cloneComponent);
 			
 			// synchronize the tree with the canvas
-			DeveloperFactory.getInstance().getSynchronizer().synchronizeTreeWithCanvas(
+			developer.getSynchronizer().synchronizeTreeWithCanvas(
 					DeveloperFactory.getInstance().getDesignerCanvas());
 			
 			// set dirty flag
-			DeveloperFactory.getInstance().getDesignerCanvas().setDirty(true);
+			developer.getDesignerCanvas().setDirty(true);
 			
 			// disable the 'Paste' action from the popup menu 
 			// and clear the clipboard

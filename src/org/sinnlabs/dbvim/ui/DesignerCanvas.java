@@ -5,21 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.sinnlabs.dbvim.rules.engine.RulesEngine;
-import org.sinnlabs.dbvim.zk.model.ComponentFactory;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
-import org.sinnlabs.dbvim.zk.model.ElementInfo;
-import org.sinnlabs.dbvim.zk.model.IElementDesc;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.sinnlabs.dbvim.zk.model.ZUMLModel;
 import org.zkoss.idom.Document;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.HtmlBasedComponent;
-import org.zkoss.zk.ui.event.DropEvent;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Absolutechildren;
 import org.zkoss.zul.Absolutelayout;
 
 public class DesignerCanvas extends DesignerWindow {
@@ -47,7 +39,9 @@ public class DesignerCanvas extends DesignerWindow {
 	 */
 	private boolean bIsEditable = false;
 	
-	private Absolutelayout layout;
+	//private Absolutelayout layout;
+	
+	private IDeveloperStudio developer;
 
 	// Getters / Setters
 	public boolean isCanvasDirty() {
@@ -56,6 +50,10 @@ public class DesignerCanvas extends DesignerWindow {
 
 	public boolean isEditable() {
 		return bIsEditable;
+	}
+	
+	public DesignerCanvas() {
+		developer = DeveloperFactory.getInstance();
 	}
 
 	/**
@@ -71,54 +69,51 @@ public class DesignerCanvas extends DesignerWindow {
 		setBorder("normal");
 		setDroppable("false");
 		
-		layout = new Absolutelayout();
-		layout.setVflex("1");
-		layout.setHflex("1");
-		layout.setDroppable("true");
-		//this.appendChild(layout);
-		final Absolutelayout al = layout;
-		final DesignerCanvas tmp = this;
-		layout.addEventListener(Events.ON_DROP, new EventListener<DropEvent>() {
-
-			@Override
-			public void onEvent(DropEvent evnt) throws Exception {
-				if (evnt.getDragged() instanceof IElementDesc) {
-					/*Messagebox.show(
-							"Element dragged: "
-									+ ((IElementDesc) evnt.getDragged())
-											.getElementInfo().getClassName(),
-							"Warning", Messagebox.OK, Messagebox.EXCLAMATION);*/
-					ElementInfo info = ((IElementDesc) evnt.getDragged())
-							.getElementInfo();
-					HtmlBasedComponent comp = (HtmlBasedComponent) ComponentFactory
-							.createComponent(info.getClassName());
-
-					/*comp.setDroppable("true");
-					comp.addEventListener(Events.ON_DROP,
-							new EventListener<Event>() {
-								public void onEvent(Event event)
-										throws Exception {
-									onEvent((DropEvent) event);
-								}
-							}); */
-					Absolutechildren child = new Absolutechildren();
-					child.setX(evnt.getX());
-					child.setY(evnt.getY());
-					child.appendChild(comp);
-					child.setDraggable("true");
-					al.appendChild(child);
-					RulesEngine.applyRules(comp, RulesEngine.CREATION_RULES);
-				} else if (evnt.getDragged() instanceof Absolutechildren) {
-					Absolutechildren ac = (Absolutechildren) evnt.getDragged();
-					ac.setX(evnt.getX());
-					ac.setY(evnt.getY());
-				}
-				DeveloperFactory.getInstance().getSynchronizer()
-						.synchronizeTreeWithCanvas(tmp);
-				setDirty(true);
-			}
-
-		});
+		//final Absolutelayout al = layout;
+		//final DesignerCanvas tmp = this;
+		
+//		layout.addEventListener(Events.ON_DROP, new EventListener<DropEvent>() {
+//
+//			@Override
+//			public void onEvent(DropEvent evnt) throws Exception {
+//				if (evnt.getDragged() instanceof IElementDesc) {
+//					/*Messagebox.show(
+//							"Element dragged: "
+//									+ ((IElementDesc) evnt.getDragged())
+//											.getElementInfo().getClassName(),
+//							"Warning", Messagebox.OK, Messagebox.EXCLAMATION);*/
+//					ElementInfo info = ((IElementDesc) evnt.getDragged())
+//							.getElementInfo();
+//					HtmlBasedComponent comp = (HtmlBasedComponent) ComponentFactory
+//							.createComponent(info.getClassName());
+//
+//					/*comp.setDroppable("true");
+//					comp.addEventListener(Events.ON_DROP,
+//							new EventListener<Event>() {
+//								public void onEvent(Event event)
+//										throws Exception {
+//									onEvent((DropEvent) event);
+//								}
+//							}); */
+//					Absolutechildren child = new Absolutechildren();
+//					child.setX(evnt.getX());
+//					child.setY(evnt.getY());
+//					child.appendChild(comp);
+//					child.setDraggable("true");
+//					al.appendChild(child);
+//					RulesEngine.applyRules(comp, RulesEngine.CREATION_RULES);
+//				} else if (evnt.getDragged() instanceof Absolutechildren) {
+//					Absolutechildren ac = (Absolutechildren) evnt.getDragged();
+//					ac.setX(evnt.getX());
+//					ac.setY(evnt.getY());
+//				}
+//				
+//				developer.getSynchronizer()
+//						.synchronizeTreeWithCanvas(tmp);
+//				setDirty(true);
+//			}
+//
+//		});
 	}
 
 	/**
@@ -207,8 +202,7 @@ public class DesignerCanvas extends DesignerWindow {
 
 			// synchronize the Tree with the model
 			if (bSynchronizeTree)
-				DeveloperFactory.getInstance().getSynchronizer()
-						.synchronizeTreeWithCanvas(this);
+				developer.getSynchronizer().synchronizeTreeWithCanvas(this);
 
 			// turn the 'DIRTY' flag off
 			bIsCanvasDirty = false;
@@ -244,7 +238,7 @@ public class DesignerCanvas extends DesignerWindow {
 
 			// synchronize the Tree with the model
 			if (bSynchronizeTree)
-				DeveloperFactory.getInstance().getSynchronizer()
+				developer.getSynchronizer()
 						.synchronizeTreeWithCanvas(this);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -261,7 +255,7 @@ public class DesignerCanvas extends DesignerWindow {
 		//	return null;
 
 		// create a model-to-ZUML convertor instance
-		ZUMLModel model = new ZUMLModel(this);
+		ZUMLModel model = new ZUMLModel(this, developer);
 
 		return model;
 	}
@@ -277,7 +271,7 @@ public class DesignerCanvas extends DesignerWindow {
 			Components.removeAllChildren(this);
 
 			// clear the Tree
-			DeveloperFactory.getInstance().getDesignerTree().clearTree();
+			developer.getDesignerTree().clearTree();
 
 			// turn the 'DIRTY' flag on
 			bIsCanvasDirty = true;
@@ -294,7 +288,7 @@ public class DesignerCanvas extends DesignerWindow {
 		// convert the current model into a ZUML Document
 		// create a model-to-ZUML convertor instance
 		try {
-			ZUMLModel model = new ZUMLModel(this);
+			ZUMLModel model = new ZUMLModel(this, developer);
 			// reload the model onto the canvas
 			loadModelFromDocument(model.getZUMLDocument(), true);
 
@@ -329,7 +323,7 @@ public class DesignerCanvas extends DesignerWindow {
 		}
 		else {
 			if (getTitle().endsWith("*")) {
-				setTitle(getTitle().substring(0, getTitle().length()-2));
+				setTitle(getTitle().substring(0, getTitle().length()-1));
 			}
 		}
 	}

@@ -70,7 +70,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider, App
 	public void setApplicationContext(ApplicationContext arg0)
 			throws BeansException {
 		try {
-			ConfigLoader.initialize(arg0.getResource("/WEB-INF/config.xml").getFile().getAbsolutePath());
+			ConfigLoader.initialize(arg0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

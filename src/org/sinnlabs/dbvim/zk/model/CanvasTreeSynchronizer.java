@@ -63,9 +63,9 @@ public class CanvasTreeSynchronizer implements IDisposable {
 	/**
 	 * Default constructor 
 	 */
-	public CanvasTreeSynchronizer()
+	public CanvasTreeSynchronizer(IDeveloperStudio developer)
 	{
-		this.developer = DeveloperFactory.getInstance();
+		this.developer = developer;
 	}
 
 	/**
@@ -301,7 +301,7 @@ public class CanvasTreeSynchronizer implements IDisposable {
 			cell.appendChild(lbl);
 			item.setDraggable("true");
 			item.setDroppable("true");
-			item.addEventListener(Events.ON_DROP, new TreeOnDropEventListener());
+			item.addEventListener(Events.ON_DROP, new TreeOnDropEventListener(developer));
 			//row.setDraggable("treeItem");
 			//row.setDroppable("treeItem, toolkitComponent");
 			//TODO: tree event listener

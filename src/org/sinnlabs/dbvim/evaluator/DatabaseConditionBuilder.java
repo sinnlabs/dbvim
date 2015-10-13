@@ -506,4 +506,17 @@ public class DatabaseConditionBuilder {
 	protected Iterator<String> tokenize(String expression) throws ParseException {
 		return tokenizer.tokenize(expression);
 	}
+	
+	/**
+	 * Builds variables from fields
+	 * @param fields List of fields
+	 * @return
+	 */
+	public static AbstractVariableSet<Value<?>> buildVariablesFromFields(List<IField<?>> fields) {
+		StaticVariableSet<Value<?>> variables = new StaticVariableSet<Value<?>>();
+		for(IField<?> f : fields) {
+			variables.set("$" + f.getId() + "$", f.getDBValue());
+		}
+		return variables;
+	}
 }

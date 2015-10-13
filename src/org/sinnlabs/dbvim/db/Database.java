@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.DBModel;
+import org.sinnlabs.dbvim.evaluator.AbstractVariableSet;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
@@ -181,13 +182,16 @@ public class Database {
 	 * @param query - Query string
 	 * @param allFields - All IField on the form
 	 * @param limit Maximum number of rows to read or 0 if no max specified
+	 * @param context AbstractVariableSet<Value<?>> that contains special variables for the query
 	 * @return List of entries
 	 * @throws ParseException 
 	 * @throws DatabaseOperationException 
 	 */
-	public List<Entry> query(List<IField<?>> fields, String query, List<IField<?>> allFields, int limit) throws ParseException, DatabaseOperationException {
+	public List<Entry> query(List<IField<?>> fields, String query, 
+			int limit, AbstractVariableSet<Value<?>> context) throws ParseException, DatabaseOperationException {
+		
 		List<Value<?>> values = new ArrayList<Value<?>>();
-		String dbCondition = conditionBuilder.buildCondition(query, null, resolver, values);
+		String dbCondition = conditionBuilder.buildCondition(query, context, resolver, values);
 		
 		try {
 			Connection db = DriverManager.getConnection(form.getDBConnection()

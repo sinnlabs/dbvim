@@ -1,20 +1,28 @@
 /**
  * 
  */
-package org.sinnlabs.dbvim.rules.Default;
+package org.sinnlabs.dbvim.rules;
 
+import org.sinnlabs.dbvim.rules.Default.DefaultRules;
 import org.sinnlabs.dbvim.rules.engine.IRulable;
 import org.sinnlabs.dbvim.rules.engine.RulesResult;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
+import org.sinnlabs.dbvim.ui.TableFieldProperties;
+import org.sinnlabs.dbvim.ui.db.TableColumnField;
+import org.sinnlabs.dbvim.ui.db.TableField;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zul.Button;
 
 /**
- * Implements default rules
+ * Class represents TableField rules
  * @author peter.liverovsky
  *
  */
-public class DefaultRules implements IRulable {
+public class TableFieldRules implements IRulable {
 
 	/* (non-Javadoc)
 	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#applyPreCreationRules()
@@ -30,7 +38,6 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public RulesResult applyCreationRules(Component cmp, IDeveloperStudio developer) throws RulesException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -78,8 +85,7 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public String[] getModelToZUMLExcludedAttributes() {
-		String[] excluded = {"style"};
-		return excluded;
+		return new DefaultRules().getModelToZUMLExcludedAttributes();
 	}
 
 	/* (non-Javadoc)
@@ -87,8 +93,7 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public String[] getExcludedProperties() {
-		String[] excluded = {"style"};
-		return excluded;
+		return new DefaultRules().getExcludedProperties();
 	}
 
 	/* (non-Javadoc)
@@ -96,7 +101,7 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public boolean showChildren() {
-		return true;
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -112,6 +117,8 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public boolean exportChildToZUML(Component child) {
+		if (!(child instanceof TableColumnField))
+			return false;
 		return true;
 	}
 
@@ -120,16 +127,30 @@ public class DefaultRules implements IRulable {
 	 */
 	@Override
 	public String[] getSpecialProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		String[] props = new String[] { "tableColumns" };
+		return props;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.sinnlabs.dbvim.rules.engine.IRulable#getSpecialProperty(java.lang.String)
 	 */
 	@Override
-	public Component getSpecialProperty(Component cmp, String name, IDeveloperStudio dev) {
-		// TODO Auto-generated method stub
-		return null;
+	public Component getSpecialProperty(final Component cmp, String name, IDeveloperStudio dev) {
+		Button edit = new Button("Edit");
+		final IDeveloperStudio developer = dev;
+		
+		edit.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+			@Override
+			public void onEvent(MouseEvent arg0) throws Exception {
+				TableFieldProperties dialog = new TableFieldProperties((TableField)cmp);
+				developer.getDesigner().appendChild(dialog);
+				dialog.doModal();
+			}
+			
+		});
+		
+		return edit;
 	}
+
 }

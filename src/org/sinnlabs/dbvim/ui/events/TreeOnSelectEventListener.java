@@ -4,7 +4,7 @@
 package org.sinnlabs.dbvim.ui.events;
 
 import org.sinnlabs.dbvim.ui.DesignerTreeItem;
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.event.EventListener;
@@ -19,13 +19,18 @@ public class TreeOnSelectEventListener implements EventListener<SelectEvent> {
 
 	private HtmlBasedComponent last = null;
 	
+	private IDeveloperStudio developer;
+	
+	public TreeOnSelectEventListener(IDeveloperStudio developer) {
+		this.developer = developer;
+	}
+	
 	@Override
 	public void onEvent(SelectEvent event) throws Exception {
 		if( event.getSelectedItems().size() == 0 )
 			return;
 		DesignerTreeItem item = (DesignerTreeItem) event.getSelectedItems().iterator().next();
-		Component selectedComp = 
-				DeveloperFactory.getInstance().getDesignerTree().
+		Component selectedComp = developer.getDesignerTree().
 					getCorrespondingCanvasComponent(item);
 		
 		// highlight element
@@ -35,7 +40,7 @@ public class TreeOnSelectEventListener implements EventListener<SelectEvent> {
 			DesignerTreeItem prev = 
 					(DesignerTreeItem) event.getPreviousSelectedItems().iterator().next();
 			
-			c = (HtmlBasedComponent) DeveloperFactory.getInstance().getDesignerTree().
+			c = (HtmlBasedComponent) developer.getDesignerTree().
 					getCorrespondingCanvasComponent(prev);
 			if (c != null)
 				c.setStyle("");
@@ -45,8 +50,7 @@ public class TreeOnSelectEventListener implements EventListener<SelectEvent> {
 		}
 		last = (HtmlBasedComponent) selectedComp;
 		
-		DeveloperFactory.getInstance().getDesignerProperties().setCurrent(selectedComp);
-		DeveloperFactory.getInstance().getDesignerEvents().setCurrent(selectedComp);
+		developer.getDesignerProperties().setCurrent(selectedComp);
+		developer.getDesignerEvents().setCurrent(selectedComp);
 	}
-
 }

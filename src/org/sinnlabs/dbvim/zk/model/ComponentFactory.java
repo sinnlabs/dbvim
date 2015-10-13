@@ -28,8 +28,7 @@ public class ComponentFactory {
 	 * properties
 	 * @throws Exception 
 	 */
-	
-	public static Component createComponent(String sComponentClass) throws Exception
+	public static Component createComponent(String sComponentClass, IDeveloperStudio developer) throws Exception
 	{
 		if (StringUtils.isEmpty(sComponentClass))
 			return null;
@@ -43,7 +42,7 @@ public class ComponentFactory {
 		try
 		{
 			// check for any pre-creation rules
-			RulesEngine.applyRules(newComponent, RulesEngine.PRE_CREATION_RULES);
+			RulesEngine.applyRules(newComponent, RulesEngine.PRE_CREATION_RULES, developer);
 		}
 		catch (RulesException re)
 		{
@@ -213,6 +212,11 @@ public class ComponentFactory {
 		// that should not be displayed onto the view
 		String[] arrExcludedProps = RulesEngine.getComponentAttributes(
 				cmp, RulesEngine.ATTRIBUTES_EXCLUDE_FROM_PROPERTY_VIEW);
+		
+		// get the list of the custom component's properties
+		// that should be displayed onto property view
+		String[] arrCustomProps = RulesEngine.getComponentAttributes(cmp, 
+				RulesEngine.ATTRIBUTES_CUSTOM_PROPERTIES);
 
 		PropertyDescriptor[] arrValidProps = null;
 		
@@ -226,6 +230,18 @@ public class ComponentFactory {
 				
 				if (descriptor == null)
 					continue;
+				
+				// check the list of custom component properties
+				if (! ArrayUtils.isEmpty(arrCustomProps)) 
+				{
+					// if yes, add custom property
+					if (ArrayUtils.contains(arrCustomProps, descriptor.getName())) {
+						if (arrValidProps == null)
+							arrValidProps = new PropertyDescriptor[]{};
+						// this is a valid property, so add it to the array
+						arrValidProps = (PropertyDescriptor[]) ArrayUtils.add(arrValidProps, descriptor);
+					}
+				}
 				
 				// get read / write property methods
 				Method methodRead = descriptor.getReadMethod();

@@ -2,10 +2,11 @@ package org.sinnlabs.dbvim.rules.engine;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.config.Configurator;
 import org.sinnlabs.dbvim.rules.Default.DefaultRules;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
-import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
+import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.idom.Element;
 import org.zkoss.zk.ui.Component;
 
@@ -52,6 +53,12 @@ public class RulesEngine {
 	 * directly by the user.
 	 */
 	public static final int ATTRIBUTES_EXCLUDE_FROM_PROPERTY_VIEW = 2;
+	
+	/**
+	 * Denotes component custom attributes that should be
+	 * displayed onto property view.
+	 */
+	public static final int ATTRIBUTES_CUSTOM_PROPERTIES = 3;
 
 	/**
 	 * Denotes a boolean flag that indicates whether a
@@ -83,7 +90,7 @@ public class RulesEngine {
 	 * @param nRulesType The type of rules to be applied
 	 */
 	public static RulesResult applyRules(Component cmp,	
-			int nRulesType) throws RulesException
+			int nRulesType, IDeveloperStudio developer) throws RulesException
 	{
 		// get the rules class of the given component
 		IRulable rulable = getRulesClassInstance(cmp);
@@ -96,11 +103,11 @@ public class RulesEngine {
 		{
 		/*** Apply pre-creation rules ***/
 		case PRE_CREATION_RULES:
-			return rulable.applyPreCreationRules();
+			return rulable.applyPreCreationRules(developer);
 
 			/*** Apply creation rules ***/
 		case CREATION_RULES:
-			return rulable.applyCreationRules(cmp);
+			return rulable.applyCreationRules(cmp, developer);
 
 			/*** Model-to-ZUML rules ***/
 		case MODEL_TO_ZUML_RULES:
@@ -112,7 +119,7 @@ public class RulesEngine {
 
 			/*** Copy rules ***/
 		case COPY_RULES:
-			return rulable.applyCreationRules(cmp);
+			return rulable.applyCreationRules(cmp, developer);
 		}
 
 		return null;
@@ -183,7 +190,11 @@ public class RulesEngine {
 
 				/*** Attributes to be excluded from the Property View dialog ***/
 			case ATTRIBUTES_EXCLUDE_FROM_PROPERTY_VIEW:
-				return rulable.getExcludedProperties();		
+				return rulable.getExcludedProperties();
+				
+				/*** Special attributes to be displayed onto Property View ***/
+			case ATTRIBUTES_CUSTOM_PROPERTIES:
+				return rulable.getSpecialProperties();
 			}
 
 			return null;
@@ -316,6 +327,32 @@ public class RulesEngine {
 			config = null;
 		}
 	}
+	
+	/**
+	 * Returns component that represent the custom property
+	 * attribute.
+	 * @param cmp The component to be resolved
+	 * @param name Property name
+	 * @return Component that will be added to the properties grid. 
+	 * Or null if property does not have component
+	 */
+	public static Component getSpecialProperty(Component cmp, String name, 
+			IDeveloperStudio dev) {
+		// get the rules class of the given component
+		IRulable rulable = getRulesClassInstance(cmp);
+
+		if (rulable == null)
+			return null;
+
+		try
+		{
+			return rulable.getSpecialProperty(cmp, name, dev);
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
+	}
 
 	/**
 	 * This method resolves the class of 
@@ -368,7 +405,7 @@ public class RulesEngine {
 			return null;
 
 		// get the pre-loaded Rules object
-		Rules rules = DeveloperFactory.getInstance().getRules();
+		Rules rules = ConfigLoader.getInstance().getRules();
 
 		if (rules == null)
 			return null;

@@ -19,7 +19,10 @@ import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.ui.IField;
+import org.sinnlabs.dbvim.ui.annotations.EventType;
 import org.sinnlabs.dbvim.zk.model.CurrentForm;
+import org.sinnlabs.dbvim.zk.model.FormEventProcessor;
+import org.sinnlabs.dbvim.zk.model.IFormComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.WrongValueException;
@@ -50,7 +53,7 @@ import org.zkoss.zul.impl.InputElement;
  * @author peter.liverovsky
  *
  */
-public class SearchComposer extends SelectorComposer<Component> {
+public class SearchComposer extends SelectorComposer<Component> implements IFormComposer {
 
 	/**
 	 * 
@@ -117,13 +120,29 @@ public class SearchComposer extends SelectorComposer<Component> {
 	@Wire("#txtAdditionalSearch")
 	Textbox txtAdditionalSearch;
 
+	/**
+	 * Current form
+	 */
 	Form form;
 	
+	/**
+	 * Current form resolver
+	 */
 	FormFieldResolver resolver;
 	
+	/**
+	 * Form events processor
+	 */
+	FormEventProcessor eventProcessor;
+	
+	/**
+	 * Current entry
+	 */
 	Entry currentEntry;
 	
 	List<Component> fieldList;
+	
+	List<IField<?>> fields;
 	
 	List<Component> readonlyFields;
 	
@@ -133,12 +152,16 @@ public class SearchComposer extends SelectorComposer<Component> {
 
 	private boolean isAdditional = false;
 	
+	public List<IField<?>> getFields() { return fields; }
+	
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
 		form = CurrentForm.getInstance().getForm();
 		resolver = new FormFieldResolver(form);
 		fieldList = new ArrayList<Component>();
+		fields = new ArrayList<IField<?>>();
+		eventProcessor = new FormEventProcessor();
 		
 		if (form.isJoin())
 			db = new DatabaseJoin(form, resolver);
@@ -159,6 +182,15 @@ public class SearchComposer extends SelectorComposer<Component> {
 				results.getListhead().appendChild(header);
 			}
 		}
+		
+		/** Invoke form loaded event **/
+		try {
+			eventProcessor.Invoke(EventType.FORM_LOADED, (Object[]) null);
+		} catch (Exception e) {
+			Messagebox.show("Unable to raise onFormLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
+			e.printStackTrace();
+		}
+		
 		setMode(MODE_SEARCH);
 	}
 	
@@ -181,6 +213,13 @@ public class SearchComposer extends SelectorComposer<Component> {
 			return;
 		}
 		populateFields();
+		/** Invoke entry loaded event **/
+		try {
+			eventProcessor.Invoke(EventType.ENTRY_LOADED, new Object[] {currentEntry});
+		} catch (Exception e1) {
+			Messagebox.show("Unable to raise onEntryLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
+			e1.printStackTrace();
+		}
 	}
 	
 	@Listen("onClick = #btnNewSearch")
@@ -287,7 +326,7 @@ public class SearchComposer extends SelectorComposer<Component> {
 				for(Component c : fieldList) {
 					fields.add((IField<?>) c);
 				}
-				entries = db.query(null, txtAdditionalSearch.getText(), fields, 0);
+				entries = db.query(null, txtAdditionalSearch.getText(), 0, null);
 			} else if (isAdditional == false && values.size() == 0) {
 				entries = db.queryAll(null, 0);
 			} else
@@ -338,6 +377,13 @@ public class SearchComposer extends SelectorComposer<Component> {
 			populateFields();
 		}
 		setMode(MODE_RESULT);
+		/** Invoke entry loaded event **/
+		try {
+			eventProcessor.Invoke(EventType.ENTRY_LOADED, new Object[] {currentEntry});
+		} catch (Exception e) {
+			Messagebox.show("Unable to raise onEntryLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
+			e.printStackTrace();
+		}
 	}
 	
 	private boolean scanForNulls() {
@@ -357,10 +403,11 @@ public class SearchComposer extends SelectorComposer<Component> {
 		StringReader r = new StringReader(form.getView());
 		HashMap<String, Object> args = new HashMap<String, Object>();
 		args.put("resolver", resolver);
+		args.put("composer", this);
 		Executions.createComponentsDirectly(r, null, detailsView, args);
 		Selectors.wireVariables(detailsView, this, null);
 		
-		// Find all DB fields of the form
+		// Find all DB fields of the form and wire all events
 		findAllDBFields(detailsView);
 	}
 	
@@ -368,8 +415,10 @@ public class SearchComposer extends SelectorComposer<Component> {
 		if (c == null || c.getChildren() == null)
 			return;
 		for(Component child : c.getChildren()) {
+			eventProcessor.addListeners(child);
 			if (child instanceof IField) {
 				fieldList.add(child);
+				fields.add((IField<?>) child);
 			}
 			/** RECURSION **/
 			findAllDBFields(child);
@@ -432,6 +481,12 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divModify.setVisible(false);
 			setFieldsMode(IField.MODE_SEARCH);
 			setAdditionalSearch(false);
+			try {
+				eventProcessor.Invoke(EventType.CHANGE_FORM_MODE, new Object[] {IField.MODE_SEARCH});
+			} catch (Exception e) {
+				Messagebox.show("Unable to change field mode.", "error", Messagebox.OK, Messagebox.ERROR);
+				e.printStackTrace();
+			}
 		}
 		if (mode == MODE_RESULT) {
 			searchResults.setVisible(true);
@@ -447,6 +502,12 @@ public class SearchComposer extends SelectorComposer<Component> {
 			divNewEntry.setVisible(false);
 			divModify.setVisible(true);
 			setFieldsMode(IField.MODE_MODIFY);
+			try {
+				eventProcessor.Invoke(EventType.CHANGE_FORM_MODE, new Object[] {IField.MODE_MODIFY});
+			} catch (Exception e) {
+				Messagebox.show("Unable to change field mode.", "error", Messagebox.OK, Messagebox.ERROR);
+				e.printStackTrace();
+			}
 		}
 		if (mode == MODE_CREATE) {
 			searchResults.setVisible(false);
@@ -466,6 +527,12 @@ public class SearchComposer extends SelectorComposer<Component> {
 			else
 				btnCreate.setDisabled(false);
 			setFieldsMode(IField.MODE_MODIFY);
+			try {
+				eventProcessor.Invoke(EventType.CHANGE_FORM_MODE, new Object[] {IField.MODE_MODIFY});
+			} catch (Exception e) {
+				Messagebox.show("Unable to change field mode.", "error", Messagebox.OK, Messagebox.ERROR);
+				e.printStackTrace();
+			}
 		}
 	}
 	

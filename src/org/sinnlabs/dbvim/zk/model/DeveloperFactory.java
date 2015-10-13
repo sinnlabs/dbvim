@@ -3,7 +3,7 @@
  */
 package org.sinnlabs.dbvim.zk.model;
 
-import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.Executions;
 
 /**
  * Class is used to get IDeveloperStudio instance
@@ -13,6 +13,6 @@ import org.zkoss.zk.ui.Sessions;
 public class DeveloperFactory<T extends IDeveloperStudio> {
 	
 	public static IDeveloperStudio getInstance() {
-		return (IDeveloperStudio) Sessions.getCurrent().getAttribute("DEVELOPER");
+		return  (IDeveloperStudio) Executions.getCurrent().getAttribute("composer");
 	}
 }
