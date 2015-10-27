@@ -550,6 +550,7 @@ public class DatabaseJoin extends Database {
 		String rightFormAlias;
 	}
 	
+	@Override
 	public Entry readEntry(Entry e) throws DatabaseOperationException {
 		List<DBField> resultFields = new ArrayList<DBField>();
 		// Add result list columns to select expression
@@ -634,6 +635,108 @@ public class DatabaseJoin extends Database {
 			e1.printStackTrace();
 			throw new DatabaseOperationException("Error while executing sql query.", e1);
 		}
+	}
+	
+	@Override
+	public void updateEntry(Entry e, List<Value<?>> values) throws DatabaseOperationException {
+		updateRecord(e, values, resolver);
+	}
+	
+	private void updateRecord(Entry e, List<Value<?>> values, FormFieldResolver r) throws DatabaseOperationException {
+		if (r.getForm().isJoin()) {
+			updateRecord(e, values, r.getLeftResolver());
+			updateRecord(e, values, r.getRightResolver());
+		} else {
+			// Get the form values
+			List<Value<?>> formValues = new ArrayList<Value<?>>();
+			for(Value<?> v : values) {
+				if (isDBFieldsContains(r.getDBFields(), v.getDBField())) {
+					formValues.add(v);
+				}
+			}
+			// If no form values found
+			if (formValues.isEmpty())
+				return;
+			
+			// find updated values
+			List<Value<?>> newValues = new ArrayList<Value<?>>();
+			for(Value<?> nv : formValues) {
+				for(Value<?> ov : e.getValues()) {
+					// if new value is different
+					if (nv.getDBField().getName().equals(ov.getDBField().getName())
+							&& (ov.getValue() == null || !nv.getValue().equals(ov.getValue())) ) {
+						// add new value to the list
+						newValues.add(nv);
+					}
+				}
+			}
+			
+			// if no value updated, return
+			if (newValues.size() == 0)
+				return;
+			
+			// Find the form primary id
+			List<Value<?>> id = new ArrayList<Value<?>>();
+			for(Value<?> v : e.getID()) {
+				if (isDBFieldsContains(r.getDBFields(), v.getDBField())) {
+					id.add(v);
+				}
+			}
+			
+			// Connect to the db
+			try {
+				Connection db = DriverManager.getConnection(r.getForm().getDBConnection()
+						.getConnectionString());
+			
+				// build update query
+				String query = "UPDATE " + r.getForm().getQualifiedName()
+						+ " SET ";
+				// add values to the query
+				for (int i=0; i<newValues.size(); i++) {
+					query += newValues.get(i).getDBField().getName() + " = ?";
+					if (i<newValues.size()-1)
+						query += ", ";
+					else
+						query += " ";
+				}
+				
+				// build query qualification
+				query += " WHERE ";
+				for(int i=0; i<id.size(); i++) {
+					query += id.get(i).getDBField().getName();
+					query += " = ?";
+					if (i<id.size()-1) {
+						query += " AND ";
+					}
+				}
+				
+				// Prepare query
+				PreparedStatement ps = db.prepareStatement(query);
+				
+				// setup all query parameters
+				// set values to update
+				for(int i=0; i<newValues.size(); i++) {
+					setParameter(ps, i+1, newValues.get(i));
+				}
+				// set qualification
+				for(int i=0; i<e.getID().size(); i++) {
+					setParameter(ps, newValues.size()+i+1, e.getID().get(i));
+				}
+				
+				// Update entry:
+				ps.executeUpdate();
+			} catch (SQLException e1) {
+				System.err.println("ERROR: Unable to update entry: ");
+				e1.printStackTrace();
+				throw new DatabaseOperationException("Unable to update entry.", e1);
+			}
+		}
+	}
+	
+	@Override
+	public void insertEntry(Entry e) throws DatabaseOperationException {
+		// it is not possible to add a new entry into a join form
+		throw new DatabaseOperationException("Operation not supported.", null);
 	}
 	
 	/**

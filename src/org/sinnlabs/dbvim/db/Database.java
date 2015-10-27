@@ -606,7 +606,7 @@ public class Database {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void setParameter(PreparedStatement ps, int id, Value<?> v) throws SQLException {
+	protected static void setParameter(PreparedStatement ps, int id, Value<?> v) throws SQLException {
 		switch(v.getDBField().getDBType()) {
 		case java.sql.Types.CHAR:
 		case java.sql.Types.VARCHAR:
