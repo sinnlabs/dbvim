@@ -373,7 +373,7 @@ public class ZUMLModel {
 			//  elements only - listeners are code elements]
 			ZScript zScript = ((ComponentCtrl)cmp).getEventHandler(sEventName);
 			
-			if (zScript == null)
+			if (zScript == null || StringUtils.isBlank(zScript.getRawContent()))
 				continue;
 			
 			// add event handler attribute to the element
