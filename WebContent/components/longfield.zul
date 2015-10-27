@@ -3,5 +3,6 @@
 		<label id="label" value="LongField" visible="true"/>
 		<space id="space" spacing="0px"></space>
 		<longbox id="value" />
+		<button id="btnMenu" label="▼" visible="false" />
 	</hlayout>
 </zk>

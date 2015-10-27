@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
+import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.CreateJoinFormDialog;
 import org.sinnlabs.dbvim.ui.Designer;
 import org.sinnlabs.dbvim.ui.DesignerCanvas;
@@ -20,9 +21,9 @@ import org.sinnlabs.dbvim.ui.DesignerTree;
 import org.sinnlabs.dbvim.ui.FormNameDialog;
 import org.sinnlabs.dbvim.ui.FormPropertiesDialog;
 import org.sinnlabs.dbvim.ui.ModelTree;
+import org.sinnlabs.dbvim.ui.SearchMenuProperties;
 import org.sinnlabs.dbvim.ui.modeltree.TableTreeNode;
 import org.sinnlabs.dbvim.zk.model.CanvasTreeSynchronizer;
-import org.sinnlabs.dbvim.zk.model.ICurrentForm;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.sinnlabs.dbvim.zk.model.ZUMLModel;
 import org.zkoss.zk.ui.Component;
@@ -44,7 +45,7 @@ import org.zkoss.zul.Messagebox;
  *
  */
 public class BuilderComposer extends SelectorComposer<Component> implements
-		IDeveloperStudio, ICurrentForm {
+		IDeveloperStudio {
 
 	/**
 	 * 
@@ -216,6 +217,24 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 		}
 	}
 	
+	@Listen("onClick = #tbbNewSearchMenu")
+	public void tbbNewSearchMenu_onClick() {
+		final SearchMenu menu = new SearchMenu();
+		final SearchMenuProperties dialog = new SearchMenuProperties(menu, true);
+		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event arg0) throws Exception {
+				if (dialog.getSelectedAction() == SearchMenuProperties.DD_OK) {
+					ConfigLoader.getInstance().getSearchMenus().create(menu);
+				}
+			}
+			
+		});
+		designer.appendChild(dialog);
+		dialog.doModal();
+	}
+	
 	@Listen("onClick = #tbbFormProperties")
 	public void tbbFormProperties_onClick() {
 		if (currentForm != null) {
@@ -360,8 +379,23 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 		checkStudioStates();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.zk.model.IDeveloperStudio#MenuTreeNode_onDoubleClick(org.sinnlabs.dbvim.model.SearchMenu)
+	 */
 	@Override
-	public Form getForm() {
-		return currentForm;
+	public void MenuTreeNode_onDoubleClick(final SearchMenu menu) {
+		final SearchMenuProperties dialog = new SearchMenuProperties(menu, false);
+		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event arg0) throws Exception {
+				if (dialog.getSelectedAction() == SearchMenuProperties.DD_OK) {
+					ConfigLoader.getInstance().getSearchMenus().update(menu);
+				}
+			}
+			
+		});
+		designer.appendChild(dialog);
+		dialog.doModal();
 	}
 }

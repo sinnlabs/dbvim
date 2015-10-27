@@ -19,6 +19,8 @@
 								label="New Basic form" />
 							<menuseparator />
 							<menuitem id="tbbNewJoinForm" label="New Join form" />
+							<menuseparator />
+							<menuitem id="tbbNewSearchMenu" label="New Search Menu" />
 						</menupopup>
 					</menu>
 					<menuitem id="tbbSaveForm" label="Save form" />

@@ -48,6 +48,8 @@ public class BaseFieldRules implements IRulable {
 					public void onEvent(Event arg0) throws Exception {
 						if (dialog.getSelectedAction() == SelectFieldDialog.DD_OK) {
 							field.setDBField(dialog.getSelectedField());
+						} else if(dialog.getSelectedAction() == SelectFieldDialog.DD_DISPLAYONLY) {
+							field.setDisplayOnly(true);
 						} else {
 							throw new RulesException(new RulesResult(
 									RulesResult.ERR_UNSPECIFIED,

@@ -243,6 +243,7 @@ public class TableFieldProperties extends Window {
 	}
 	
 	private void initFormFields(boolean newForm) {
+		// clear the lists
 		lstAvailableFields.getItems().clear();
 		lstTableFields.getItems().clear();
 		Form form = null;
@@ -273,6 +274,11 @@ public class TableFieldProperties extends Window {
 		List<TableColumnField> columns = tableField.getTableColumns();
 		
 		for (IField<?> f : resolver.getFields().values()) {
+			// skip all display only fields
+			// because they do not store the values
+			if (f.isDisplayOnly())
+				continue;
+			// create the listitem
 			Listitem item = new Listitem();
 			Listcell name = new Listcell(f.getId());
 			Listcell label = new Listcell(f.getLabel());
@@ -281,6 +287,7 @@ public class TableFieldProperties extends Window {
 			item.setValue(new TableColumnField(f.getLabel(), f.getId()));
 			
 			// if it is not a new form
+			// then check if column is already on the table field
 			if (!newForm) {
 				if (isColumnAdded(columns, f)) {
 					lstTableFields.getItems().add(item);

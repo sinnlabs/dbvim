@@ -4,20 +4,20 @@
 package org.sinnlabs.dbvim.ui;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.Form;
-import org.sinnlabs.dbvim.zk.model.ICurrentForm;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.GenericRichlet;
 import org.zkoss.zk.ui.Page;
-import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zul.Idspace;
 
 import com.j256.ormlite.stmt.Where;
@@ -29,7 +29,7 @@ import com.j256.ormlite.stmt.Where;
  * @author peter.liverovsy
  *
  */
-public class DataRichlet extends GenericRichlet implements ICurrentForm {
+public class DataRichlet extends GenericRichlet {
 
 	protected Form form;
 
@@ -42,8 +42,6 @@ public class DataRichlet extends GenericRichlet implements ICurrentForm {
 	 */
 	@Override
 	public void service(Page page) throws Exception {
-
-		Sessions.getCurrent().setAttribute("CURRENTFORM", this);
 
 		String[] arr = page.getRequestPath().split("/");
 		arr = ArrayUtils.removeElements(arr, "");
@@ -77,7 +75,9 @@ public class DataRichlet extends GenericRichlet implements ICurrentForm {
 	}
 
 	private void buildSearch(Component root, String formName) {
-		Executions.createComponents("/components/search_page.zul", root, null);
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("form", form);
+		Executions.createComponents("/components/search_page.zul", root, args);
 	}
 
 	private void setError(int err) {
@@ -103,10 +103,5 @@ public class DataRichlet extends GenericRichlet implements ICurrentForm {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	@Override
-	public Form getForm() {
-		return form;
 	}
 }

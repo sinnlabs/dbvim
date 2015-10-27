@@ -17,6 +17,7 @@
 <hlayout>
 <div hflex="1"></div>
 <button id="btnOK" label="OK" onClick="" />
+<button id="btnDisplayOnly" label="Display Only" />
 <div></div>
 </hlayout>
 </zk>

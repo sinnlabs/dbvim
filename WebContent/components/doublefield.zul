@@ -3,5 +3,6 @@
 		<label id="label" value="DoubleField" visible="true"/>
 		<space id="space" spacing="0px"></space>
 		<doublebox id="value" />
+		<button id="btnMenu" label="▼" visible="false" />
 	</hlayout>
 </zk>

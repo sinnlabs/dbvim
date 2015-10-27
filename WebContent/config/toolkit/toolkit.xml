@@ -724,7 +724,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>CharacterField - represents all character fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>CharacterField</name>
 	  		</component>
 	  		<component>
@@ -732,7 +732,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>IntegerField - represents all integer fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>IntegerField</name>
 	  		</component>
 	  		<component>
@@ -740,7 +740,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DecimalField - represents all decimal fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>DecimalField</name>
 	  		</component>
 	  		<component>
@@ -748,7 +748,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>LongField - represents all long fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>LongField</name>
 	  		</component>
 	  		<component>
@@ -756,7 +756,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DatetimeField - represents all timestamp fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>DatetimeField</name>
 	  		</component>
 	  		<component>
@@ -764,7 +764,7 @@
 	  			<image16></image16>
 	  			<image32></image32>
 	  			<tooltip>DoubleField - represents all double fields from db table</tooltip>
-	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK</events>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
 	  			<name>DoubleField</name>
 	  		</component>
 	  		<component>

@@ -1,0 +1,33 @@
+<zk>
+	<vlayout hflex="1" vflex="1">
+		<hlayout hflex="1" valign="middle">
+			<label value="Name: " />
+			<textbox id="txtName" hflex="1" />
+		</hlayout>
+		<hlayout hflex="1" valign="middle">
+			<label value="Form Name: " />
+			<textbox id="txtFormName" hflex="1" />
+			<button id="btnSelectForm" label="..." />
+		</hlayout>
+		<hlayout hflex="1" valign="middle">
+			<label value="Label field: " />
+			<textbox id="txtLabelField" hflex="1" />
+			<button id="btnLabelField" label="..." />
+		</hlayout>
+		<hlayout hflex="1" valign="middle">
+			<label value="Value field: " />
+			<textbox id="txtValueField" hflex="1" />
+			<button id="btnValueField" label="..." />
+		</hlayout>
+		<hlayout vflex="1" hflex="1" >
+			<label value="Qualification: " />
+			<textbox id="txtQualification" hflex="1" vflex="1" multiline="true" rows="3"/>
+			<button id="btnQualification" label="..." />
+		</hlayout>
+		<hlayout hflex="1">
+			<div hflex="1" />
+			<button id="btnOK" label="OK" />
+			<button id="btnCancel" label="Cancel" />
+		</hlayout>
+	</vlayout>
+</zk>

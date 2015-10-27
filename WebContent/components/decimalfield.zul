@@ -3,5 +3,6 @@
 		<label id="label" value="DecimalField" visible="true"/>
 		<space id="space" spacing="0px"></space>
 		<decimalbox id="value" />
+		<button id="btnMenu" label="▼" visible="false" />
 	</hlayout>
 </zk>

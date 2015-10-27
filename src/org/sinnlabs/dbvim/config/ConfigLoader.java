@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.Role;
+import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.model.User;
 import org.sinnlabs.dbvim.model.UserRole;
 import org.sinnlabs.dbvim.rules.engine.Rules;
@@ -50,6 +51,8 @@ public class ConfigLoader {
 	protected Dao<Role, String> roles;
 	
 	protected Dao<UserRole, Integer> userroles;
+	
+	protected Dao<SearchMenu, String> searchMenus;
 	
 	private static volatile ConfigLoader instance;
 
@@ -150,6 +153,10 @@ public class ConfigLoader {
 		return roles;
 	}
 	
+	public Dao<SearchMenu, String> getSearchMenus() {
+		return searchMenus;
+	}
+	
 	/**
 	 * Returns the Rules object that contains all
 	 * active component rules
@@ -234,6 +241,11 @@ public class ConfigLoader {
 			Role adminRole = roles.queryForId(Role.ROLE_ADMIN);
 			userroles.create(new UserRole(user, userRole));
 			userroles.create(new UserRole(admin, adminRole));
+		}
+		
+		searchMenus = DaoManager.createDao(connectionSource, SearchMenu.class);
+		if (!searchMenus.isTableExists()) {
+			TableUtils.createTableIfNotExists(connectionSource, SearchMenu.class);
 		}
 	}
 }

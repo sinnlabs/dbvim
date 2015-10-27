@@ -43,6 +43,11 @@ public class SelectFieldDialog extends Window {
 	 */
 	public static final int DD_CANCEL = 2;
 	
+	/**
+	 * The display only field
+	 */
+	public static final int DD_DISPLAYONLY = 3;
+	
 	public static final int CHARACTER_FIELD = 1;
 	public static final int INTEGER_FIELD = 2;
 	public static final int DECIMAL_FIELD = 3;
@@ -64,6 +69,9 @@ public class SelectFieldDialog extends Window {
 	
 	@Wire
 	Button btnCancel;
+	
+	@Wire
+	Button btnDisplayOnly;
 	
 	@Wire
 	Listbox lstFields;
@@ -101,6 +109,18 @@ public class SelectFieldDialog extends Window {
 				else {
 					Messagebox.show("Select the field first.");
 				}
+			}
+			
+		});
+		
+		btnDisplayOnly.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+			@Override
+			public void onEvent(MouseEvent arg0) throws Exception {
+				nSelectedAction = DD_DISPLAYONLY;
+				Event closeEvent = new Event("onClose", t);
+      			Events.postEvent(closeEvent);
+      			detach();
 			}
 			
 		});

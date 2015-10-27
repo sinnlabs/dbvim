@@ -3,14 +3,20 @@
  */
 package org.sinnlabs.dbvim.ui.db;
 
-import java.sql.SQLException;
 import java.util.Map;
 
+import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.IDBField;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.menu.MenuItem;
+import org.sinnlabs.dbvim.menu.SearchMenuResolver;
+import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.IField;
+import org.sinnlabs.dbvim.ui.events.MenuSelectEvent;
+import org.sinnlabs.dbvim.ui.events.VimEvents;
+import org.sinnlabs.dbvim.zk.model.IFormComposer;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.CreateEvent;
 import org.zkoss.zk.ui.event.DropEvent;
@@ -19,10 +25,13 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.event.KeyEvent;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Idspace;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Space;
 import org.zkoss.zul.impl.InputElement;
 
@@ -44,6 +53,8 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	protected String formName;
 	
+	protected String menu;
+	
 	@Wire
 	protected Label label;
 	
@@ -53,9 +64,20 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	@Wire
 	protected Space space;
 	
+	@Wire
+	protected Button btnMenu;
+	
+	protected IFormComposer composer;
+	
 	protected boolean isChildable = true;
 	
+	protected SearchMenu searchMenu;
+	
+	protected Menupopup popup;
+	
 	private boolean readOnly;
+	
+	private boolean displayOnly = false;
 	
 
 	protected BaseField(String zulUrl, DBField field) {
@@ -81,6 +103,7 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 		readOnly = value.isReadonly();
 		final BaseField<T, E> t = this;
 		
+		/* init event listeners */
 		value.addEventListener(Events.ON_CHANGE, new EventListener<InputEvent>() {
 
 			@Override
@@ -143,6 +166,67 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 			}
 			
 		});
+		
+		if (btnMenu != null) {
+			btnMenu.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+				@Override
+				public void onEvent(MouseEvent arg0) throws Exception {
+					if (popup != null)
+						popup.open(btnMenu);
+				}
+				
+			});
+		}
+	}
+	
+	/**
+	 * Initialize menu items
+	 * @throws Exception
+	 */
+	private void initMenu() throws Exception {
+		if (searchMenu != null) {
+			popup = new Menupopup();
+			popup.setStyle("overflow: auto; max-height: 100vh;");
+			// Resolve menu items
+			SearchMenuResolver menuResolver = new SearchMenuResolver(searchMenu);
+			
+			for(MenuItem i : menuResolver.getItems(composer)) {
+				// Add items to the popup menu
+				FieldMenuItem item = new FieldMenuItem(i);
+				item.setLabel(i.getLabel().getValue().toString());
+				
+				/** Add item event listener **/
+				item.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+					@SuppressWarnings("unchecked")
+					@Override
+					public void onEvent(MouseEvent evnt) throws Exception {
+						if (evnt.getTarget() != null) {
+							FieldMenuItem item = (FieldMenuItem) evnt.getTarget();
+							// if user defined the event listener onMenuSelect
+							// then we do not take default action
+							// User must implement logic manually
+							if (Events.isListened(BaseField.this, VimEvents.ON_MENUSELECTED, false)) {
+								Event e = new MenuSelectEvent(
+										VimEvents.ON_MENUSELECTED, BaseField.this, item.getItem());
+								Events.postEvent(e);
+							} else {
+								// if event listener is not defined
+								// then we just set the field value
+								BaseField.this.setDBValue((Value<T>) item.getItem().getValue());
+							}
+						}
+					}
+					
+				});
+				popup.appendChild(item);
+			}
+			// add popup to the field
+			isChildable = true;
+			this.appendChild(popup);
+			isChildable = false;
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -224,6 +308,18 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	public void setForm(String form) {
 		formName = form;
 	}
+	
+	public String getMenu() {
+		return menu;
+	}
+	
+	public void setMenu(String menu) throws Exception {
+		this.menu = menu;
+		searchMenu = ConfigLoader.getInstance().getSearchMenus().queryForId(menu);
+		if (btnMenu != null) {
+			btnMenu.setVisible(true);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.sinnlabs.dbvim.ui.IField#setDBValue(com.asd.dbuibuilder.db.Value)
@@ -240,6 +336,17 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	@Override
 	public Value<T> getDBValue() {
 		return new Value<T>((T)value.getRawValue(), dbField);
+	}
+	
+	@Override
+	public void setValue(T val) {
+		value.setRawValue(val);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public T getValue() {
+		return (T)value.getRawValue();
 	}
 
 	public String getLabel() {
@@ -315,11 +422,28 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	}
 	
 	@Override
-	public void onCreate(Map<?,?> args) throws ClassNotFoundException, SQLException {
+	public boolean isDisplayOnly() {
+		return displayOnly;
+	}
+	
+	@Override
+	public void setDisplayOnly(boolean val) {
+		displayOnly = val;
+	}
+	
+	@Override
+	public void onCreate(Map<?,?> args) throws Exception {
+		if (displayOnly)
+			return;
 		if (args != null) {
 			FormFieldResolver f = (FormFieldResolver) args.get("resolver");
 			if (f != null) {
 				dbField = f.getFieldByMapping(formName, map);
+			}
+			Object c = args.get("composer");
+			if ( c!= null) {
+				composer = (IFormComposer) c;
+				initMenu();
 			}
 		}
 	}

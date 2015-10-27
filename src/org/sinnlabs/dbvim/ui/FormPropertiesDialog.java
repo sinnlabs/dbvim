@@ -129,6 +129,10 @@ public class FormPropertiesDialog extends Window {
 		
 		boolean contains = false;
 		for(IField<?> f : fields.values()) {
+			// it is not possible to use display only fields for the form result list
+			if (f.isDisplayOnly())
+				continue;
+			
 			Listitem item = new Listitem();
 			ResultColumn column = resContains(resList, f.getId());
 			if (column == null) {

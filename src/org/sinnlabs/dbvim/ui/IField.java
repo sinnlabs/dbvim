@@ -66,6 +66,17 @@ public interface IField<T> {
 	public Value<T> getDBValue();
 	
 	/**
+	 * Set the field value
+	 * @param v field value
+	 */
+	public void setValue(T v);
+	
+	/**
+	 * Returns the field value
+	 */
+	public T getValue();
+	
+	/**
 	 * Show error on the client
 	 */
 	public void setErrorMessage(String err);
@@ -98,6 +109,18 @@ public interface IField<T> {
 	 * Returns field label
 	 */
 	public String getLabel();
+	
+	/**
+	 * Indicates that field is Display Only. (not mapped to any db field)
+	 * @return
+	 */
+	public boolean isDisplayOnly();
+	
+	/**
+	 * Sets the display only flag
+	 * @param val - true if field is DisplayOnly, otherwise false
+	 */
+	public void setDisplayOnly(boolean val);
 	
 	/**
 	 * Calls when all components attributes are loaded

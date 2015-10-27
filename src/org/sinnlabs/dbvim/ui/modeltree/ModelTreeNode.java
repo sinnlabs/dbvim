@@ -12,7 +12,8 @@ import org.zkoss.zul.AbstractTreeModel;
 import org.zkoss.zul.Messagebox;
 
 /**
- * @author peter
+ * Class represents all objects tree data
+ * @author peter.liverovsky
  *
  */
 public class ModelTreeNode extends AbstractTreeModel<Object> {
@@ -60,6 +61,16 @@ public class ModelTreeNode extends AbstractTreeModel<Object> {
 					e.printStackTrace();
 				}
 			}
+			else if (index == 2) {
+				try {
+					return new MenusTreeNode(conn);
+				} catch (SQLException e) {
+					Messagebox.show("Unable to get list of menus: " + e.getMessage(), 
+							"Error", Messagebox.OK, Messagebox.ERROR);
+					System.err.println("Unable to get list of menus: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
 		}
 		if (node instanceof TablesTreeNode) {
 			TablesTreeNode tables = (TablesTreeNode) node;
@@ -68,6 +79,10 @@ public class ModelTreeNode extends AbstractTreeModel<Object> {
 		if (node instanceof FormsTreeNode) {
 			FormsTreeNode forms = (FormsTreeNode) node;
 			return forms.getChild(index);
+		}
+		if (node instanceof MenusTreeNode) {
+			MenusTreeNode menus = (MenusTreeNode) node;
+			return menus.getChild(index);
 		}
 		return null;
 	}
@@ -81,7 +96,7 @@ public class ModelTreeNode extends AbstractTreeModel<Object> {
 			return connections.size();
 		}
 		if (node instanceof DBConnection) {
-			return 2;
+			return 3;
 		}
 		if (node instanceof TablesTreeNode) {
 			TablesTreeNode tables = (TablesTreeNode) node;
@@ -90,6 +105,10 @@ public class ModelTreeNode extends AbstractTreeModel<Object> {
 		if (node instanceof FormsTreeNode) {
 			FormsTreeNode forms = (FormsTreeNode) node;
 			return forms.getChildCount();
+		}
+		if (node instanceof MenusTreeNode) {
+			MenusTreeNode menus = (MenusTreeNode) node;
+			return menus.getChildCount();
 		}
 		return 0;
 	}
@@ -109,6 +128,9 @@ public class ModelTreeNode extends AbstractTreeModel<Object> {
 			return false;
 		}
 		if (node instanceof FormsTreeNode) {
+			return false;
+		}
+		if (node instanceof MenusTreeNode) {
 			return false;
 		}
 		return true;

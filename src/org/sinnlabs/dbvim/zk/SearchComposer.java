@@ -20,7 +20,7 @@ import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.annotations.EventType;
-import org.sinnlabs.dbvim.zk.model.CurrentForm;
+import org.sinnlabs.dbvim.ui.events.VimEvents;
 import org.sinnlabs.dbvim.zk.model.FormEventProcessor;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
 import org.zkoss.zk.ui.Component;
@@ -28,6 +28,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -140,10 +141,19 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	 */
 	Entry currentEntry;
 	
+	/**
+	 * List of all form fields
+	 */
 	List<Component> fieldList;
 	
+	/**
+	 * Contains all form fields
+	 */
 	List<IField<?>> fields;
 	
+	/**
+	 * List of all read only fields
+	 */
 	List<Component> readonlyFields;
 	
 	Database db;
@@ -157,7 +167,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
 
-		form = CurrentForm.getInstance().getForm();
+		form = (Form) Executions.getCurrent().getArg().get("form");
 		resolver = new FormFieldResolver(form);
 		fieldList = new ArrayList<Component>();
 		fields = new ArrayList<IField<?>>();
@@ -213,13 +223,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			return;
 		}
 		populateFields();
-		/** Invoke entry loaded event **/
-		try {
-			eventProcessor.Invoke(EventType.ENTRY_LOADED, new Object[] {currentEntry});
-		} catch (Exception e1) {
-			Messagebox.show("Unable to raise onEntryLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
-			e1.printStackTrace();
-		}
+		raiseOnEntryLoadedEvent();
 	}
 	
 	@Listen("onClick = #btnNewSearch")
@@ -377,13 +381,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			populateFields();
 		}
 		setMode(MODE_RESULT);
-		/** Invoke entry loaded event **/
-		try {
-			eventProcessor.Invoke(EventType.ENTRY_LOADED, new Object[] {currentEntry});
-		} catch (Exception e) {
-			Messagebox.show("Unable to raise onEntryLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
-			e.printStackTrace();
-		}
+		raiseOnEntryLoadedEvent();
 	}
 	
 	private boolean scanForNulls() {
@@ -438,11 +436,21 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		}
 	}
 	
+	/**
+	 * Find all mapped field that has user values
+	 * @return List of fields values
+	 */
 	private List<Value<?>> getUserValues() {
 		List<Value<?>> list = new ArrayList<Value<?>>();
 		for (Component c : fieldList) {
 			IField<?> f = (IField<?>) c;
+			
+			// Skip all display only fields
+			if (f.isDisplayOnly())
+				continue;
+			
 			Value<?> v = f.getDBValue();
+			// if value is set then add it to the condition
 			if (v.getValue() != null) {
 				list.add(v);
 			}
@@ -458,7 +466,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			IField<Object> field = (IField<Object>) c;
 			for(Value<?> v : currentEntry.getValues()) {
 				// find value for the field
-				if (dbField.getFullName().equals(v.getDBField().getFullName())) {
+				if (!field.isDisplayOnly() && 
+						dbField.getFullName().equals(v.getDBField().getFullName())) {
+					// sets the value
 					field.setDBValue((Value<Object>) v);
 				}
 			}
@@ -542,9 +552,26 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	}
 	
 	private void setFieldsMode(int mode) {
-		for(Component c : fieldList){
-			IField<?> f = (IField<?>)c;
+		for(IField<?> f : fields){
 			f.setFieldMode(mode);
+		}
+	}
+	
+	/**
+	 * Raise the onEntryLoaded event
+	 */
+	private void raiseOnEntryLoadedEvent() {
+		/** Invoke entry loaded event **/
+		try {
+			eventProcessor.Invoke(EventType.ENTRY_LOADED, new Object[] {currentEntry});
+		} catch (Exception e1) {
+			Messagebox.show("Unable to raise onEntryLoaded event.", "error", Messagebox.OK, Messagebox.ERROR);
+			e1.printStackTrace();
+		}
+		// raise onEntryLoaded event for the fields
+		for (Component f : fieldList) {
+			Event e = new Event(VimEvents.ON_ENTRYLOADED, f);
+			Events.postEvent(e);
 		}
 	}
 }

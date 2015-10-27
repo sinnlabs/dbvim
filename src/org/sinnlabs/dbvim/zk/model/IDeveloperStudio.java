@@ -4,7 +4,7 @@
 package org.sinnlabs.dbvim.zk.model;
 
 import org.sinnlabs.dbvim.model.Form;
-import org.sinnlabs.dbvim.rules.engine.Rules;
+import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.Designer;
 import org.sinnlabs.dbvim.ui.DesignerCanvas;
 import org.sinnlabs.dbvim.ui.DesignerEvents;
@@ -65,4 +65,10 @@ public interface IDeveloperStudio {
 	 * @param form - target form
 	 */
 	public void FormTreeNode_onDoubleClick(Form form);
+	
+	/**
+	 * Raise when user double clicks on menu tree node
+	 * @param menu - target menu
+	 */
+	public void MenuTreeNode_onDoubleClick(SearchMenu menu);
 }
