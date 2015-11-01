@@ -38,7 +38,7 @@ public class FormFieldResolver {
 	private List<DBField> dbFields;
 	
 
-	public FormFieldResolver(Form form) throws Exception {
+	/*package*/ FormFieldResolver(Form form) throws Exception {
 		this.form = form;
 		
 		dbModel = new DBModel(form.getDBConnection().getConnectionString(), 
@@ -48,8 +48,8 @@ public class FormFieldResolver {
 		fields = new HashMap<String, IField<?>>();
 		
 		if (form.isJoin()) {
-			leftResolver = new FormFieldResolver(form.getLeftForm());
-			rightResolver = new FormFieldResolver(form.getRightForm());
+			leftResolver = FormFieldResolverFactory.getResolver(form.getLeftForm());
+			rightResolver = FormFieldResolverFactory.getResolver(form.getRightForm());
 		}
 		dbFields = findAllDBFields();
 		
@@ -96,7 +96,7 @@ public class FormFieldResolver {
 	 */
 	public IField<?> findByDBField(DBField f) {
 		for(IField<?> field : fields.values()) {
-			if (field.getDBField().getFullName().equals(f.getDBTypeName()))
+			if (field.getDBField().getFullName().equals(f.getFullName()))
 				return field;
 		}
 		return null;

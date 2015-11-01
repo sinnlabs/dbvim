@@ -64,6 +64,14 @@
 				<events>onFulfill</events>
 				<name>Style</name>
 	  		</component>
+	  		<component>
+	 			<class>org.zkoss.zul.Html</class>
+	  			<image16>images/designer/tree/components/Html.png</image16>
+	 			<image32>images/designer/toolkit/input/Html.png</image32>
+	 			<tooltip>Html - The html component used to embed whatever HTML tags you want to send directly to the browser.</tooltip>
+				<name>Html</name>
+	 			<events>onCreate, onDrop, onCtrlKey, onFulfill</events>	  		
+	  		</component>
 			<component>
 	  			<class>org.zkoss.zul.Menubar</class>
 	  			<image16>images/designer/tree/components/Menubar.png</image16>
@@ -774,6 +782,16 @@
 	  			<tooltip>TableField - Represents data from other form</tooltip>
 	  			<events></events>
 	  			<name>TableField</name>
+	  		</component>
+		</tab>
+		<tab name="Special Components">
+			<component>
+	  			<class>org.sinnlabs.dbvim.ui.components.ClientScriptManager</class>
+	  			<image16></image16>
+	  			<image32></image32>
+	  			<tooltip>ClientScriptManager - Component that used to eval custom java script on the client side.</tooltip>
+	  			<events></events>
+	  			<name>ClientScriptManager</name>
 	  		</component>
 		</tab>
   </tabs>

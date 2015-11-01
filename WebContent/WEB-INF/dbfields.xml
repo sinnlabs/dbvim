@@ -43,4 +43,9 @@
         <component-class>org.sinnlabs.dbvim.ui.db.TableColumnField</component-class>
 		<widget-class>zul.wgt.Cell</widget-class>
     </component>
+	<component>
+		<component-name>clientscriptmanager</component-name>
+		<component-class>org.sinnlabs.dbvim.ui.components.ClientScriptManager</component-class>
+		<widget-class>zul.wgt.Cell</widget-class>
+	</component>
 </language-addon>

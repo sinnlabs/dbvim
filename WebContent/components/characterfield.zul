@@ -3,5 +3,6 @@
 		<label id="label" value="CharacterField" visible="true"/>
 		<space id="space" spacing="0px"></space>
 		<textbox id="value" />
+		<button id="btnMenu" label="▼" visible="false" />
 	</hlayout>
 </zk>

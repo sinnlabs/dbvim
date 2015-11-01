@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
 import org.zkoss.zk.ui.Component;
@@ -333,13 +334,13 @@ public class CreateJoinFormDialog extends Window {
 	private void initStage2() throws Exception {
 		if (leftForm == null)
 			return;
-		FormFieldResolver leftResolver = new FormFieldResolver(leftForm);
+		FormFieldResolver leftResolver = FormFieldResolverFactory.getResolver(leftForm);
 		fillFieldList(lstFirstFields, leftResolver.getFields().values());
 		tabFirst.setLabel(leftForm.getName() + " fields");
 		
 		if (rightForm == null)
 			return;
-		FormFieldResolver rightResolver = new FormFieldResolver(rightForm);
+		FormFieldResolver rightResolver = FormFieldResolverFactory.getResolver(rightForm);
 		fillFieldList(lstSecondFields, rightResolver.getFields().values());
 		tabSecond.setLabel(rightForm.getName() + " fields");
 	}

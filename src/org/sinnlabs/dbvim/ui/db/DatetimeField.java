@@ -49,4 +49,12 @@ public class DatetimeField extends BaseField<Timestamp, Datebox> {
 		}
 		return new Value<Timestamp>(Timestamp.valueOf(string), dbField);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromObject(java.lang.Object)
+	 */
+	@Override
+	public Value<Timestamp> fromObject(Object val) {
+		return new Value<Timestamp>((Timestamp) val, dbField);
+	}
 }

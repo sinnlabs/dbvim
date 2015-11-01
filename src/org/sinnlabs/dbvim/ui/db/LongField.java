@@ -36,4 +36,12 @@ public class LongField extends BaseField<Long, Longbox> {
 		}
 		return new Value<Long>(Long.valueOf(string), dbField);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromObject(java.lang.Object)
+	 */
+	@Override
+	public Value<Long> fromObject(Object val) {
+		return new Value<Long>((Long) val, dbField);
+	}
 }

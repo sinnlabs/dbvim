@@ -51,11 +51,11 @@ public class Database {
 	
 	protected DatabaseConditionBuilder conditionBuilder;
 	
-	public Database() {
+	protected Database() {
 		
 	}
 	
-	public Database(Form form, FormFieldResolver resolver) throws ClassNotFoundException, SQLException, DatabaseOperationException {
+	/*package*/ Database(Form form, FormFieldResolver resolver) throws ClassNotFoundException, SQLException, DatabaseOperationException {
 		this.form = form;
 		DBModel model = new DBModel(form.getDBConnection().getConnectionString(), 
 				form.getDBConnection().getClassName());
@@ -180,7 +180,6 @@ public class Database {
 	 * @param fields List of fields to be selected. 
 	 * Can be null, then form result list will be use.
 	 * @param query - Query string
-	 * @param allFields - All IField on the form
 	 * @param limit Maximum number of rows to read or 0 if no max specified
 	 * @param context AbstractVariableSet<Value<?>> that contains special variables for the query
 	 * @return List of entries
@@ -226,6 +225,154 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Updates all entries in the form
+	 * @param values New field values
+	 * @throws DatabaseOperationException
+	 */
+	public void updateAll(List<Value<?>> values) throws DatabaseOperationException {
+		// Connect to the db
+		try {
+			Connection db = DriverManager.getConnection(form.getDBConnection()
+					.getConnectionString());
+
+			// build update query
+			String query = "UPDATE " + form.getQualifiedName()
+					+ " SET ";
+			// add values to the query
+			for (int i=0; i<values.size(); i++) {
+				query += values.get(i).getDBField().getName() + " = ?";
+				if (i<values.size()-1)
+					query += ", ";
+				else
+					query += " ";
+			}
+
+			// Prepare query
+			PreparedStatement ps = db.prepareStatement(query);
+
+			// setup all query parameters
+			// set values to update
+			for(int i=0; i<values.size(); i++) {
+				setParameter(ps, i+1, values.get(i));
+			}
+			
+			// Update entry:
+			ps.executeUpdate();
+		} catch (SQLException e1) {
+			System.err.println("ERROR: Unable to update entry: ");
+			e1.printStackTrace();
+			throw new DatabaseOperationException("Unable to update entries.", e1);
+		}
+	}
+	
+	/**
+	 * Updates multiple records
+	 * @param condition Qualification
+	 * @param values New field values
+	 * @throws DatabaseOperationException 
+	 */
+	public void update(List<Value<?>> condition, List<Value<?>> values) throws DatabaseOperationException {
+		// Connect to the db
+		try {
+			Connection db = DriverManager.getConnection(form.getDBConnection()
+					.getConnectionString());
+
+			// build update query
+			String query = "UPDATE " + form.getQualifiedName()
+					+ " SET ";
+			// add values to the query
+			for (int i=0; i<values.size(); i++) {
+				query += values.get(i).getDBField().getName() + " = ?";
+				if (i<values.size()-1)
+					query += ", ";
+				else
+					query += " ";
+			}
+
+			// build query qualification
+			query += " WHERE ";
+			// build condition
+			for(int i=0; i<condition.size(); i++) {
+				Value<?> v = condition.get(i);
+				query += v.getDBField().getName() + " ";
+				query += getOperator(v.getDBField()) + " ?";
+				if (i<condition.size()-1) {
+					query += " AND ";
+				}
+			}
+
+			// Prepare query
+			PreparedStatement ps = db.prepareStatement(query);
+
+			// setup all query parameters
+			// set values to update
+			for(int i=0; i<values.size(); i++) {
+				setParameter(ps, i+1, values.get(i));
+			}
+			// set qualification
+			for(int i=0; i<condition.size(); i++) {
+				setParameter(ps, values.size()+i+1, condition.get(i));
+			}
+
+			// Update entry:
+			ps.executeUpdate();
+		} catch (SQLException e1) {
+			System.err.println("ERROR: Unable to update entry: ");
+			e1.printStackTrace();
+			throw new DatabaseOperationException("Unable to update entry.", e1);
+		}
+	}
+	
+	public void update(List<Value<?>> values, String query, 
+			AbstractVariableSet<Value<?>> context) throws ParseException, DatabaseOperationException {
+		List<Value<?>> condition = new ArrayList<Value<?>>();
+		String dbCondition = conditionBuilder.buildCondition(query, context, resolver, condition);
+		
+		try {
+			Connection db = DriverManager.getConnection(form.getDBConnection()
+					.getConnectionString());
+
+			// build update query
+			String dbQuery = "UPDATE " + form.getQualifiedName()
+					+ " SET ";
+			// add values to the query
+			for (int i=0; i<values.size(); i++) {
+				dbQuery += values.get(i).getDBField().getName() + " = ?";
+				if (i<values.size()-1)
+					dbQuery += ", ";
+				else
+					dbQuery += " ";
+			}
+
+			if (!StringUtils.isBlank(dbCondition)) {
+				dbQuery += " WHERE " + dbCondition;
+			}
+			
+			
+			PreparedStatement ps = db.prepareStatement(dbQuery);
+			
+			// setup all query parameters
+			// set values to update
+			for(int i=0; i<values.size(); i++) {
+				setParameter(ps, i+1, values.get(i));
+			}
+			// set qualification
+			for(int i=0; i<condition.size(); i++) {
+				setParameter(ps, values.size()+i+1, condition.get(i));
+			}
+
+			// Update entry:
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DatabaseOperationException(
+					"Error while executing sql query.", e);
+		}
+
+	}
+
 	/**
 	 * Returns operator string
 	 * @param field

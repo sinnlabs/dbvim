@@ -6,6 +6,7 @@ package org.sinnlabs.dbvim.ui;
 import java.sql.SQLException;
 
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -127,8 +128,8 @@ public class SelectJoinFieldDialog extends Window {
 	private void fillFields(String fieldType) {
 		lstFields.getItems().clear();
 		try {
-			FormFieldResolver lr = new FormFieldResolver(form.getLeftForm());
-			FormFieldResolver rr = new FormFieldResolver(form.getRightForm());
+			FormFieldResolver lr = FormFieldResolverFactory.getResolver(form.getLeftForm());
+			FormFieldResolver rr = FormFieldResolverFactory.getResolver(form.getRightForm());
 			addFields(lr, fieldType, form.getLeftForm().getName());
 			addFields(rr, fieldType, form.getRightForm().getName());
 		} catch (Exception e) {

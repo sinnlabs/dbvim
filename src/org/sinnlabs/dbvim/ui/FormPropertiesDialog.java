@@ -12,6 +12,7 @@ import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.zkoss.zk.ui.Executions;
@@ -114,7 +115,7 @@ public class FormPropertiesDialog extends Window {
 	}
 	
 	private void initUI() throws Exception {
-		FormFieldResolver resolver = new FormFieldResolver(form);
+		FormFieldResolver resolver = FormFieldResolverFactory.getResolver(form);
 		fields = resolver.getFields();
 		
 		List<ResultColumn> resList = form.getResultList();
@@ -154,11 +155,11 @@ public class FormPropertiesDialog extends Window {
 		
 		if (form.isJoin()) {
 			tabJoin.setVisible(true);
-			FormFieldResolver leftResolver = new FormFieldResolver(form.getLeftForm());
+			FormFieldResolver leftResolver = FormFieldResolverFactory.getResolver(form.getLeftForm());
 			fillFieldList(lstFirstFields, leftResolver.getFields().values());
 			tabFirst.setLabel(form.getLeftForm().getName() + " fields");
 			
-			FormFieldResolver rightResolver = new FormFieldResolver(form.getRightForm());
+			FormFieldResolver rightResolver = FormFieldResolverFactory.getResolver(form.getRightForm());
 			fillFieldList(lstSecondFields, rightResolver.getFields().values());
 			tabSecond.setLabel(form.getRightForm().getName() + " fields");
 			
@@ -345,7 +346,7 @@ public class FormPropertiesDialog extends Window {
 	private void checkJoinCondition() throws Exception {
 		DatabaseConditionBuilder builder = new DatabaseConditionBuilder();
 		
-		FormFieldResolver resolver = new FormFieldResolver(form);
+		FormFieldResolver resolver = FormFieldResolverFactory.getResolver(form);
 		
 		builder.buildCondition(txtCondition.getText(), null, resolver, new ArrayList<Value<?>>(), 
 				"left", "right", new HashMap<DBField, String>(), new HashMap<DBField, String>(), true);

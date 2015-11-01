@@ -35,4 +35,12 @@ public class IntegerField extends BaseField<Integer, Intbox> {
 			return new Value<Integer>(null, dbField);
 		return new Value<Integer>(Integer.valueOf(string), dbField);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromObject(java.lang.Object)
+	 */
+	@Override
+	public Value<Integer> fromObject(Object val) {
+		return new Value<Integer>((Integer) val, dbField);
+	}
 }

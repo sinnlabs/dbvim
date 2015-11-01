@@ -15,16 +15,17 @@ import java.util.NoSuchElementException;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.db.Database;
-import org.sinnlabs.dbvim.db.DatabaseJoin;
+import org.sinnlabs.dbvim.db.DatabaseFactory;
 import org.sinnlabs.dbvim.db.Entry;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.evaluator.AbstractVariableSet;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
-import org.sinnlabs.dbvim.evaluator.StaticVariableSet;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
+import org.sinnlabs.dbvim.script.Record;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.annotations.EventType;
 import org.sinnlabs.dbvim.ui.annotations.WireEvent;
@@ -37,13 +38,13 @@ import org.zkoss.zk.ui.event.CreateEvent;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Idspace;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Messagebox;
 
 import com.mysql.jdbc.StringUtils;
 
@@ -121,13 +122,17 @@ public class TableField extends Idspace {
 		/* Create the ui */
 		isChildable = true;
 		Executions.createComponents("/components/tablefield.zul", this, null);
+		Selectors.wireVariables(this, this, null);
 		Selectors.wireComponents(this, this, false);
+		Selectors.wireEventListeners(this, this);
 
 		// lock the component
 		isChildable = false;
 		
 		init();
 	}
+	
+	
 
 	@WireEvent(EventType.CHANGE_FORM_MODE)
 	public void setFieldMode(int mode) {
@@ -140,11 +145,8 @@ public class TableField extends Idspace {
 		if (form == null)
 			return;
 		if (resolver == null) {
-			resolver = new FormFieldResolver(form);
-			if (form.isJoin())
-				db = new DatabaseJoin(form, resolver);
-			else
-				db = new Database(form, resolver);
+			resolver = FormFieldResolverFactory.getResolver(form);
+			db = DatabaseFactory.createInstance(form, resolver);
 		}
 		for (TableColumnField column : _items) {
 			IField<?> f = resolver.getFields().get(column.getField());
@@ -160,6 +162,15 @@ public class TableField extends Idspace {
 	
 	@WireEvent(EventType.ENTRY_LOADED)
 	public void onEntryLoaded(Entry e) throws ParseException, DatabaseOperationException {
+		loadData();
+	}
+	
+	@Listen("onClick = #btnRefresh")
+	public void refreshTable() throws ParseException, DatabaseOperationException {
+		loadData();
+	}
+	
+	private void loadData() throws ParseException, DatabaseOperationException {
 		lstData.getItems().clear();
 		AbstractVariableSet<Value<?>> variables = 
 				DatabaseConditionBuilder.buildVariablesFromFields(composer.getFields());
@@ -175,10 +186,22 @@ public class TableField extends Idspace {
 			lstData.getItems().add(item);
 		}
 	}
-
 	
-	public void updateTable(List<IField<?>> context, Database db) throws Exception {
-			
+	/**
+	 * Returns table records
+	 * @return
+	 */
+	public List<Record> getRecords() {
+		List<Record> records = new ArrayList<Record>(lstData.getItemCount());
+		for(Listitem i : lstData.getItems()) {
+			Entry e = i.getValue();
+			Record r = new Record();
+			for (int k=0; k<e.getValues().size(); k++) {
+				r.getValues().put(selectFields.get(k).getId(), e.getValues().get(k).getValue());
+			}
+			records.add(r);
+		}
+		return records;
 	}
 	
 	@Override
@@ -219,11 +242,6 @@ public class TableField extends Idspace {
 			return;
 		}
 		// we can not create resolver here, because it may cause infinity loop, so init it later
-		/*resolver = new FormFieldResolver(f);
-		if (f.isJoin())
-			db = new DatabaseJoin(f, resolver);
-		else
-			db = new Database(f, resolver);*/
 		form = f;
 	}
 	

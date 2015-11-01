@@ -35,4 +35,12 @@ public class DoubleField extends BaseField<Double, Doublebox> {
 			return new Value<Double>(null, dbField);
 		return new Value<Double>(Double.valueOf(string), dbField);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.sinnlabs.dbvim.ui.IField#fromObject(java.lang.Object)
+	 */
+	@Override
+	public Value<Double> fromObject(Object val) {
+		return new Value<Double>((Double) val, dbField);
+	}
 }

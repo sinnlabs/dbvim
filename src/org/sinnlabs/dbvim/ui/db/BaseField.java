@@ -75,6 +75,8 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	protected Menupopup popup;
 	
+	protected SearchMenuResolver menuResolver = null;
+	
 	private boolean readOnly;
 	
 	private boolean displayOnly = false;
@@ -189,9 +191,9 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 			popup = new Menupopup();
 			popup.setStyle("overflow: auto; max-height: 100vh;");
 			// Resolve menu items
-			SearchMenuResolver menuResolver = new SearchMenuResolver(searchMenu);
+			menuResolver = new SearchMenuResolver(searchMenu, composer);
 			
-			for(MenuItem i : menuResolver.getItems(composer)) {
+			for(MenuItem i : menuResolver.getItems()) {
 				// Add items to the popup menu
 				FieldMenuItem item = new FieldMenuItem(i);
 				item.setLabel(i.getLabel().getValue().toString());
@@ -431,17 +433,24 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 		displayOnly = val;
 	}
 	
+	/**
+	 * @return Returns menu resolver or null if menu is not set
+	 */
+	public SearchMenuResolver getMenuResolver() {
+		return menuResolver;
+	}
+	
 	@Override
 	public void onCreate(Map<?,?> args) throws Exception {
-		if (displayOnly)
-			return;
 		if (args != null) {
-			FormFieldResolver f = (FormFieldResolver) args.get("resolver");
-			if (f != null) {
-				dbField = f.getFieldByMapping(formName, map);
+			if (!displayOnly) {
+				FormFieldResolver f = (FormFieldResolver) args.get("resolver");
+				if (f != null) {
+					dbField = f.getFieldByMapping(formName, map);
+				}
 			}
 			Object c = args.get("composer");
-			if ( c!= null) {
+			if (c!= null) {
 				composer = (IFormComposer) c;
 				initMenu();
 			}

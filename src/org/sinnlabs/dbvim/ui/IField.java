@@ -106,6 +106,13 @@ public interface IField<T> {
 	public Value<T> fromString(String string);
 	
 	/**
+	 * Try to convert Object to value
+	 * @param val Object to be converted
+	 * @return
+	 */
+	public Value<T> fromObject(Object val);
+	
+	/**
 	 * Returns field label
 	 */
 	public String getLabel();

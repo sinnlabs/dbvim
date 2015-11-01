@@ -642,6 +642,23 @@ public class DatabaseJoin extends Database {
 		updateRecord(e, values, resolver);
 	}
 	
+	@Override
+	public void update(List<Value<?>> values, String query, 
+			AbstractVariableSet<Value<?>> context) throws ParseException, DatabaseOperationException {
+		throw new DatabaseOperationException("Operation not supported.", null);
+	}
+	
+	@Override
+	public void update(List<Value<?>> condition, List<Value<?>> values) 
+			throws DatabaseOperationException {
+		throw new DatabaseOperationException("Operation not supported.", null);
+	}
+	
+	@Override
+	public void updateAll(List<Value<?>> values) throws DatabaseOperationException {
+		throw new DatabaseOperationException("Operation not supported.", null);
+	}
+	
 	private void updateRecord(Entry e, List<Value<?>> values, FormFieldResolver r) throws DatabaseOperationException {
 		if (r.getForm().isJoin()) {
 			updateRecord(e, values, r.getLeftResolver());

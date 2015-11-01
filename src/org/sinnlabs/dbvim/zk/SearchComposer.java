@@ -4,20 +4,23 @@
 package org.sinnlabs.dbvim.zk;
 
 import java.io.StringReader;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.sinnlabs.dbvim.db.Database;
-import org.sinnlabs.dbvim.db.DatabaseJoin;
+import org.sinnlabs.dbvim.db.DatabaseFactory;
 import org.sinnlabs.dbvim.db.Entry;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
 import org.sinnlabs.dbvim.db.model.IDBField;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
+import org.sinnlabs.dbvim.script.ScriptApi;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.annotations.EventType;
 import org.sinnlabs.dbvim.ui.events.VimEvents;
@@ -25,10 +28,12 @@ import org.sinnlabs.dbvim.zk.model.FormEventProcessor;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -54,6 +59,7 @@ import org.zkoss.zul.impl.InputElement;
  * @author peter.liverovsky
  *
  */
+// @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SearchComposer extends SelectorComposer<Component> implements IFormComposer {
 
 	/**
@@ -66,6 +72,8 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	protected static final int MODE_RESULT = 2;
 	
 	protected static final int MODE_CREATE = 3;
+	
+	protected static final int MODE_CHANGE = 4;
 
 	@Wire("#border #searchResults")
 	North searchResults;
@@ -115,6 +123,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	@Wire("#divModify")
 	Hlayout divModify;
 	
+	@Wire("#divChange")
+	Hlayout divChange;
+	
 	@Wire("#south")
 	South south;
 	
@@ -156,27 +167,61 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	 */
 	List<Component> readonlyFields;
 	
+	/**
+	 * Database object for the current form
+	 */
 	Database db;
 	
+	/**
+	 * Api for the scripting
+	 */
+	ScriptApi api;
+	
 	List<Value<?>> lastSearch;
+	
+	private LastSearch search;
+	
+	private int currentViewMode;
 
 	private boolean isAdditional = false;
 	
 	public List<IField<?>> getFields() { return fields; }
 	
-	public void doAfterCompose(Component comp) throws Exception {
-		super.doAfterCompose(comp);
-
+	public ScriptApi getApi() { return api; }
+	
+	private class LastSearch {
+		public List<Value<?>> values;
+		public String additional;
+	}
+	
+	public ComponentInfo doBeforeCompose(Page page, Component parent, ComponentInfo compInfo) {
+		search = new LastSearch();
 		form = (Form) Executions.getCurrent().getArg().get("form");
-		resolver = new FormFieldResolver(form);
+		try {
+			resolver = FormFieldResolverFactory.getResolver(form);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		fieldList = new ArrayList<Component>();
 		fields = new ArrayList<IField<?>>();
 		eventProcessor = new FormEventProcessor();
 		
-		if (form.isJoin())
-			db = new DatabaseJoin(form, resolver);
-		else
-			db = new Database(form, resolver);
+		try {
+			db = DatabaseFactory.createInstance(form, resolver);
+		} catch (ClassNotFoundException | DatabaseOperationException
+				| SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		api = new ScriptApi(this);
+		
+		return super.doBeforeCompose(page, parent, compInfo);
+	}
+	
+	public void doAfterCompose(Component comp) throws Exception {
+		super.doAfterCompose(comp);
 		
 		loadForm();
 		
@@ -214,6 +259,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	@Listen("onSelect = #lstResults")
 	public void lstResults_onSelect() {
 		Entry e = results.getSelectedItem().getValue();
+		setMode(MODE_RESULT);
 		try {
 			currentEntry = db.readEntry(e);
 		} catch (DatabaseOperationException ex) {
@@ -243,9 +289,15 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		clearAllFields(detailsView);
 	}
 	
+	@Listen("onClick = #btnChangeAll")
+	public void btnChangeAll_onClick() {
+		setMode(MODE_CHANGE);
+		clearAllFields(detailsView);
+	}
+	
 	@Listen("onClick = #btnSave")
 	public void btnSave_onClick() {
-		if (currentEntry != null) {
+		if (currentEntry != null && currentViewMode == MODE_RESULT) {
 			if (scanForNulls()) {
 				return;
 			}
@@ -262,6 +314,34 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 				Messagebox.show("Unable to update entry.", "Update error.", 
 						Messagebox.OK, Messagebox.ERROR);
 				e.printStackTrace();
+				return;
+			}
+			
+			// mark as modified
+			if (results.getSelectedItem() != null) {
+				markItemAsChanged(results.getSelectedItem());
+			}
+		} else if (currentViewMode == MODE_CHANGE) {
+			Messagebox.show("You are shure that you want to update " + this.results.getItemCount() +
+					" entries.", 
+					"Update entries", Messagebox.YES | Messagebox.NO, Messagebox.QUESTION, 
+					new EventListener<Event>() {
+
+						@Override
+						public void onEvent(Event evnt) throws Exception {
+							if (evnt.getName().equals(Messagebox.ON_YES)) {
+								updateAllEntries();
+							}
+						}
+				
+			});
+		}
+	}
+	
+	private void markItemAsChanged(Listitem item) {
+		for (Component c : item.getChildren()) {
+			if (c instanceof Listcell) {
+				((Listcell) c).setStyle("font-style: italic;");
 			}
 		}
 	}
@@ -320,6 +400,37 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		}
 	}
 	
+	/**
+	 * Updates all fields from result list with value
+	 * @throws ParseException
+	 * @throws DatabaseOperationException
+	 */
+	private void updateAllEntries() throws ParseException, DatabaseOperationException {
+		if (search == null)
+			return;
+		
+		// get the user values
+		List<Value<?>> values = getUserValues();
+		
+		// update the records
+		if (search.values == null && search.additional != null) {
+			db.update(values, search.additional, null);
+		} else if (search.values != null && search.additional == null) {
+			db.update(search.values, values);
+		} else if (search.values == null && search.additional == null) {
+			db.updateAll(values);
+		}
+		
+		// mark all result list items as changed
+		for (Listitem i : results.getItems()) {
+			markItemAsChanged(i);
+		}
+	}
+	
+	/**
+	 * Perform search on the form
+	 * @param values - User entered values, that can be used for filtering
+	 */
 	private void search(List<Value<?>> values) {
 		List<Entry> entries = null;
 		if (values == null)
@@ -331,10 +442,17 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 					fields.add((IField<?>) c);
 				}
 				entries = db.query(null, txtAdditionalSearch.getText(), 0, null);
+				search.values = null;
+				search.additional = txtAdditionalSearch.getText();
 			} else if (isAdditional == false && values.size() == 0) {
 				entries = db.queryAll(null, 0);
-			} else
+				search.values = null;
+				search.additional = null;
+			} else {
 				entries = db.query(null, values, 0);
+				search.values = values;
+				search.additional = null;
+			}
 		} catch(DatabaseOperationException e) {
 			Messagebox.show("DB Operation error: " + e.getMessage(), "ERROR",
 					Messagebox.OK, Messagebox.ERROR);
@@ -384,6 +502,11 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		raiseOnEntryLoadedEvent();
 	}
 	
+	/**
+	 * Checks that all not nullable fields has the assigned value.
+	 * Shows notification to user if not nullable field set to null
+	 * @return False if all not nullable fields has a value, otherwise True
+	 */
 	private boolean scanForNulls() {
 		boolean ret = false;
 		for(Component c : this.fieldList) {
@@ -397,11 +520,18 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		return ret;
 	}
 	
+	/**
+	 * Creates form ui
+	 * @throws Exception
+	 */
 	private void loadForm() throws Exception {
+		// get form view definition
 		StringReader r = new StringReader(form.getView());
+		// sets executions parameters
 		HashMap<String, Object> args = new HashMap<String, Object>();
 		args.put("resolver", resolver);
 		args.put("composer", this);
+		// create the ui
 		Executions.createComponentsDirectly(r, null, detailsView, args);
 		Selectors.wireVariables(detailsView, this, null);
 		
@@ -458,6 +588,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		return list;
 	}
 	
+	/**
+	 * Fill form fields with currentEntry values
+	 */
 	@SuppressWarnings("unchecked")
 	private void populateFields() {
 		// read all fields
@@ -475,7 +608,12 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		} // for
 	} // populateFields
 	
+	/**
+	 * Changes form view mode (create, modify, etc)
+	 * @param mode Form view mode
+	 */
 	private void setMode(int mode) {
+		currentViewMode = mode;
 		if (mode == MODE_SEARCH) {
 			searchResults.setVisible(false);
 			btnSearch.setVisible(true);
@@ -489,6 +627,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			divSearch.setVisible(true);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(false);
+			divChange.setVisible(false);
 			setFieldsMode(IField.MODE_SEARCH);
 			setAdditionalSearch(false);
 			try {
@@ -511,6 +650,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(false);
 			divModify.setVisible(true);
+			divChange.setVisible(false);
 			setFieldsMode(IField.MODE_MODIFY);
 			try {
 				eventProcessor.Invoke(EventType.CHANGE_FORM_MODE, new Object[] {IField.MODE_MODIFY});
@@ -532,6 +672,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			divSearch.setVisible(false);
 			divNewEntry.setVisible(true);
 			divModify.setVisible(false);
+			divChange.setVisible(false);
 			if (form.isJoin())
 				btnCreate.setDisabled(true);
 			else
@@ -544,13 +685,43 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 				e.printStackTrace();
 			}
 		}
+		if (mode == MODE_CHANGE) {
+			searchResults.setVisible(true);
+			btnSearch.setVisible(false);
+			btnSave.setVisible(true);
+			btnCreate.setVisible(false);
+			btnChange.setDisabled(false);
+			btnCopy.setDisabled(false);
+			btnDelete.setDisabled(false);
+			btnAdditionalSearch.setDisabled(true);
+			south.setVisible(false);
+			divSearch.setVisible(false);
+			divNewEntry.setVisible(false);
+			divModify.setVisible(false);
+			divChange.setVisible(true);
+			setFieldsMode(IField.MODE_MODIFY);
+			try {
+				eventProcessor.Invoke(EventType.CHANGE_FORM_MODE, new Object[] {IField.MODE_MODIFY});
+			} catch (Exception e) {
+				Messagebox.show("Unable to change field mode.", "error", Messagebox.OK, Messagebox.ERROR);
+				e.printStackTrace();
+			}
+		}
 	}
 	
+	/**
+	 * Shows additional search bar
+	 * @param b True - show bar, otherwise false
+	 */
 	private void setAdditionalSearch(boolean b) {
 		south.setVisible(b);
 		isAdditional  = b;
 	}
 	
+	/**
+	 * Sets view mode to all form fields
+	 * @param mode
+	 */
 	private void setFieldsMode(int mode) {
 		for(IField<?> f : fields){
 			f.setFieldMode(mode);
@@ -574,4 +745,5 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			Events.postEvent(e);
 		}
 	}
+
 }

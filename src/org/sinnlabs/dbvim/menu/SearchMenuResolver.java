@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sinnlabs.dbvim.db.Database;
-import org.sinnlabs.dbvim.db.DatabaseJoin;
+import org.sinnlabs.dbvim.db.DatabaseFactory;
 import org.sinnlabs.dbvim.db.Entry;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.exceptions.DatabaseOperationException;
@@ -15,6 +15,7 @@ import org.sinnlabs.dbvim.evaluator.AbstractVariableSet;
 import org.sinnlabs.dbvim.evaluator.DatabaseConditionBuilder;
 import org.sinnlabs.dbvim.evaluator.exceptions.ParseException;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
@@ -30,18 +31,23 @@ public class SearchMenuResolver {
 	private SearchMenu menu;
 	
 	private Database db;
+	
+	private IFormComposer composer;
 
-	public SearchMenuResolver(SearchMenu menu) throws Exception {
+	public SearchMenuResolver(SearchMenu menu, IFormComposer composer) throws Exception {
 		this.menu = menu;
-		resolver = new FormFieldResolver(menu.getForm());
-		if (menu.getForm().isJoin()) {
-			db = new DatabaseJoin(menu.getForm(), resolver);
-		} else {
-			db = new Database(menu.getForm(), resolver);
-		}
+		resolver = FormFieldResolverFactory.getResolver(menu.getForm());
+		db = DatabaseFactory.createInstance(menu.getForm(), resolver);
+		this.composer = composer;
 	}
 	
-	public List<MenuItem> getItems(IFormComposer composer) 
+	/**
+	 * Returns menu items
+	 * @return
+	 * @throws ParseException
+	 * @throws DatabaseOperationException
+	 */
+	public List<MenuItem> getItems() 
 			throws ParseException, DatabaseOperationException {
 		
 		List<MenuItem> items = new ArrayList<MenuItem>();
@@ -63,5 +69,41 @@ public class SearchMenuResolver {
 			}
 		}
 		return items;
+	}
+	
+	/**
+	 * Gets MenuItem by label
+	 * @param label Label to be searched
+	 * @return MenuItem
+	 * @throws ParseException
+	 * @throws DatabaseOperationException
+	 */
+	public MenuItem byLabel(Object label) throws ParseException, DatabaseOperationException {
+		List<MenuItem> menuItems = this.getItems();
+		
+		for (MenuItem i : menuItems) {
+			if (i.getLabel().getValue().equals(label)) {
+				return i;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Gets MenuItem by Value
+	 * @param value Value to be searched
+	 * @return MenuItem
+	 * @throws ParseException
+	 * @throws DatabaseOperationException
+	 */
+	public MenuItem byValue(Object value) throws ParseException, DatabaseOperationException {
+		List<MenuItem> menuItems = this.getItems();
+		
+		for (MenuItem i : menuItems) {
+			if (i.getValue().getValue().equals(value)) {
+				return i;
+			}
+		}
+		return null;
 	}
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.ui.db.TableColumnField;
 import org.sinnlabs.dbvim.ui.db.TableField;
@@ -263,7 +264,7 @@ public class TableFieldProperties extends Window {
 		}
 		
 		try {
-			resolver = new FormFieldResolver(form);
+			resolver = FormFieldResolverFactory.getResolver(form);
 		} catch (Exception e) {
 			Messagebox.show("Unable to load form fields: " + txtFormName.getText(), "Error", 
 					Messagebox.OK, Messagebox.ERROR);
