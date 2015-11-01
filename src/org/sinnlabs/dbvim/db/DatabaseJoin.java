@@ -47,7 +47,7 @@ public class DatabaseJoin extends Database {
 	 * @throws SQLException
 	 * @throws DatabaseOperationException
 	 */
-	public DatabaseJoin(Form form, FormFieldResolver resolver) throws DatabaseOperationException, ClassNotFoundException, SQLException {
+	/*package*/ DatabaseJoin(Form form, FormFieldResolver resolver) throws DatabaseOperationException, ClassNotFoundException, SQLException {
 		if (!form.isJoin())
 			throw new IllegalArgumentException("Form should be join.");
 		
@@ -663,7 +663,7 @@ public class DatabaseJoin extends Database {
 			for(Value<?> nv : formValues) {
 				for(Value<?> ov : e.getValues()) {
 					// if new value is different
-					if (nv.getDBField().getName().equals(ov.getDBField().getName())
+					if (nv.getDBField().getFullName().equals(ov.getDBField().getFullName())
 							&& (ov.getValue() == null || !nv.getValue().equals(ov.getValue())) ) {
 						// add new value to the list
 						newValues.add(nv);
