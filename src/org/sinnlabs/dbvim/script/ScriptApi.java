@@ -29,6 +29,10 @@ public class ScriptApi {
 
 	SearchComposer composer;
 	
+	/**
+	 * Creates ScriptApi instance
+	 * @param composer Current search composer
+	 */
 	public ScriptApi(SearchComposer composer) {
 		this.composer = composer;
 	}
@@ -133,6 +137,33 @@ public class ScriptApi {
 			Database db = DatabaseFactory.createInstance(f, resolver);
 			
 			db.updateEntry(entry, entry.getValues());
+		} else {
+			throw new IllegalArgumentException("Form does not exists.");
+		}
+	}
+	
+	/**
+	 * Updates all matching request with values
+	 * @param formName Form name
+	 * @param qualification Update query qualification
+	 * @param values new values
+	 * @throws Exception
+	 */
+	public void updateEntry(String formName, String qualification, Record values) throws Exception {
+		AbstractVariableSet<Value<?>> vars = 
+				DatabaseConditionBuilder.buildVariablesFromFields(composer.getFields());
+		Form f = getForm(formName);
+		if (f!= null) {
+			FormFieldResolver resolver = FormFieldResolverFactory.getResolver(f);
+			Database db = DatabaseFactory.createInstance(f, resolver);
+			// Fill db values list
+			List<Value<?>> newValues = new ArrayList<Value<?>>(values.getValues().size());
+			for (java.util.Map.Entry<String, Object> entry : values.getValues().entrySet()) {
+				Value<?> v = resolver.getFields().get(entry.getKey()).fromObject(entry.getValue());
+				newValues.add(v);
+			}
+			
+			db.update(newValues, qualification, vars);
 		} else {
 			throw new IllegalArgumentException("Form does not exists.");
 		}

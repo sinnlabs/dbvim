@@ -195,14 +195,16 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	}
 	
 	public ComponentInfo doBeforeCompose(Page page, Component parent, ComponentInfo compInfo) {
+		// We must do initialization before ui will be created
+		// initialize all for related objects
 		search = new LastSearch();
 		form = (Form) Executions.getCurrent().getArg().get("form");
 		try {
 			resolver = FormFieldResolverFactory.getResolver(form);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// init field lists
 		fieldList = new ArrayList<Component>();
 		fields = new ArrayList<IField<?>>();
 		eventProcessor = new FormEventProcessor();
@@ -211,10 +213,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			db = DatabaseFactory.createInstance(form, resolver);
 		} catch (ClassNotFoundException | DatabaseOperationException
 				| SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		// init script api object
 		api = new ScriptApi(this);
 		
 		return super.doBeforeCompose(page, parent, compInfo);
@@ -222,7 +223,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
+		// create form ui
 		loadForm();
 		
 		currentEntry = null;

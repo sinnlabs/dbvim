@@ -324,6 +324,14 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Updates all matching requests
+	 * @param values List of new values
+	 * @param query qualification
+	 * @param context qualification context
+	 * @throws ParseException
+	 * @throws DatabaseOperationException
+	 */
 	public void update(List<Value<?>> values, String query, 
 			AbstractVariableSet<Value<?>> context) throws ParseException, DatabaseOperationException {
 		List<Value<?>> condition = new ArrayList<Value<?>>();
