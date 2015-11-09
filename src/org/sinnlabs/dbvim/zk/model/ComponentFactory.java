@@ -240,6 +240,7 @@ public class ComponentFactory {
 							arrValidProps = new PropertyDescriptor[]{};
 						// this is a valid property, so add it to the array
 						arrValidProps = (PropertyDescriptor[]) ArrayUtils.add(arrValidProps, descriptor);
+						continue;
 					}
 				}
 				

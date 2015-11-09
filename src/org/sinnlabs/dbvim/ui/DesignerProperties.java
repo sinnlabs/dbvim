@@ -92,7 +92,10 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 		this.setTitle(ComponentFactory.getSimpleClassName(current) + " Properties");
 
 		// get the propery descriptors of the Component class
-		PropertyDescriptor[] arrDescriptors = ComponentFactory.getComponentProperties(current);	
+		PropertyDescriptor[] arrDescriptors = ComponentFactory.getComponentProperties(current);
+		
+		String[] customProps = RulesEngine.getComponentAttributes(current, 
+				RulesEngine.ATTRIBUTES_CUSTOM_PROPERTIES);
 
 		if (ArrayUtils.isEmpty(arrDescriptors))
 			return;
@@ -151,6 +154,11 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 					 (descriptor.getPropertyType() != int.class) &&
 					 (descriptor.getPropertyType() != long.class))
 				{
+					cmpValue = RulesEngine.getSpecialProperty(current, sName, developer);
+					row.appendChild(cmpValue);
+				}
+				else if (ArrayUtils.isNotEmpty(customProps) && 
+						ArrayUtils.contains(customProps, descriptor.getName())) {
 					cmpValue = RulesEngine.getSpecialProperty(current, sName, developer);
 					row.appendChild(cmpValue);
 				}
