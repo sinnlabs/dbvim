@@ -25,7 +25,7 @@ import org.zkoss.zul.Textbox;
  */
 public class HtmlRules implements IRulable {
 
-	String[] excludedProperties = new String[] {"zclass", "action", "autag", "widgetClass", 
+	String[] excludedProperties = new String[] {"zclass", "Zclass", "action", "autag", "widgetClass", 
 			 "droppable", "popup", "context", "draggable", "style"};
 	String[] specialProperties = new String[] {"content"};
 	

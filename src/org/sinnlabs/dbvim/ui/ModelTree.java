@@ -23,11 +23,13 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Idspace;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Toolbarbutton;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.Treeitem;
 
 /**
+ * Class represents tree that contains all server objects (forms, menus, etc)
  * @author peter.liverovsky
  *
  */
@@ -136,22 +138,33 @@ public class ModelTree extends Idspace {
 
 			@Override
 			public void onEvent(MouseEvent e) throws Exception {
-				Treeitem selected = trModelTree.getSelectedItem();
+				final Treeitem selected = trModelTree.getSelectedItem();
 				if (selected != null) {
-					Object value = selected.getValue();
-					// Check selected item type
-					if (value instanceof DBConnection) {
-						ConfigLoader.getInstance().getDBConnections()
-							.delete((DBConnection) value);
-						RefreshTree();
-					}
-					if (value instanceof FormTreeNode) {
-						Form frm = (Form) ((FormTreeNode)value).getForm();
-						ConfigLoader.getInstance().getForms()
-							.delete(frm);
-						RefreshTree();
-					}
-				}
+					Messagebox.show("Do you really want to delete object?", "Delete object", 
+							Messagebox.YES | Messagebox.NO, 
+							Messagebox.QUESTION, new EventListener<Event>() {
+
+						@Override
+						public void onEvent(Event evnt) throws Exception {
+							if (Messagebox.ON_YES.equals(evnt.getName())) {
+								Object value = selected.getValue();
+								// Check selected item type
+								if (value instanceof DBConnection) {
+									ConfigLoader.getInstance().getDBConnections()
+										.delete((DBConnection) value);
+									RefreshTree();
+								}
+								if (value instanceof FormTreeNode) {
+									Form frm = (Form) ((FormTreeNode)value).getForm();
+									ConfigLoader.getInstance().getForms()
+										.delete(frm);
+									RefreshTree();
+								}
+							}
+						}
+					});
+
+				} // if
 			}
 			
 		});
