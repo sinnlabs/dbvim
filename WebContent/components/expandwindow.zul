@@ -1,0 +1,12 @@
+<?page title="new page title" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<vlayout vflex="1" hflex="1">
+	<hlayout vflex="1" hflex="1"><textbox id="textbox" hflex="1" multiline="true" vflex="1"/></hlayout>
+	<hlayout>
+		<div hflex="1" />
+		<button id="btnOK" label="OK" />
+		<button id="btnCancel" label="Cancel" />
+		<div hflex="1" />
+	</hlayout>
+	</vlayout>
+</zk>

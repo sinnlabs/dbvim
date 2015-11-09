@@ -19,5 +19,6 @@
 	<component class="org.sinnlabs.dbvim.ui.db.DoubleField" rulesClass="org.sinnlabs.dbvim.rules.DoubleFieldRules" />
 	<component class="org.sinnlabs.dbvim.ui.db.TableField" rulesClass="org.sinnlabs.dbvim.rules.TableFieldRules" />
 	<component class="org.sinnlabs.dbvim.ui.components.ClientScriptManager" rulesClass="org.sinnlabs.dbvim.rules.ClientScriptManagerRules" />
+	<component class="org.zkoss.zul.Html" rulesClass="org.sinnlabs.dbvim.rules.HtmlRules" />
 	<!-- Custom Components -->
 </rules>
