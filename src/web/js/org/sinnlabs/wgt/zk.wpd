@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package name="org.sinnlabs.wgt" language="xul/html" depends="zul.wgt">
+    <widget name="DBField"/>
+</package>

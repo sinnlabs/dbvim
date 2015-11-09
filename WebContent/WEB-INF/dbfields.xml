@@ -7,31 +7,37 @@
         <component-name>characterfield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.CharacterField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>integerfield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.IntegerField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>decimalfield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.DecimalField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>longfield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.LongField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>datetimefield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.DatetimeField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>doublefield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.DoubleField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
         <component-name>tablefield</component-name>
