@@ -40,4 +40,21 @@ public class FormFieldResolverFactory {
 			return cache.get(f.getName());
 		}
 	}
+	
+	/**
+	 * Returns cached forms count
+	 * @return
+	 */
+	public static int getCacheSize() {
+		return cache.size();
+	}
+	
+	/**
+	 * Flush forms cache
+	 */
+	public static void flushCache() {
+		synchronized(cache) {
+			cache.clear();
+		}
+	}
 }

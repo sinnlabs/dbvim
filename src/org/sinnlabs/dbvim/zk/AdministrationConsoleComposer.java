@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Role;
 import org.sinnlabs.dbvim.model.User;
 import org.sinnlabs.dbvim.security.LoginProvider;
@@ -72,6 +73,9 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 	@Wire
 	Textbox txtRoleDesc;
 	
+	@Wire
+	Label formsCount;
+	
 	User selectedUser;
 	Role selectedRole;
 	
@@ -87,8 +91,24 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 		refreshUserList();
 		// fill roles list
 		refreshRoleList();
+		// Refresh cache UI
+		refreshCache();
 	}
 	
+	/**
+	 * Refresh cache UI
+	 */
+	private void refreshCache() {
+		int size = FormFieldResolverFactory.getCacheSize();
+		formsCount.setValue("Forms cahced: " + size);
+	}
+	
+	@Listen("onClick = #btnFlushCache")
+	public void btnFlushCache_onClick() {
+		FormFieldResolverFactory.flushCache();
+		refreshCache();
+	}
+
 	@Listen("onSelect = #lstUsers")
 	public void lstUsers_onSelect() throws SQLException {
 		if (isUserDirty) {
