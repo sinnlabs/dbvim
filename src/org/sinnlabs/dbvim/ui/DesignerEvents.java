@@ -190,10 +190,10 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 			model.addEventHandler((AbstractComponent)current, sEventName, sScript);
 			
 			
-			// reload the model without refreshing the tree, 
+			// reload the model with refreshing the tree, 
 			// so that the updated event handlers will be activated
 			developer.getDesignerCanvas().
-				loadModelFromDocument(model.getZUMLDocument(), false);
+				loadModelFromDocument(model.getZUMLDocument(), true);
 		}
 		catch (Exception e)
 		{
