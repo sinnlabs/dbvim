@@ -23,7 +23,7 @@ public class EventsOnOkEventListener implements EventListener<Event> {
 	@Override
 	public void onEvent(Event event) throws Exception {
 		// update the event handler
-		developer.getDesignerEvents().updateEventHandlers(event.getTarget());
+		developer.getDesignerEvents().updateEventHandlers(event.getTarget().getParent());
 		// set dirty flag
 		developer.getDesignerCanvas().setDirty(true);
 	}

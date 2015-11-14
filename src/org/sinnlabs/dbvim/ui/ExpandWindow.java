@@ -3,13 +3,13 @@
  */
 package org.sinnlabs.dbvim.ui;
 
+import org.sinnlabs.zk.ui.CodeMirror;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 /**
@@ -40,7 +40,7 @@ public class ExpandWindow extends Window {
 	private int nSelectedAction = DD_CANCEL;
 
 	@Wire
-	Textbox textbox;
+	CodeMirror textbox;
 
 	public ExpandWindow() {
 		super();
@@ -79,6 +79,13 @@ public class ExpandWindow extends Window {
 	 */
 	public String getText() {
 		return textbox.getText();
+	}
+	
+	/**
+	 * Sets codemirror mode
+	 */
+	public void setMode(String mode) {
+		textbox.setMode(mode);
 	}
 	
 	@Listen("onClick = #btnOK")

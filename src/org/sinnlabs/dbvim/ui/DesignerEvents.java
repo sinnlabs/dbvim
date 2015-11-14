@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sinnlabs.dbvim.ui.events.EventsExpandOnClickEventListener;
 import org.sinnlabs.dbvim.ui.events.EventsOnOkEventListener;
 import org.sinnlabs.dbvim.zk.model.ComponentFactory;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
@@ -21,8 +22,11 @@ import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.sys.ComponentCtrl;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Column;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Groupbox;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
@@ -55,6 +59,12 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 
 	@Wire("#gridEvents")
 	protected Grid gridEvents;
+	
+	@Wire
+	protected Column colEvent;
+	
+	@Wire
+	protected Column colHandler;
 
 	public DesignerEvents() {
 		
@@ -105,8 +115,10 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 		if (ArrayUtils.isEmpty(arrEvents))
 			return;
 		
-		// create property event listener
+		// create property event listeners
 		EventsOnOkEventListener listener = new EventsOnOkEventListener(developer);
+		EventsExpandOnClickEventListener expandListener = 
+				new EventsExpandOnClickEventListener(developer);
 
 		mapEvents = new HashMap<Component, String>();
 
@@ -135,11 +147,21 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 
 				// add the Handler value at the 2nd column
 
+				Hlayout layout = new Hlayout();
+				layout.setValign("middle");
+				
+				
 				// for any other property type, display a
 				// textbox component
 				Textbox textbox = new Textbox();
-				textbox.setWidth("95%");
+				textbox.setHflex("1");
 				textbox.setMaxlength(1000);
+				layout.appendChild(textbox);
+				
+				// button for expand box
+				Button expand = new Button();
+				expand.setLabel("...");
+				layout.appendChild(expand);
 
 				// if the size of the value string is > 50 chars,
 				// set the Textbox to multiline, so that the value
@@ -149,17 +171,20 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 
 				// display the value on the Textbox
 				textbox.setValue(sScript);
-				row.appendChild(textbox);
+				row.appendChild(layout);
 
 				// add the Textbox objects to the Hashmap,
 				// using their Ids as the key
-				mapEvents.put(textbox, sEventName);
+				mapEvents.put(layout, sEventName);
 				textbox.addEventListener(Events.ON_CHANGE, listener);
 				textbox.addEventListener(Events.ON_OK, listener);
+				expand.addEventListener(Events.ON_CLICK, expandListener);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+		colEvent.setHflex("min");
+		colHandler.setHflex("1");
 	}
 	
 	/**
@@ -181,7 +206,7 @@ public class DesignerEvents extends Groupbox implements IdSpace {
 			String sEventName = (String) mapEvents.get(cmpValue);
 							
 			// get the event handling script (textbox value)
-			String sScript = ((Textbox) cmpValue).getValue();
+			String sScript = ((Textbox) cmpValue.getChildren().get(0)).getValue();
 					
 			if (sScript == null)
 				sScript = "";
