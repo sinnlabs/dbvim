@@ -9,6 +9,7 @@ import org.sinnlabs.dbvim.rules.engine.RulesResult;
 import org.sinnlabs.dbvim.rules.engine.exceptions.RulesException;
 import org.sinnlabs.dbvim.ui.ExpandWindow;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
+import org.sinnlabs.zk.ui.CodeMirror;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -184,6 +185,7 @@ public class HtmlRules implements IRulable {
 					ExpandWindow expandBox = new ExpandWindow();
 					CloseExpandBoxEventListener listener = new CloseExpandBoxEventListener(html, txtContent);
 					expandBox.setTitle("Content");
+					expandBox.setMode(CodeMirror.TEXT_HTML);
 					expandBox.setText(txtContent.getText());
 					expandBox.addEventListener(Events.ON_CLOSE, listener);
 					expandBox.setPosition("center");

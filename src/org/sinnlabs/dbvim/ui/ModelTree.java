@@ -3,6 +3,9 @@
  */
 package org.sinnlabs.dbvim.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
@@ -14,6 +17,9 @@ import org.sinnlabs.dbvim.ui.modeltree.ModelTreeRenderer;
 import org.sinnlabs.dbvim.ui.modeltree.TableTreeNode;
 import org.sinnlabs.dbvim.zk.model.DeveloperFactory;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
+import org.sinnlabs.zk.ui.CodeMirror;
+import org.w3c.dom.Document;
+import org.w3c.tidy.Tidy;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -51,6 +57,9 @@ public class ModelTree extends Idspace {
 	
 	@Wire
 	protected Toolbarbutton btnDelete;
+	
+	@Wire
+	protected Toolbarbutton btnEditFormXML;
 
 	public ModelTree() throws SQLException {
 
@@ -88,6 +97,48 @@ public class ModelTree extends Idspace {
 		dialog.doModal();
 	}
 	
+	private void btnEditFormXML_onClick() throws UnsupportedEncodingException {
+		final Treeitem selected = trModelTree.getSelectedItem();
+		if (selected != null) {
+			Object value = selected.getValue();
+			// Check selected item type
+			if (value instanceof FormTreeNode) {
+				final Form frm = (Form) ((FormTreeNode)value).getForm();
+				final ExpandWindow dialog = new ExpandWindow();
+				dialog.setMode(CodeMirror.XML);
+				dialog.setText(beautyHTML(frm.getView()));
+				dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if (dialog.getSelectedAction() == ExpandWindow.DD_OK) {
+							frm.setView(beautyHTML(dialog.getText()));
+							ConfigLoader.getInstance().getForms().update(frm);
+						}
+					}
+					
+				});
+				this.appendChild(dialog);
+				dialog.doModal();
+			}
+		}
+	}
+	
+	private String beautyHTML(String html) throws UnsupportedEncodingException {
+		Tidy tidy = new Tidy();
+		tidy.setInputEncoding("UTF-8");
+	    tidy.setOutputEncoding("UTF-8");
+	    tidy.setWraplen(Integer.MAX_VALUE);
+	    tidy.setXmlOut(true);
+	    tidy.setXmlTags(true);
+	    tidy.setSmartIndent(true);
+	    ByteArrayInputStream inputStream = new ByteArrayInputStream(html.getBytes("UTF-8"));
+	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    Document doc = tidy.parseDOM(inputStream, null);
+	    tidy.pprint(doc, outputStream);
+	    return outputStream.toString("UTF-8");
+	}
+
 	private void RefreshTree() throws SQLException {
 		trModelTree.clear();
 		trModelTree.setModel(new ModelTreeNode());
@@ -129,6 +180,15 @@ public class ModelTree extends Idspace {
 			@Override
 			public void onEvent(MouseEvent e) throws Exception {
 				RefreshTree();
+			}
+			
+		});
+		
+		btnEditFormXML.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+			@Override
+			public void onEvent(MouseEvent arg0) throws Exception {
+				btnEditFormXML_onClick();
 			}
 			
 		});

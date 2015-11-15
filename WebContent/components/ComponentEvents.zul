@@ -1,8 +1,8 @@
 <zk>
 <grid id="gridEvents"  hflex="1" vflex="1">
 		<columns sizable="true">
-			<column label="Event"/>
-			<column label="Handler"/>
+			<column id="colEvent" label="Event"/>
+			<column id="colHandler" label="Handler"/>
 		</columns>
 		<rows></rows>
 	</grid>

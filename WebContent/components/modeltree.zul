@@ -3,6 +3,7 @@
 	<toolbar>
 		<toolbarbutton id="btnDelete" label="Delete"/>
 		<toolbarbutton id="btnRefresh" label="Refresh"/>
+		<toolbarbutton id="btnEditFormXML" label="Form definition"/>
 	</toolbar>
 	<tree id="trModelTree" vflex="1">
 	<treecols>
