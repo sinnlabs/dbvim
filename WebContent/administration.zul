@@ -4,13 +4,13 @@
 		vflex="1" hflex="1"
 		apply="org.sinnlabs.dbvim.zk.AdministrationConsoleComposer">
 
-		<tabbox>
+		<tabbox vflex="1">
 			<tabs>
 				<tab label="Users and Roles" />
 				<tab label="Cache settings" />
 			</tabs>
 			<tabpanels>
-				<tabpanel>
+				<tabpanel vflex="1">
 					<groupbox vflex="1" title="Users"
 						closable="false">
 						<hlayout vflex="1" hflex="1">
@@ -37,7 +37,7 @@
 							<groupbox vflex="1" hflex="3"
 								title="Details" closable="false">
 								<vlayout vflex="1">
-									<grid hflex="1">
+									<grid vflex="1" hflex="1">
 										<columns>
 											<column hflex="min" />
 											<column hflex="1" />
@@ -148,7 +148,7 @@
 						</hlayout>
 					</groupbox>
 				</tabpanel>
-				<tabpanel>
+				<tabpanel vflex="1">
 					<groupbox vflex="1" hflex="1" title="Forms" closable="false">
 						<hlayout>
 							<label id="formsCount" value="Forms cached" />
