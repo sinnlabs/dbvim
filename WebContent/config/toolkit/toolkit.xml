@@ -783,6 +783,14 @@
 	  			<events></events>
 	  			<name>TableField</name>
 	  		</component>
+	  		<component>
+	  			<class>org.sinnlabs.dbvim.ui.db.TimeField</class>
+	  			<image16></image16>
+	  			<image32></image32>
+	  			<tooltip>TimeField - Represents time data type</tooltip>
+	  			<events></events>
+	  			<name>TimeField</name>
+	  		</component>
 		</tab>
 		<tab name="Special Components">
 			<component>

@@ -45,6 +45,11 @@
         <component-class>org.sinnlabs.dbvim.ui.db.TableField</component-class>
     </component>
 	<component>
+        <component-name>timefield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.sinnlabs.dbvim.ui.db.TimeField</component-class>
+    </component>
+	<component>
         <component-name>tablecolumnfield</component-name>
         <component-class>org.sinnlabs.dbvim.ui.db.TableColumnField</component-class>
 		<widget-class>zul.wgt.Cell</widget-class>

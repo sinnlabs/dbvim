@@ -1,0 +1,7 @@
+<zk>
+	<hlayout valign="middle">
+		<label id="label" value="TimeField" visible="true"/>
+		<space id="space" spacing="0px"></space>
+		<timebox id="value" cols="12" format="medium"/>
+	</hlayout>
+</zk>
