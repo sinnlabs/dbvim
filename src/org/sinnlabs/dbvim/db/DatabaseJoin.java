@@ -472,7 +472,7 @@ public class DatabaseJoin extends Database {
 				aliases.put(f, aliasGenerator.getNext());
 				String alias = leftAliases.get(f);
 				if (alias == null) {
-					query += leftSubQuery.alias + "." + f.getName() + " " + 
+					query += leftSubQuery.alias + ".\"" + f.getName() + "\" " + 
 							aliases.get(f) + ", ";
 				} else {
 					query += leftSubQuery.alias + "." + alias + " " + 
@@ -582,7 +582,7 @@ public class DatabaseJoin extends Database {
 				if (alias != null)
 					query += alias;
 				else
-					query += e.getID().get(i).getDBField().getName();
+					query += "\"" + e.getID().get(i).getDBField().getName() + "\"";
 				if (e.getID().get(i).getValue() != null) {
 					  query += " = ?";
 					values.add(e.getID().get(i));
@@ -595,7 +595,7 @@ public class DatabaseJoin extends Database {
 				if (alias != null)
 					query += alias;
 				else
-					query += e.getID().get(i).getDBField().getName(); 
+					query += "\"" + e.getID().get(i).getDBField().getName() + "\""; 
 				if (e.getID().get(i).getValue() != null) {
 					query += " = ?";
 					values.add(e.getID().get(i));
@@ -710,7 +710,7 @@ public class DatabaseJoin extends Database {
 						+ " SET ";
 				// add values to the query
 				for (int i=0; i<newValues.size(); i++) {
-					query += newValues.get(i).getDBField().getName() + " = ?";
+					query += "\"" + newValues.get(i).getDBField().getName() + "\" = ?";
 					if (i<newValues.size()-1)
 						query += ", ";
 					else
@@ -720,7 +720,7 @@ public class DatabaseJoin extends Database {
 				// build query qualification
 				query += " WHERE ";
 				for(int i=0; i<id.size(); i++) {
-					query += id.get(i).getDBField().getName();
+					query += "\"" + id.get(i).getDBField().getName() + "\"";
 					query += " = ?";
 					if (i<id.size()-1) {
 						query += " AND ";

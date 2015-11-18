@@ -79,8 +79,10 @@ public class Database {
 					.getConnectionString());
 
 			String[] results = getResultList(fields);
+			String[] escapedResults = escapeFieldNames(results);
+			String[] escapedIds = escapeFieldNames(formIds);
 
-			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String sFields = StringUtils.join(ArrayUtils.addAll(escapedIds, escapedResults),
 					", ");
 
 			PreparedStatement q = db.prepareStatement("SELECT " + sFields
@@ -144,7 +146,10 @@ public class Database {
 
 			String[] results = getResultList(fields);
 
-			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String[] escapedResults = escapeFieldNames(results);
+			String[] escapedIds = escapeFieldNames(formIds);
+
+			String sFields = StringUtils.join(ArrayUtils.addAll(escapedIds, escapedResults),
 					", ");
 
 			String query = "SELECT " + sFields
@@ -198,7 +203,10 @@ public class Database {
 
 			String[] results = getResultList(fields);
 
-			String sFields = StringUtils.join(ArrayUtils.addAll(formIds, results),
+			String[] escapedResults = escapeFieldNames(results);
+			String[] escapedIds = escapeFieldNames(formIds);
+
+			String sFields = StringUtils.join(ArrayUtils.addAll(escapedIds, escapedResults),
 					", ");
 
 			String dbQuery = "SELECT " + sFields
@@ -241,7 +249,7 @@ public class Database {
 					+ " SET ";
 			// add values to the query
 			for (int i=0; i<values.size(); i++) {
-				query += values.get(i).getDBField().getName() + " = ?";
+				query += "\"" + values.get(i).getDBField().getName() + "\" = ?";
 				if (i<values.size()-1)
 					query += ", ";
 				else
@@ -283,7 +291,7 @@ public class Database {
 					+ " SET ";
 			// add values to the query
 			for (int i=0; i<values.size(); i++) {
-				query += values.get(i).getDBField().getName() + " = ?";
+				query += "\"" + values.get(i).getDBField().getName() + "\" = ?";
 				if (i<values.size()-1)
 					query += ", ";
 				else
@@ -346,7 +354,7 @@ public class Database {
 					+ " SET ";
 			// add values to the query
 			for (int i=0; i<values.size(); i++) {
-				dbQuery += values.get(i).getDBField().getName() + " = ?";
+				dbQuery += "\"" + values.get(i).getDBField().getName() + "\" = ?";
 				if (i<values.size()-1)
 					dbQuery += ", ";
 				else
@@ -428,7 +436,7 @@ public class Database {
 			
 			// build qualification
 			for(int i=0; i<e.getID().size(); i++) {
-				query += e.getID().get(i).getDBField().getName();
+				query += "\"" + e.getID().get(i).getDBField().getName() + "\"";
 				query += " = ?";
 				if (i<e.getID().size()-1) {
 					query += " AND ";
@@ -494,7 +502,7 @@ public class Database {
 					+ " SET ";
 			// add values to the query
 			for (int i=0; i<newValues.size(); i++) {
-				query += newValues.get(i).getDBField().getName() + " = ?";
+				query += "\"" + newValues.get(i).getDBField().getName() + "\" = ?";
 				if (i<newValues.size()-1)
 					query += ", ";
 				else
@@ -543,7 +551,7 @@ public class Database {
 		String query = "INSERT INTO " + form.getQualifiedName() + " (";
 		
 		for (int i=0; i<e.getValues().size(); i++) {
-			query += e.getValues().get(i).getDBField().getName();
+			query += "\"" + e.getValues().get(i).getDBField().getName() + "\"";
 			if (i<e.getValues().size()-1)
 				query += ", ";
 		}
@@ -586,7 +594,7 @@ public class Database {
 		
 		// build qualification
 		for(int i=0; i<e.getID().size(); i++) {
-			query += e.getID().get(i).getDBField().getName();
+			query += "\"" + e.getID().get(i).getDBField().getName() + "\"";
 			query += " = ?";
 			if (i<e.getID().size()-1)
 				query += " AND ";
@@ -663,6 +671,17 @@ public class Database {
 		String[] res = new String[fields.size()];
 		for (int i=0; i<res.length; i++) {
 			res[i] = fields.get(i).getDBField().getName();
+		}
+		return res;
+	}
+	
+	private String[] escapeFieldNames(String[] fields) {
+		if (fields == null)
+			return null;
+		
+		String[] res = new String[fields.length];
+		for (int i=0; i<fields.length; i++) {
+			res[i] = "\"" + fields[i] + "\"";
 		}
 		return res;
 	}
