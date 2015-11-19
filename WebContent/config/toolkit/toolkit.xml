@@ -768,6 +768,14 @@
 	  			<name>DatetimeField</name>
 	  		</component>
 	  		<component>
+	  			<class>org.sinnlabs.dbvim.ui.db.DateField</class>
+	  			<image16></image16>
+	  			<image32></image32>
+	  			<tooltip>DateField - represents all timestamp fields from db table</tooltip>
+	  			<events>onCreate, onCtrlKey, onDrop, onBlur, onChange, onFocus, onOK, onMenuSelected, onEntryLoaded</events>
+	  			<name>DateField</name>
+	  		</component>
+	  		<component>
 	  			<class>org.sinnlabs.dbvim.ui.db.DoubleField</class>
 	  			<image16></image16>
 	  			<image32></image32>

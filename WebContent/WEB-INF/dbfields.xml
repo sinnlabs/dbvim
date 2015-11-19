@@ -28,6 +28,12 @@
 		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
     </component>
 	<component>
+        <component-name>datefield</component-name>
+        <extends>idspace</extends>
+        <component-class>org.sinnlabs.dbvim.ui.db.DateField</component-class>
+		<widget-class>org.sinnlabs.wgt.DBField</widget-class>
+    </component>
+	<component>
         <component-name>datetimefield</component-name>
         <extends>idspace</extends>
         <component-class>org.sinnlabs.dbvim.ui.db.DatetimeField</component-class>
