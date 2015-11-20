@@ -8,12 +8,15 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.Role;
 import org.sinnlabs.dbvim.model.SearchMenu;
+import org.sinnlabs.dbvim.model.StaticResource;
 import org.sinnlabs.dbvim.model.User;
 import org.sinnlabs.dbvim.model.UserRole;
 import org.sinnlabs.dbvim.rules.engine.Rules;
@@ -53,6 +56,8 @@ public class ConfigLoader {
 	protected Dao<UserRole, Integer> userroles;
 	
 	protected Dao<SearchMenu, String> searchMenus;
+	
+	protected Dao<StaticResource, String> staticResources;
 	
 	private static volatile ConfigLoader instance;
 
@@ -96,6 +101,23 @@ public class ConfigLoader {
 			e.printStackTrace();
 		}
 	}
+	
+	private ConfigLoader(ServletContext context) throws IOException {
+		String config = context.getRealPath("/WEB-INF/config.xml");
+
+		loadConfig(config);
+		
+		String rulesPath = context.getRealPath("/config/rules/rules.xml");
+		// load the rules using the rules engine
+		rules = RulesEngine.loadComponentRules(rulesPath);
+				
+		try {
+			initializeDB();
+		} catch (SQLException e) {
+			System.err.println("Unable to initialize db: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Get the instance
@@ -117,6 +139,19 @@ public class ConfigLoader {
 	}
 	
 	public static void initialize(ApplicationContext context) throws IOException {
+		ConfigLoader result = instance;
+		/* First check */
+		if (result == null) {
+			synchronized (ConfigLoader.class) {
+				result = instance;
+				/* second check with locking */
+				if (result == null)
+					instance = result = new ConfigLoader(context);
+			}
+		}
+	}
+	
+	public static void initialize(ServletContext context) throws IOException {
 		ConfigLoader result = instance;
 		/* First check */
 		if (result == null) {
@@ -155,6 +190,10 @@ public class ConfigLoader {
 	
 	public Dao<SearchMenu, String> getSearchMenus() {
 		return searchMenus;
+	}
+	
+	public Dao<StaticResource, String> getStaticResources() {
+		return staticResources;
 	}
 	
 	/**
@@ -246,6 +285,11 @@ public class ConfigLoader {
 		searchMenus = DaoManager.createDao(connectionSource, SearchMenu.class);
 		if (!searchMenus.isTableExists()) {
 			TableUtils.createTableIfNotExists(connectionSource, SearchMenu.class);
+		}
+		
+		staticResources = DaoManager.createDao(connectionSource, StaticResource.class);
+		if (!staticResources.isTableExists()) {
+			TableUtils.createTableIfNotExists(connectionSource, StaticResource.class);
 		}
 	}
 }
