@@ -15,6 +15,11 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable
 public class StaticResource {
 
+	/**
+	 * Name field name
+	 */
+	public static final String NAME_FIELD = "name";
+	
 	@DatabaseField(id = true)
 	protected String name;
 	

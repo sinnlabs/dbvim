@@ -17,6 +17,7 @@
 		
 		<toolbarbutton label="Developer Studio" target="_blank" href="/developer.zul" />
 		<toolbarbutton label="Administration Console" target="_blank" href="/administration.zul"/>
+		<toolbarbutton label="Resource Manager" target="_blank" href="/reourcemanager.zul" />
 		<toolbarbutton target="_blank" style="color: #696569;"
                     iconSclass="z-icon-github-square" href="https://github.com/sinnlabs" />
 	</toolbar>

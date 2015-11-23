@@ -1,0 +1,81 @@
+<?page title="Static Resource Manager" contentType="text/html;charset=UTF-8"?>
+<zk>
+	<window hflex="1" vflex="1" title="Static Resource Manager"
+		border="normal" apply="org.sinnlabs.dbvim.zk.ResourceManagerComposer">
+		<menubar>
+			<menu label="New">
+				<menupopup>
+					<menuitem id="btnNewResource" label="Static Resource" />
+				</menupopup>
+			</menu>
+			<menuitem id="btnDeleteResource" label="Delete" />
+		</menubar>
+		<vlayout vflex="1">
+			<groupbox title="Filter" closable="true" open="false">
+				<hlayout>
+					<label value="Name" />
+					<listbox id="lstFilterType" mold="select">
+						<listitem selected="true" value="contains">
+							<listcell label="Contains" />
+						</listitem>
+						<listitem value="equals">
+							<listcell label="Equals" />
+						</listitem>
+					</listbox>
+					<textbox id="txtQuery" hflex="1" />
+				</hlayout>
+			</groupbox>
+			<listbox vflex="1" id="lstResult" emptyMessage="No resources exists.">
+				<listhead sizable="true">
+					<listheader hflex="3">Name</listheader>
+					<listheader hflex="1">Type</listheader>
+				</listhead>
+				<listitem>
+					<listcell label="name1" />
+					<listcell label="type" />
+				</listitem>
+				<listitem>
+					<listcell label="name2" />
+					<listcell label="type" />
+				</listitem>
+			</listbox>
+			<groupbox title="Resource Details">
+				 <grid>
+				 	<columns>
+				 		<column hflex="min" />
+				 	</columns>
+				 	<rows>
+				 		<row>
+				 			<label value="Name" />
+				 			<textbox hflex="1" id="txtName" />
+				 		</row>
+				 		<row>
+				 			<label value="Content-Type" />
+				 			<textbox hflex="1" id="txtContentType" />
+				 		</row>
+				 		<row valign="middle">
+				 			<label value="Data" />
+				 			<cell valign="middle">
+				 				<hlayout>
+				 					<textbox id="txtFileName"
+				 						readonly="true" />
+				 					<space orient="vertical" />
+				 					<button id="btnDelete"
+				 						label="Remove" />
+				 					<space orient="vertical" />
+				 					<button id="btnUpload"
+				 						label="Upload" upload="true,maxsize=-1" />
+				 					<space orient="vertical" />
+				 					<button id="btnOpen" label="Open" />
+				 				</hlayout>
+				 			</cell>
+				 		</row>
+				 	</rows>
+				 </grid>
+				 <hlayout>
+				 	<button id="btnSave" label="Save" />
+				 </hlayout>
+			</groupbox>
+		</vlayout>
+	</window>
+</zk>
