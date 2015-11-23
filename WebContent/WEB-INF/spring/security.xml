@@ -13,6 +13,9 @@
 		<intercept-url pattern="/*" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')" />
 		<csrf disabled="true" />
 		<logout logout-url="/logout" />
+		<headers>
+        	<frame-options policy="SAMEORIGIN"/>
+    	</headers>
 	</http>
 	
 	<authentication-manager>
