@@ -133,6 +133,7 @@ public class CreateJoinFormDialog extends Window {
 		setBorder("normal");
 		setClosable(true);
 		setTitle("New join form wizard");
+		setSizable(true);
 		
 		addEventListeners();
 		
