@@ -20,8 +20,10 @@ import org.sinnlabs.dbvim.ui.DesignerProperties;
 import org.sinnlabs.dbvim.ui.DesignerTree;
 import org.sinnlabs.dbvim.ui.FormNameDialog;
 import org.sinnlabs.dbvim.ui.FormPropertiesDialog;
+import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.ModelTree;
 import org.sinnlabs.dbvim.ui.SearchMenuProperties;
+import org.sinnlabs.dbvim.ui.events.ComponentDeletedEvent;
 import org.sinnlabs.dbvim.ui.modeltree.TableTreeNode;
 import org.sinnlabs.dbvim.zk.model.CanvasTreeSynchronizer;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
@@ -261,6 +263,21 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 				e.printStackTrace();
 			}
 			designerCanvas.setDirty(true);
+		}
+	}
+	
+	@Listen("onComponentDeleted = #designerTree")
+	public void designerTree_onComponentDeleted(ComponentDeletedEvent evnt) {
+		if (evnt.getDeletedComponent() != null && evnt.getDeletedComponent() instanceof IField<?>) {
+			// rebuild form ResultList
+			if (currentForm.getResultList() == null)
+				return;
+			for (ResultColumn c : currentForm.getResultList()) {
+				if (c.fieldName.equals(evnt.getDeletedComponent().getId())) {
+					currentForm.getResultList().remove(c);
+					break;
+				}
+			}
 		}
 	}
 

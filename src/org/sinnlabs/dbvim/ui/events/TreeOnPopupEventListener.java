@@ -15,6 +15,7 @@ import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Treeitem;
@@ -112,6 +113,10 @@ public class TreeOnPopupEventListener implements EventListener<MouseEvent> {
 				
 				Components.removeAllChildren(selectedComponent);
 				selectedComponent.detach();
+				
+				// Raise onComponentDeleted event
+				ComponentDeletedEvent evnt = new ComponentDeletedEvent(tree, selectedComponent);
+				Events.postEvent(evnt);
 			}
 			
 			// remove the item from the tree
