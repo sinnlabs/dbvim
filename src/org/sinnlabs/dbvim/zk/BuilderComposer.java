@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
+import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.model.SearchMenu;
@@ -366,12 +367,19 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 			updateViewDefinition();
 			ConfigLoader.getInstance().getForms().createOrUpdate(currentForm);
 			designerCanvas.setDirty(false);
+			FormFieldResolverFactory.refreshItem(currentForm);
 		} catch (SQLException e) {
 			System.err
 					.println("Unable to save form into db: " + e.getMessage());
 			e.printStackTrace();
 			Messagebox.show("Unable to save form into db: " + e.getMessage(),
 					"ERROR", Messagebox.OK, Messagebox.ERROR);
+		} catch (Exception e) {
+			System.err.println("Unable to update cache for form: " + currentForm.getName() + " " + 
+					e.getMessage());
+			e.printStackTrace();
+			Messagebox.show("Unable to update cache for form: " + currentForm.getName() + " " + 
+					e.getMessage());
 		}
 	}
 	

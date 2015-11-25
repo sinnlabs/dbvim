@@ -57,4 +57,23 @@ public class FormFieldResolverFactory {
 			cache.clear();
 		}
 	}
+	
+	/**
+	 * Refresh cached form field resolver
+	 * @param f form to be refreshed
+	 * @return true if entry exists in cache, otherwise false
+	 * @throws Exception
+	 */
+	public static boolean refreshItem(Form f) throws Exception {
+		if (cache.containsKey(f.getName())) {
+			synchronized (cache) {
+				if (cache.containsKey(f.getName())) {
+					FormFieldResolver r = new FormFieldResolver(f);
+					cache.replace(f.getName(), r);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
