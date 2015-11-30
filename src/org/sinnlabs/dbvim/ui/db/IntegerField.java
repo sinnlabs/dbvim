@@ -3,6 +3,7 @@
  */
 package org.sinnlabs.dbvim.ui.db;
 
+import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.zkoss.zul.Intbox;
@@ -31,7 +32,7 @@ public class IntegerField extends BaseField<Integer, Intbox> {
 	 */
 	@Override
 	public Value<Integer> fromString(String string) {
-		if (string == null)
+		if (StringUtils.isBlank(string))
 			return new Value<Integer>(null, dbField);
 		return new Value<Integer>(Integer.valueOf(string), dbField);
 	}

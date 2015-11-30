@@ -180,7 +180,10 @@ public class TableField extends Idspace {
 		for (Entry entry : entries) {
 			Listitem item = new Listitem();
 			for (Value<?> v : entry.getValues()) {
-				item.appendChild(new Listcell(v.getValue().toString()));
+				if (v.getValue() != null)
+					item.appendChild(new Listcell(v.getValue().toString()));
+				else
+					item.appendChild(new Listcell(""));
 			}
 			item.setValue(entry);
 			lstData.getItems().add(item);
