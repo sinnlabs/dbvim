@@ -143,7 +143,7 @@ public class SelectJoinFieldDialog extends Window {
 	 */
 	private void addFields(FormFieldResolver resolver, String fieldType, String formName) {
 		for(IField<?> field : resolver.getFields().values()) {
-			if (field.getClass().getName().equals(fieldType)) {
+			if (field.getClass().getName().equals(fieldType) && !field.isDisplayOnly()) {
 				Listitem item = new Listitem();
 				Listcell id = new Listcell();
 				Listcell form = new Listcell();
