@@ -58,7 +58,7 @@
 					</listbox>
 				</north>
 				<center>
-					<idspace id="center" vflex="1" hflex="1"></idspace>
+					<idspace id="center" vflex="1" hflex="1" style="overflow:auto;"></idspace>
 				</center>
 			</borderlayout>
 		</center>
