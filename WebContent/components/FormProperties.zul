@@ -36,8 +36,7 @@
 						<listbox id="lstResultFields" hflex="1"
 							vflex="1">
 							<listhead>
-								<listheader label="Result Fields"
-									sort="auto" />
+								<listheader label="Result Fields" />
 							</listhead>
 						</listbox>
 					</hlayout>

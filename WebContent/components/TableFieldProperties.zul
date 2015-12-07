@@ -32,8 +32,8 @@
 			</vlayout>
 			<listbox id="lstTableFields" vflex="1" hflex="1">
 				<listhead>
-					<listheader label="ID" sort="auto" />
-					<listheader label="Label" sort="auto" />
+					<listheader label="ID"/>
+					<listheader label="Label"/>
 				</listhead>
 				<listitem>
 					<listcell label="eee" />
