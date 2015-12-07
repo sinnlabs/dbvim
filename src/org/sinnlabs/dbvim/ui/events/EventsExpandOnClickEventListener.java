@@ -35,7 +35,7 @@ public class EventsExpandOnClickEventListener implements EventListener<Event> {
 		final Hlayout layout = (Hlayout) evnt.getTarget().getParent();
 		final Textbox txtEvent = (Textbox) layout.getChildren().get(0);
 		
-		//wnd.setText(Roaster.format(txtEvent.getText()));
+		wnd.setText(txtEvent.getText());
 		wnd.setMode(CodeMirror.JAVA);
 		
 		wnd.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
