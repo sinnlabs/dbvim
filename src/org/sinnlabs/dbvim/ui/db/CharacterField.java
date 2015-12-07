@@ -8,6 +8,8 @@ import org.sinnlabs.dbvim.db.model.DBField;
 import org.zkoss.zul.Textbox;
 
 /**
+ * A CharacterField.
+ * Used to represent character data.
  * @author peter.liverovsky
  *
  */
@@ -26,6 +28,54 @@ public class CharacterField extends BaseField<String, Textbox> {
 	
 	public CharacterField() {
 		this(null);
+	}
+	
+	/**
+	 * Sets the rows.
+	 * @param rows
+	 */
+	public void setRows(int rows) {
+		value.setRows(rows);
+	}
+	
+	/**
+	 * Returns the rows.
+	 * @return
+	 */
+	public int getRows() {
+		return value.getRows();
+	}
+	
+	/**
+	 * Sets whether it is multiline.
+	 * @param multiline
+	 */
+	public void setMultiline(boolean multiline) {
+		value.setMultiline(multiline);
+	}
+	
+	/**
+	 * Returns whether it is multiline.
+	 * @return
+	 */
+	public boolean isMultiline() {
+		return value.isMultiline();
+	}
+	
+	/**
+	 * Sets whether TAB is allowed.
+	 * @param tabbable
+	 */
+	public void setTabbable(boolean tabbable) {
+		value.setTabbable(tabbable);
+	}
+	
+	/**
+	 * Returns whether TAB is allowed.
+	 * @return
+	 */
+	public boolean isTabbable() {
+		return value.isTabbable();
 	}
 	
 	@Override
