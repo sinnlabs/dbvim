@@ -24,6 +24,7 @@ import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.script.ScriptApi;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.annotations.EventType;
+import org.sinnlabs.dbvim.ui.db.ConditionFieldMenuitem;
 import org.sinnlabs.dbvim.ui.events.VimEvents;
 import org.sinnlabs.dbvim.zk.model.FormEventProcessor;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
@@ -34,6 +35,7 @@ import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
@@ -47,6 +49,7 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listfooter;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.North;
 import org.zkoss.zul.South;
@@ -132,6 +135,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	
 	@Wire("#txtAdditionalSearch")
 	Textbox txtAdditionalSearch;
+	
+	@Wire("#btnFields")
+	Button btnFields;
 
 	/**
 	 * Current form
@@ -177,6 +183,11 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	 * Api for the scripting
 	 */
 	ScriptApi api;
+	
+	/**
+	 * Menu contains all form fields
+	 */
+	protected Menupopup fieldsPopup;
 	
 	List<Value<?>> lastSearch;
 	
@@ -251,6 +262,9 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		
 		setMode(MODE_SEARCH);
 		
+		/** init fields popup menu **/
+		initFieldsMenu();
+		
 		/** process request parameters **/
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> params = 
@@ -279,6 +293,90 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Initialize field select menu
+	 */
+	private void initFieldsMenu() {
+		fieldsPopup = new Menupopup();
+		fieldsPopup.setStyle("overflow: auto; max-height: 100vh;");
+		detailsView.appendChild(fieldsPopup);
+		for (IField<?> c : fields) {
+			final ConditionFieldMenuitem i = new ConditionFieldMenuitem(c);
+			i.setLabel(c.getId() + " ("  + c.getLabel() + ")");
+			
+			/** Add item event listener **/
+			i.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
+
+				@Override
+				public void onEvent(MouseEvent arg0) throws Exception {
+					txtAdditionalSearch.setText(txtAdditionalSearch.getText() + 
+							"'" + i.getField().getId() + "'");
+				}
+				
+			});
+			
+			/** add item **/
+			fieldsPopup.appendChild(i);
+		}
+	}
+	
+	@Listen("onClick = #btnFields")
+	public void btnFields_onClick() {
+		if (fieldsPopup != null) {
+			fieldsPopup.open(btnFields);
+		}
+	}
+	
+	@Listen("onClick = #btnEq")
+	public void btnEq_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " = ");
+	}
+	
+	@Listen("onClick = #btnNotEq")
+	public void btnNotEq_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " != ");
+	}
+	
+	@Listen("onClick = #btnLt")
+	public void btnLt_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " < ");
+	}
+	
+	@Listen("onClick = #btnGt")
+	public void btnGt_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " > ");
+	}
+	
+	@Listen("onClick = #btnLtEq")
+	public void btnLtEq_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " <= ");
+	}
+	
+	@Listen("onClick = #btnGtEq")
+	public void btnGtEq_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " >= ");
+	}
+	
+	@Listen("onClick = #btnLIKE")
+	public void btnLIKE_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " LIKE ");
+	}
+	
+	@Listen("onClick = #btnAND")
+	public void btnAND_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " AND ");
+	}
+	
+	@Listen("onClick = #btnOR")
+	public void btnOR_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " OR ");
+	}
+	
+	@Listen("onClick = #btnNOT")
+	public void btnNOT_onClick() {
+		txtAdditionalSearch.setText(txtAdditionalSearch.getText() + " NOT ");
 	}
 	
 	@Listen("onClick = #btnSearch")

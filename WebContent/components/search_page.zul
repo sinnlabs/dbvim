@@ -63,10 +63,36 @@
 			</borderlayout>
 		</center>
 		<south id="south">
+			<vlayout>
+			<hlayout>
+				<div hflex="1"/>
+				<button label="=" id="btnEq"/>
+				<div hflex="1"/>
+				<button label="!=" id="btnNotEq"/>
+				<div hflex="1"/>
+				<button label="&lt;" id="btnLt"/>
+				<div hflex="1"/>
+				<button label="&gt;" id="btnGt"/>
+				<div hflex="1"/>
+				<button label="&lt;=" id="btnLtEq"/>
+				<div hflex="1"/>
+				<button label="&gt;=" id="btnGtEq"/>
+				<div hflex="1"/>
+				<button label="LIKE" id="btnLIKE"/>
+				<div hflex="1"/>
+				<button label="AND" id="btnAND"/>
+				<div hflex="1"/>
+				<button label="OR" id="btnOR"/>
+				<div hflex="1"/>
+				<button label="NOT" id="btnNOT"/>
+				<div hflex="1"/>
+			</hlayout>
 			<hlayout valign="middle">
 				<label value="Condition"/>
 				<textbox id="txtAdditionalSearch" hflex="1" />
+				<button id="btnFields" label="Fields ▼" />
 			</hlayout>
+			</vlayout>
 		</south>
 	</borderlayout>
 </zk>
