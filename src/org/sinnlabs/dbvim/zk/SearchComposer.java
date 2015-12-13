@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sinnlabs.dbvim.db.Database;
 import org.sinnlabs.dbvim.db.DatabaseFactory;
@@ -199,6 +200,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		// initialize all for related objects
 		search = new LastSearch();
 		form = (Form) Executions.getCurrent().getArg().get("form");
+		
 		try {
 			resolver = FormFieldResolverFactory.getResolver(form);
 		} catch (Exception e) {
@@ -248,6 +250,19 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		}
 		
 		setMode(MODE_SEARCH);
+		
+		/** process request parameters **/
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> params = 
+				(Map<String, String[]>) Executions.getCurrent().getArg().get("params");
+		if (params != null) {
+			if (params.containsKey("query")) {
+				String query = params.get("query")[0];
+				isAdditional = true;
+				txtAdditionalSearch.setText(query);
+				search(new ArrayList<Value<?>>());
+			}
+		}
 	}
 	
 	@Listen("onClick = #btnSearch")
@@ -548,6 +563,16 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			if (child instanceof IField) {
 				fieldList.add(child);
 				fields.add((IField<?>) child);
+				// force field initialization
+				HashMap<String, Object> args = new HashMap<String, Object>();
+				args.put("resolver", resolver);
+				args.put("composer", this);
+				try {
+					((IField<?>) child).onCreate(args);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			/** RECURSION **/
 			findAllDBFields(child);

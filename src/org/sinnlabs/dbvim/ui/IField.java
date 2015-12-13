@@ -18,6 +18,7 @@ public interface IField<T> {
 	
 	public static final int MODE_MODIFY=1;
 	
+	
 	/**
 	 * Use to set mapping
 	 * @param field

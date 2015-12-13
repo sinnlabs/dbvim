@@ -58,6 +58,9 @@ public class DataRichlet extends GenericRichlet {
 		root.setVflex("1");
 		root.setHflex("1");
 		root.setPage(page);
+		
+		/** request parameters **/
+		Map<String, String[]> params = Executions.getCurrent().getParameterMap();
 
 		form = getForm(formName);
 		if (form == null) {
@@ -71,12 +74,13 @@ public class DataRichlet extends GenericRichlet {
 
 		page.setTitle(form.getTitle());
 
-		buildSearch(root, formName);
+		buildSearch(root, formName, params);
 	}
 
-	private void buildSearch(Component root, String formName) {
+	private void buildSearch(Component root, String formName, Map<String, String[]> params) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("form", form);
+		args.put("params", params);
 		Executions.createComponents("/components/search_page.zul", root, args);
 	}
 
