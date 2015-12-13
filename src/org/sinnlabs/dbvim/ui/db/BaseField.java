@@ -345,6 +345,12 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 		value.setRawValue(val);
 	}
 	
+	@Override
+	public void setValueFromString(String v) {
+		Value<T> val = fromString(v);
+		setDBValue(val);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public T getValue() {

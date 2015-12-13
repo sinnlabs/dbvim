@@ -261,6 +261,22 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 				isAdditional = true;
 				txtAdditionalSearch.setText(query);
 				search(new ArrayList<Value<?>>());
+			} else if (params.containsKey("mode")) {
+				String formMode = params.get("mode")[0];
+				if (formMode.equals("create")) {
+					setMode(MODE_CREATE);
+				} else if (formMode.equals("search")) {
+					setMode(MODE_SEARCH);
+				}
+				/** populate fields **/
+				for (IField<?> f : fields) {
+					String s = "'" + f.getId() + "'";
+					if (params.containsKey(s)) {
+						f.setValueFromString((params.get(s)[0]));
+					} else if (params.containsKey(f.getId())) {
+						f.setValueFromString(params.get(f.getId())[0]);
+					}
+				}
 			}
 		}
 	}

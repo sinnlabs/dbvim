@@ -73,6 +73,12 @@ public interface IField<T> {
 	public void setValue(T v);
 	
 	/**
+	 * Sets the field value from string
+	 * @param v field value
+	 */
+	public void setValueFromString(String v);
+	
+	/**
 	 * Returns the field value
 	 */
 	public T getValue();
