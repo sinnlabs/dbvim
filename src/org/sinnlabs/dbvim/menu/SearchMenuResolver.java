@@ -24,7 +24,7 @@ import org.sinnlabs.dbvim.zk.model.IFormComposer;
  * @author peter.liverovsky
  *
  */
-public class SearchMenuResolver {
+public class SearchMenuResolver implements MenuResolver {
 	
 	private FormFieldResolver resolver;
 	
@@ -65,7 +65,8 @@ public class SearchMenuResolver {
 			
 			List<Entry> entries = db.query(fields, query, 0, vars);
 			for (Entry e : entries) {
-				items.add(new MenuItem(e.getValues().get(0), e.getValues().get(1)));
+				items.add(new MenuItem(e.getValues().get(0).getValue(), 
+						e.getValues().get(1).getValue()));
 			}
 		}
 		return items;
@@ -82,7 +83,7 @@ public class SearchMenuResolver {
 		List<MenuItem> menuItems = this.getItems();
 		
 		for (MenuItem i : menuItems) {
-			if (i.getLabel().getValue().equals(label)) {
+			if (i.getLabel().equals(label)) {
 				return i;
 			}
 		}
@@ -100,7 +101,7 @@ public class SearchMenuResolver {
 		List<MenuItem> menuItems = this.getItems();
 		
 		for (MenuItem i : menuItems) {
-			if (i.getValue().getValue().equals(value)) {
+			if (i.getValue().equals(value)) {
 				return i;
 			}
 		}

@@ -39,10 +39,10 @@ public class MenuSelectEvent extends Event {
 	}
 	
 	public String getLabel() {
-		return data.getLabel().getValue().toString();
+		return data.getLabel().toString();
 	}
 	
 	public Object getValue() {
-		return data.getValue().getValue();
+		return data.getValue();
 	}
 }

@@ -5,14 +5,14 @@ package org.sinnlabs.dbvim.ui.db;
 
 import java.util.Map;
 
-import org.sinnlabs.dbvim.config.ConfigLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.db.Value;
 import org.sinnlabs.dbvim.db.model.DBField;
 import org.sinnlabs.dbvim.db.model.IDBField;
 import org.sinnlabs.dbvim.form.FormFieldResolver;
 import org.sinnlabs.dbvim.menu.MenuItem;
-import org.sinnlabs.dbvim.menu.SearchMenuResolver;
-import org.sinnlabs.dbvim.model.SearchMenu;
+import org.sinnlabs.dbvim.menu.MenuResolver;
+import org.sinnlabs.dbvim.menu.MenuResolverFactory;
 import org.sinnlabs.dbvim.ui.IField;
 import org.sinnlabs.dbvim.ui.events.MenuSelectEvent;
 import org.sinnlabs.dbvim.ui.events.VimEvents;
@@ -71,11 +71,9 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	protected boolean isChildable = true;
 	
-	protected SearchMenu searchMenu;
-	
 	protected Menupopup popup;
 	
-	protected SearchMenuResolver menuResolver = null;
+	protected MenuResolver menuResolver = null;
 	
 	private boolean readOnly;
 	
@@ -187,21 +185,18 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	 * @throws Exception
 	 */
 	private void initMenu() throws Exception {
-		if (searchMenu != null) {
+		if (menuResolver != null) {
 			popup = new Menupopup();
 			popup.setStyle("overflow: auto; max-height: 100vh;");
-			// Resolve menu items
-			menuResolver = new SearchMenuResolver(searchMenu, composer);
 			
 			for(MenuItem i : menuResolver.getItems()) {
 				// Add items to the popup menu
 				FieldMenuItem item = new FieldMenuItem(i);
-				item.setLabel(i.getLabel().getValue().toString());
+				item.setLabel(i.getLabel().toString());
 				
 				/** Add item event listener **/
 				item.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
 
-					@SuppressWarnings("unchecked")
 					@Override
 					public void onEvent(MouseEvent evnt) throws Exception {
 						if (evnt.getTarget() != null) {
@@ -216,7 +211,7 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 							} else {
 								// if event listener is not defined
 								// then we just set the field value
-								BaseField.this.setDBValue((Value<T>) item.getItem().getValue());
+								BaseField.this.setDBValue(fromObject(item.getItem().getValue()));
 							}
 						}
 					}
@@ -317,8 +312,7 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	public void setMenu(String menu) throws Exception {
 		this.menu = menu;
-		searchMenu = ConfigLoader.getInstance().getSearchMenus().queryForId(menu);
-		if (btnMenu != null) {
+		if (btnMenu != null && StringUtils.isNotEmpty(menu)) {
 			btnMenu.setVisible(true);
 		}
 	}
@@ -442,7 +436,7 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	/**
 	 * @return Returns menu resolver or null if menu is not set
 	 */
-	public SearchMenuResolver getMenuResolver() {
+	public MenuResolver getMenuResolver() {
 		return menuResolver;
 	}
 	
@@ -458,7 +452,16 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 			Object c = args.get("composer");
 			if (c!= null) {
 				composer = (IFormComposer) c;
-				initMenu();
+				if (StringUtils.isNotBlank(menu)) {
+					menuResolver = MenuResolverFactory.getMenuResolver(menu, composer);
+					if (btnMenu != null) {
+						btnMenu.setVisible(true);
+					}
+					initMenu();
+					if (menuResolver == null) {
+						throw new IllegalStateException("Field menu does not exists: " + menu);
+					}
+				}
 			}
 		}
 	}

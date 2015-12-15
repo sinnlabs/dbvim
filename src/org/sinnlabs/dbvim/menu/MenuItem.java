@@ -3,20 +3,18 @@
  */
 package org.sinnlabs.dbvim.menu;
 
-import org.sinnlabs.dbvim.db.Value;
-
 /**
- * Class represents SearchMenu item
+ * Class represents Menu item
  * @author peter.liverovsky
  *
  */
 public class MenuItem {
 
-	private Value<?> label;
+	private Object label;
 	
-	private Value<?> value;
+	private Object value;
 	
-	public MenuItem(Value<?> label, Value<?> value) {
+	public MenuItem(Object label, Object value) {
 		this.label = label;
 		this.value = value;
 	}
@@ -25,11 +23,11 @@ public class MenuItem {
 		this(null, null);
 	}
 	
-	public Value<?> getLabel() { return label; }
+	public Object getLabel() { return label; }
 	
-	public void setLabel(Value<?> label) { this.label = label; }
+	public void setLabel(Object label) { this.label = label; }
 	
-	public Value<?> getValue() { return value; }
+	public Object getValue() { return value; }
 	
-	public void setValue(Value<?> value) { this.value = value; }
+	public void setValue(Object value) { this.value = value; }
 }
