@@ -211,7 +211,12 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 							} else {
 								// if event listener is not defined
 								// then we just set the field value
-								BaseField.this.setDBValue(fromObject(item.getItem().getValue()));
+								
+								// if value is a String
+								if (item.getItem().getValue() instanceof String)
+									BaseField.this.fromString((String) item.getItem().getValue());
+								else
+									BaseField.this.setDBValue(fromObject(item.getItem().getValue()));
 							}
 						}
 					}

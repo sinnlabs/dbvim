@@ -6,6 +6,7 @@ package org.sinnlabs.dbvim.ui;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.sinnlabs.dbvim.menu.MenuResolverFactory;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.SearchMenu;
 import org.zkoss.zk.ui.Executions;
@@ -137,7 +138,7 @@ public class SearchMenuProperties extends Window {
 	}
 	
 	@Listen("onClick = #btnOK")
-	public void btnOK_onClick() {
+	public void btnOK_onClick() throws SQLException {
 		if (StringUtils.isBlank(txtFormName.getText())) {
 			showError("Name can not be empty.");
 			return;
@@ -152,6 +153,10 @@ public class SearchMenuProperties extends Window {
 		}
 		if (StringUtils.isBlank(txtLabelField.getText())) {
 			showError("Label field can not be empty.");
+			return;
+		}
+		if (!MenuResolverFactory.isNenuNameAvailable(txtName.getText())) {
+			showError("Menu name is already taken.");
 			return;
 		}
 		

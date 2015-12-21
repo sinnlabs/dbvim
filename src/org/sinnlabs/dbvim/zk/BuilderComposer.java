@@ -9,9 +9,11 @@ import java.util.ArrayList;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.form.FormFieldResolverFactory;
+import org.sinnlabs.dbvim.model.CharacterMenu;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.ResultColumn;
 import org.sinnlabs.dbvim.model.SearchMenu;
+import org.sinnlabs.dbvim.ui.CharacterMenuProperties;
 import org.sinnlabs.dbvim.ui.CreateJoinFormDialog;
 import org.sinnlabs.dbvim.ui.Designer;
 import org.sinnlabs.dbvim.ui.DesignerCanvas;
@@ -238,6 +240,14 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 		dialog.doModal();
 	}
 	
+	@Listen("onClick = #tbbNewCharacterMenu")
+	public void tbbNewCharacterMenu_onClick() {
+		CharacterMenuProperties dialog = new CharacterMenuProperties(null);
+		designer.appendChild(dialog);
+		
+		dialog.doModal();
+	}
+	
 	@Listen("onClick = #tbbFormProperties")
 	public void tbbFormProperties_onClick() {
 		if (currentForm != null) {
@@ -408,19 +418,26 @@ public class BuilderComposer extends SelectorComposer<Component> implements
 	 * @see org.sinnlabs.dbvim.zk.model.IDeveloperStudio#MenuTreeNode_onDoubleClick(org.sinnlabs.dbvim.model.SearchMenu)
 	 */
 	@Override
-	public void MenuTreeNode_onDoubleClick(final SearchMenu menu) {
-		final SearchMenuProperties dialog = new SearchMenuProperties(menu, false);
-		dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
+	public void MenuTreeNode_onDoubleClick(final Object menu) {
+		if (menu instanceof SearchMenu) {
+			final SearchMenuProperties dialog = new SearchMenuProperties((SearchMenu) menu, false);
+			dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
 
-			@Override
-			public void onEvent(Event arg0) throws Exception {
-				if (dialog.getSelectedAction() == SearchMenuProperties.DD_OK) {
-					ConfigLoader.getInstance().getSearchMenus().update(menu);
+				@Override
+				public void onEvent(Event arg0) throws Exception {
+					if (dialog.getSelectedAction() == SearchMenuProperties.DD_OK) {
+						ConfigLoader.getInstance().getSearchMenus().update((SearchMenu) menu);
+					}
 				}
-			}
-			
-		});
-		designer.appendChild(dialog);
-		dialog.doModal();
+
+			});
+			designer.appendChild(dialog);
+			dialog.doModal();
+		}
+		if (menu instanceof CharacterMenu) {
+			CharacterMenuProperties dialog = new CharacterMenuProperties((CharacterMenu) menu);
+			designer.appendChild(dialog);
+			dialog.doModal();
+		}
 	}
 }

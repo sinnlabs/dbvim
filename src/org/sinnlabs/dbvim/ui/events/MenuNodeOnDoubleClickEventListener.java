@@ -3,7 +3,6 @@
  */
 package org.sinnlabs.dbvim.ui.events;
 
-import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.modeltree.MenuTreeNode;
 import org.sinnlabs.dbvim.zk.model.IDeveloperStudio;
 import org.zkoss.zk.ui.event.EventListener;
@@ -30,7 +29,7 @@ public class MenuNodeOnDoubleClickEventListener implements
 	public void onEvent(MouseEvent evnt) throws Exception {
 		Treeitem item = (Treeitem) evnt.getTarget();
 		MenuTreeNode node = (MenuTreeNode) item.getValue();
-		SearchMenu menu = node.getMenu();
+		Object menu = node.getMenu();
 		developer.MenuTreeNode_onDoubleClick(menu);
 	}
 

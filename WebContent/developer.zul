@@ -21,6 +21,7 @@
 							<menuitem id="tbbNewJoinForm" label="New Join form" />
 							<menuseparator />
 							<menuitem id="tbbNewSearchMenu" label="New Search Menu" />
+							<menuitem id="tbbNewCharacterMenu" label="New Character Menu" />
 						</menupopup>
 					</menu>
 					<menuitem id="tbbSaveForm" label="Save form" />

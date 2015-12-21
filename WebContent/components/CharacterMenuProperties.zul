@@ -1,0 +1,48 @@
+<zk>
+	<vlayout vflex="1" hflex="1">
+		<hlayout valign="middle">
+			<label value="Name"></label>
+			<textbox id="txtName" hflex="1" />
+		</hlayout>
+		<hlayout vflex="1" hflex="1">
+			<listbox id="lstItems" hflex="1" vflex="1">
+				<listhead>
+					<listheader>Label</listheader>
+					<listheader>Value</listheader>
+				</listhead>
+				<listitem>
+					<listcell>Menuitem</listcell>
+					<listcell>Menuitem</listcell>
+				</listitem>
+			</listbox>
+			<vlayout>
+				<button id="btnAdd" label="Add Item" hflex="1" />
+				<button id="btnDelete" label="Delete Item" hflex="1" />
+				<div height="15px"></div>
+				<button id="btnUp" label="Up" hflex="1" />
+				<button id="btnDown" label="Down" hflex="1" />
+			</vlayout>
+		</hlayout>
+		<grid>
+			<columns>
+				<column hflex="min" />
+				<column hflex="1" />
+			</columns>
+			<rows>
+				<row>
+					<label value="Label: "/>
+					<textbox id="txtLabel" hflex="1" />
+				</row>
+				<row>
+					<label value="Value: "/>
+					<textbox id="txtValue" hflex="1" />
+				</row>
+			</rows>
+		</grid>
+		<hlayout>
+			<div hflex="1"/>
+			<button id="btnOK" label="Ok" />
+			<button id="btnCancel" label="Cancel" />
+		</hlayout>
+	</vlayout>
+</zk>

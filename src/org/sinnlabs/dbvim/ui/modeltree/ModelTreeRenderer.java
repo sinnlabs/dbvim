@@ -3,7 +3,9 @@
  */
 package org.sinnlabs.dbvim.ui.modeltree;
 
+import org.sinnlabs.dbvim.model.CharacterMenu;
 import org.sinnlabs.dbvim.model.DBConnection;
+import org.sinnlabs.dbvim.model.SearchMenu;
 import org.sinnlabs.dbvim.ui.events.DBConnectionOnDoubleClickEventListener;
 import org.sinnlabs.dbvim.ui.events.FormNodeOnDoubleClickEventListener;
 import org.sinnlabs.dbvim.ui.events.MenuNodeOnDoubleClickEventListener;
@@ -113,7 +115,11 @@ public class ModelTreeRenderer implements TreeitemRenderer<Object> {
         	MenuTreeNode menuNode = (MenuTreeNode) node;
         	Treecell cell = new Treecell();
         	cell.appendChild(new Image("/images/lines7.png"));
-        	cell.appendChild(new Label(menuNode.getMenu().getName()));
+        	if (menuNode.getMenu() instanceof SearchMenu) {
+        		cell.appendChild(new Label(((SearchMenu)menuNode.getMenu()).getName()));
+        	} else if (menuNode.getMenu() instanceof CharacterMenu) {
+        		cell.appendChild(new Label(((CharacterMenu)menuNode.getMenu()).getName()));
+        	}
         	dataRow.appendChild(cell);
         	item.addEventListener(Events.ON_DOUBLE_CLICK, 
         			new MenuNodeOnDoubleClickEventListener(developer));

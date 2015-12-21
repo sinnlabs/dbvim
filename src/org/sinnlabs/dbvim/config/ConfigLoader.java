@@ -12,6 +12,8 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.sinnlabs.dbvim.model.CharacterMenu;
+import org.sinnlabs.dbvim.model.CharacterMenuItem;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.Role;
@@ -56,6 +58,10 @@ public class ConfigLoader {
 	protected Dao<UserRole, Integer> userroles;
 	
 	protected Dao<SearchMenu, String> searchMenus;
+	
+	protected Dao<CharacterMenu, String> characterMenus;
+	
+	protected Dao<CharacterMenuItem, Integer> characterMenuItems;
 	
 	protected Dao<StaticResource, String> staticResources;
 	
@@ -192,6 +198,14 @@ public class ConfigLoader {
 		return searchMenus;
 	}
 	
+	public Dao<CharacterMenu, String> getCharacterMenu() {
+		return characterMenus;
+	}
+	
+	public Dao<CharacterMenuItem, Integer> getCharacterMenuItems() {
+		return characterMenuItems;
+	}
+	
 	public Dao<StaticResource, String> getStaticResources() {
 		return staticResources;
 	}
@@ -290,6 +304,16 @@ public class ConfigLoader {
 		staticResources = DaoManager.createDao(connectionSource, StaticResource.class);
 		if (!staticResources.isTableExists()) {
 			TableUtils.createTableIfNotExists(connectionSource, StaticResource.class);
+		}
+		
+		characterMenuItems = DaoManager.createDao(connectionSource, CharacterMenuItem.class);
+		if (!characterMenuItems.isTableExists()) {
+			TableUtils.createTableIfNotExists(connectionSource, CharacterMenuItem.class);
+		}
+		
+		characterMenus = DaoManager.createDao(connectionSource, CharacterMenu.class);
+		if (!characterMenus.isTableExists()) {
+			TableUtils.createTableIfNotExists(connectionSource, CharacterMenu.class);
 		}
 	}
 }

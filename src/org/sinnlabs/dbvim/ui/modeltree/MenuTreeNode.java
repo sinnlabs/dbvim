@@ -5,8 +5,6 @@ package org.sinnlabs.dbvim.ui.modeltree;
 
 import java.io.Serializable;
 
-import org.sinnlabs.dbvim.model.SearchMenu;
-
 /**
  * @author peter.liverovsky
  *
@@ -19,9 +17,9 @@ public class MenuTreeNode implements Serializable {
 	private static final long serialVersionUID = -8001129951233199812L;
 	
 	
-	private SearchMenu menu;
+	private Object menu;
 	
-	public MenuTreeNode(SearchMenu menu) {
+	public MenuTreeNode(Object menu) {
 		this.menu = menu;
 	}
 	
@@ -35,7 +33,7 @@ public boolean isLeaf() { return true; }
 		return 0;
 	}
 	
-	public SearchMenu getMenu() {
+	public Object getMenu() {
 		return menu;
 	}
 }

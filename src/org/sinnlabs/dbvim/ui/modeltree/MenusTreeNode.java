@@ -5,9 +5,11 @@ package org.sinnlabs.dbvim.ui.modeltree;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sinnlabs.dbvim.config.ConfigLoader;
+import org.sinnlabs.dbvim.model.CharacterMenu;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
 import org.sinnlabs.dbvim.model.SearchMenu;
@@ -27,7 +29,7 @@ public class MenusTreeNode implements Serializable {
 	private static final long serialVersionUID = -8821032822201751576L;
 
 	
-	private List<SearchMenu> menus;
+	private List<Object> menus;
 	
 	public MenusTreeNode(DBConnection connection) throws SQLException {
 		// Get list of forms
@@ -42,7 +44,12 @@ public class MenusTreeNode implements Serializable {
 		
 		queryBuilder.where().in(SearchMenu.FORM_FIELD_NAME, qb);
 		
-		menus = queryBuilder.query();
+		List<SearchMenu> searchMenus = queryBuilder.query();
+		List<CharacterMenu> characterMenus = ConfigLoader.getInstance().getCharacterMenu().queryForAll();
+		
+		menus = new ArrayList<Object>();
+		menus.addAll(searchMenus);
+		menus.addAll(characterMenus);
 	}
 	
 	public boolean isLeaf() {
