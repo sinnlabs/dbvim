@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.DBConnection;
 import org.sinnlabs.dbvim.model.Form;
@@ -97,6 +98,10 @@ public class ModelTree extends Idspace {
 		dialog.doModal();
 	}
 	
+	/**
+	 * Edit xml form definitions
+	 * @throws UnsupportedEncodingException
+	 */
 	private void btnEditFormXML_onClick() throws UnsupportedEncodingException {
 		final Treeitem selected = trModelTree.getSelectedItem();
 		if (selected != null) {
@@ -106,7 +111,7 @@ public class ModelTree extends Idspace {
 				final Form frm = (Form) ((FormTreeNode)value).getForm();
 				final ExpandWindow dialog = new ExpandWindow();
 				dialog.setMode(CodeMirror.XML);
-				dialog.setText(beautyHTML(frm.getView()));
+				dialog.setText(StringEscapeUtils.escapeXml10(beautyHTML(frm.getView())));
 				dialog.addEventListener(Events.ON_CLOSE, new EventListener<Event>() {
 
 					@Override
