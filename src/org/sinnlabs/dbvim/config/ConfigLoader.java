@@ -24,8 +24,6 @@ import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.security.LoginProvider;
 import org.zkoss.idom.Element;
 import org.zkoss.zk.ui.WebApp;
-import org.zkoss.zk.ui.util.WebAppInit;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
@@ -36,7 +34,7 @@ import com.j256.ormlite.table.TableUtils;
  * @author peter.liverovsky
  *
  */
-public class ConfigLoader implements WebAppInit {
+public class ConfigLoader {
 	
 	protected String jdbcString;
 	
@@ -108,6 +106,12 @@ public class ConfigLoader implements WebAppInit {
 		return result;
 	}
 	
+	/**
+	 * Initialize Config loader instance.
+	 * </br><p><strong>Note:</strong> Internal use only.</p>
+	 * @param webApp - ZK WebApp application
+	 * @throws IOException
+	 */
 	public static void initialize(WebApp webApp) throws IOException {
 		ConfigLoader result = instance;
 		/* First check */
@@ -269,8 +273,12 @@ public class ConfigLoader implements WebAppInit {
 		}
 	}
 
-	@Override
-	public void init(WebApp wapp) throws Exception {
-		System.out.print("Initialization webapp." + wapp.getAppName());
+	public void dispose() {
+		try {
+			connectionSource.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

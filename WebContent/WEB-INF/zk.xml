@@ -27,4 +27,7 @@
 	<listener>
     	<listener-class>org.sinnlabs.dbvim.config.ApplicationInit</listener-class>
 	</listener>
+	<listener>
+    	<listener-class>org.sinnlabs.dbvim.config.ApplicationCleanup</listener-class>
+	</listener>
 </zk>
