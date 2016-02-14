@@ -12,9 +12,6 @@ import java.util.List;
 import org.sinnlabs.dbvim.config.ConfigLoader;
 import org.sinnlabs.dbvim.model.Role;
 import org.sinnlabs.dbvim.model.User;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +24,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  * @author peter.liverovsky
  *
  */
-public class CustomAuthenticationProvider implements AuthenticationProvider, ApplicationContextAware {
+public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.security.authentication.AuthenticationProvider#authenticate(org.springframework.security.core.Authentication)
@@ -64,18 +61,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider, App
 	@Override
 	public boolean supports(Class<?> arg0) {
 		return true;
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext arg0)
-			throws BeansException {
-		try {
-			ConfigLoader.initialize(arg0);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 
 }

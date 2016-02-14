@@ -3,7 +3,6 @@ package org.sinnlabs.dbvim.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,15 +25,6 @@ public class ResourceLoader extends HttpServlet {
      */
     public ResourceLoader() {
         super();
-    }
-    
-    public void init(ServletConfig config) {
-    	try {
-			ConfigLoader.initialize(config.getServletContext());
-		} catch (IOException e) {
-			System.out.println("Unable to initialize dbvim.");
-			e.printStackTrace();
-		}
     }
 
 	/**

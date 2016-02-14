@@ -24,4 +24,7 @@
 		<richlet-name>DataRichlet</richlet-name>
 		<url-pattern>/*</url-pattern>
 	</richlet-mapping>
+	<listener>
+    	<listener-class>org.sinnlabs.dbvim.config.ApplicationInit</listener-class>
+	</listener>
 </zk>

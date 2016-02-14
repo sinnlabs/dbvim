@@ -8,8 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sinnlabs.dbvim.model.CharacterMenu;
@@ -24,10 +22,9 @@ import org.sinnlabs.dbvim.model.UserRole;
 import org.sinnlabs.dbvim.rules.engine.Rules;
 import org.sinnlabs.dbvim.rules.engine.RulesEngine;
 import org.sinnlabs.dbvim.security.LoginProvider;
-import org.springframework.context.ApplicationContext;
 import org.zkoss.idom.Element;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.WebApp;
+import org.zkoss.zk.ui.util.WebAppInit;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -39,7 +36,7 @@ import com.j256.ormlite.table.TableUtils;
  * @author peter.liverovsky
  *
  */
-public class ConfigLoader {
+public class ConfigLoader implements WebAppInit {
 	
 	protected String jdbcString;
 	
@@ -67,8 +64,7 @@ public class ConfigLoader {
 	
 	private static volatile ConfigLoader instance;
 
-	private ConfigLoader() {
-		WebApp webApp = Executions.getCurrent().getDesktop().getWebApp();
+	private ConfigLoader(WebApp webApp) {
 		
 		// get the real path of the configuration file
 		String uri = webApp.getRealPath("/config/rules/rules.xml");
@@ -91,39 +87,6 @@ public class ConfigLoader {
 		}
 	}
 	
-	private ConfigLoader(ApplicationContext context) throws IOException {
-		String config = context.getResource("/WEB-INF/config.xml").getFile().getAbsolutePath();
-		
-		loadConfig(config);
-		
-		String rulesPath = context.getResource("/config/rules/rules.xml").getFile().getAbsolutePath();
-		// load the rules using the rules engine
-		rules = RulesEngine.loadComponentRules(rulesPath);
-				
-		try {
-			initializeDB();
-		} catch (SQLException e) {
-			System.err.println("Unable to initialize db: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	private ConfigLoader(ServletContext context) throws IOException {
-		String config = context.getRealPath("/WEB-INF/config.xml");
-
-		loadConfig(config);
-		
-		String rulesPath = context.getRealPath("/config/rules/rules.xml");
-		// load the rules using the rules engine
-		rules = RulesEngine.loadComponentRules(rulesPath);
-				
-		try {
-			initializeDB();
-		} catch (SQLException e) {
-			System.err.println("Unable to initialize db: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Get the instance
@@ -134,17 +97,18 @@ public class ConfigLoader {
 		ConfigLoader result = instance;
 		/* First check */
 		if (result == null) {
-			synchronized (ConfigLoader.class) {
-				result = instance;
-				/* second check with locking */
-				if (result == null)
-					instance = result = new ConfigLoader();
-			}
+//			synchronized (ConfigLoader.class) {
+//				result = instance;
+//				/* second check with locking */
+//				if (result == null)
+//					instance = result = new ConfigLoader();
+//			}
+			throw new IllegalStateException("Configuration not loaded yet.");
 		}
 		return result;
 	}
 	
-	public static void initialize(ApplicationContext context) throws IOException {
+	public static void initialize(WebApp webApp) throws IOException {
 		ConfigLoader result = instance;
 		/* First check */
 		if (result == null) {
@@ -152,23 +116,11 @@ public class ConfigLoader {
 				result = instance;
 				/* second check with locking */
 				if (result == null)
-					instance = result = new ConfigLoader(context);
+					instance = result = new ConfigLoader(webApp);
 			}
 		}
 	}
 	
-	public static void initialize(ServletContext context) throws IOException {
-		ConfigLoader result = instance;
-		/* First check */
-		if (result == null) {
-			synchronized (ConfigLoader.class) {
-				result = instance;
-				/* second check with locking */
-				if (result == null)
-					instance = result = new ConfigLoader(context);
-			}
-		}
-	}
 	
 	public String getJDBCString() {
 		return jdbcString;
@@ -315,5 +267,10 @@ public class ConfigLoader {
 		if (!characterMenus.isTableExists()) {
 			TableUtils.createTableIfNotExists(connectionSource, CharacterMenu.class);
 		}
+	}
+
+	@Override
+	public void init(WebApp wapp) throws Exception {
+		System.out.print("Initialization webapp." + wapp.getAppName());
 	}
 }
