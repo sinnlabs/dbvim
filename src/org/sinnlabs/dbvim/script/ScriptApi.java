@@ -173,9 +173,57 @@ public class ScriptApi {
 	 * Deletes entry
 	 * @param formName Form name
 	 * @param entry Entry contains valid id
+	 * @throws Exception 
 	 */
-	public void deleteEntry(String formName, Entry entry) {
-		
+	public void deleteEntry(String formName, Entry entry) throws Exception {
+		Form f = getForm(formName);
+		if (f!=null) {
+			FormFieldResolver resolver = FormFieldResolverFactory.getResolver(f);
+			Database db = DatabaseFactory.createInstance(f, resolver);
+			
+			db.deleteEntry(entry);
+		} else {
+			throw new IllegalArgumentException("Form does not exists.");
+		}
+	}
+	
+	/**
+	 * Deletes entry
+	 * @param formName Form name
+	 * @param r Record to be deleted
+	 * @throws Exception
+	 */
+	public void deleteEntry(String formName, Record r) throws Exception {
+		Form f = getForm(formName);
+		if (f!= null) {
+			FormFieldResolver resolver = FormFieldResolverFactory.getResolver(f);
+			Database db = DatabaseFactory.createInstance(f, resolver);
+			
+			Entry e = new Entry();
+			// fill the Entry object
+			for ( java.util.Map.Entry<String, Object> i : r.getValues().entrySet()) {
+				IField<?> field = resolver.getFields().get(i.getKey());
+				
+				if (field == null)
+					throw new IllegalArgumentException("Unknown field: " + i.getKey() + 
+							" on the form: " + f);
+				Value<?> dbVal = null;
+				if (i.getValue() == null || i.getValue() instanceof String) {
+					dbVal = field.fromString((String)i.getValue());
+				} else if (i.getValue() instanceof Value<?>) {
+					dbVal = (Value<?>) i.getValue();
+				} else {
+					dbVal = field.fromObject(i.getValue());
+				}
+				e.getValues().add(dbVal);
+				if (field.getDBField().isPrimaryKey())
+					e.getID().add(dbVal);
+			}
+			
+			db.deleteEntry(e);
+		} else {
+			throw new IllegalArgumentException("Form does not exists.");
+		}
 	}
 	
 	/**
