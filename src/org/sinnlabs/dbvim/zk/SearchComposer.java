@@ -434,7 +434,8 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 			// get values
 			List<Value<?>> values = new ArrayList<Value<?>>();
 			for(Component c : fieldList) {
-				values.add(((IField<?>)c).getDBValue());
+				if (!((IField<?>)c).isDisplayOnly())
+					values.add(((IField<?>)c).getDBValue());
 			}
 			
 			//update entry
@@ -486,7 +487,7 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		
 		for(Component c : fieldList) {
 			IField<?> f = (IField<?>) c;
-			if (f.getDBValue().getValue() != null)
+			if (f.getDBValue().getValue() != null && !f.isDisplayOnly())
 				e.getValues().add(f.getDBValue());
 		}
 		// if no user values
