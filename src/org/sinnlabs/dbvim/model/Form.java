@@ -43,7 +43,7 @@ public class Form implements IForm {
 	@DatabaseField(width = 1024*1024, dataType = DataType.SERIALIZABLE)
 	protected ArrayList<ResultColumn> resultList;
 	
-	@DatabaseField(width = 7999)
+	@DatabaseField(dataType = DataType.LONG_STRING)
 	protected String view;
 	
 	@DatabaseField
