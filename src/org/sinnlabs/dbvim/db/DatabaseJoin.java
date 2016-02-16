@@ -119,6 +119,9 @@ public class DatabaseJoin extends Database {
 			List<Entry> result = readEntries(res, resultFields, aliases, limit);
 			res.close();
 			
+			ps.close();
+			db.close();
+			
 			return result;
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -208,6 +211,9 @@ public class DatabaseJoin extends Database {
 			List<Entry> result = readEntries(res, resultFields, aliases, limit);
 			res.close();
 			
+			ps.close();
+			db.close();
+			
 			return result;
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -266,6 +272,9 @@ public class DatabaseJoin extends Database {
 			
 			List<Entry> result = readEntries(res, resultFields, aliases, limit);
 			res.close();
+			
+			ps.close();
+			db.close();
 			
 			return result;
 		} catch (SQLException e1) {
@@ -625,6 +634,8 @@ public class DatabaseJoin extends Database {
 			List<Entry> entries = readEntries(set, resultFields, aliases, 1);
 			
 			set.close();
+			ps.close();
+			db.close();
 			
 			if (entries.size() > 0)
 				return entries.get(0);
@@ -742,6 +753,10 @@ public class DatabaseJoin extends Database {
 				
 				// Update entry:
 				ps.executeUpdate();
+				
+				//release resources
+				ps.close();
+				db.close();
 			} catch (SQLException e1) {
 				System.err.println("ERROR: Unable to update entry: ");
 				e1.printStackTrace();

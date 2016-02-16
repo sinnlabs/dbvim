@@ -734,6 +734,10 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	 */
 	@SuppressWarnings("unchecked")
 	private void populateFields() {
+		// If currentEntry not set
+		if (currentEntry == null)
+			return;
+		
 		// read all fields
 		for(Component c : fieldList) {
 			IDBField dbField = (IDBField) c;

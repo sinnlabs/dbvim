@@ -397,7 +397,7 @@ public class DatabaseConditionBuilder {
 			if (value != null) {
 				return value;
 			}
-			if (lastField.isField()) {
+			if (lastField != null && lastField.isField()) {
 				Value<?> v = convert(literal, lastField.getField());
 				if (v == null) {
 					throw new IllegalArgumentException("Incorrect value for field " + 
@@ -416,7 +416,7 @@ public class DatabaseConditionBuilder {
 	}
 	
 	protected Value<?> convert(Constant c, Token previous, Token lastField) {
-		if (NULL.equals(c) && lastField.isField()) {
+		if (NULL.equals(c) && lastField != null && lastField.isField()) {
 			return convert((String)null, lastField.getField());
 		}
 		return null;

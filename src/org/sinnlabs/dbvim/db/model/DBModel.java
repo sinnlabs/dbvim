@@ -32,6 +32,7 @@ public class DBModel {
 		while(tables.next()) {
 			list.add(new DBTable(tables.getString(2), tables.getString(3)));
 		}
+		tables.close();
 		
 		return list;
 	}
@@ -58,6 +59,8 @@ public class DBModel {
 					isGenerated(columns), isPrimaryKey(catalog, 
 							tablename, columns.getString("COLUMN_NAME")), nullable));
 		}
+		columns.close();
+		
 		return list;
 	}
 	
@@ -79,6 +82,7 @@ public class DBModel {
 			if ( columns.getString("COLUMN_NAME").equals(column))
 				return true;
 		}
+		columns.close();
 		
 		return false;
 	}
@@ -95,6 +99,7 @@ public class DBModel {
 					isGenerated(columns), isPrimaryKey(catalog, 
 							tableName, columns.getString("COLUMN_NAME")), nullable);
 		}
+		columns.close();
 		return null;
 	}
 	

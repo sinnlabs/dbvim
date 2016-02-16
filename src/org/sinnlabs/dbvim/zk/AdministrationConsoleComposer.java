@@ -181,7 +181,7 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 	
 	private void userSelected() throws SQLException {
 		User usr = lstUsers.getSelectedItem().getValue();
-		if (usr!= null || usr != selectedUser) {
+		if (usr!= null && usr != selectedUser) {
 			selectedUser = usr;
 			this.txtLogin.setValue(usr.getLogin());
 			this.txtPassword.setText("password encrypted");
@@ -195,7 +195,7 @@ public class AdministrationConsoleComposer extends SelectorComposer<Component> {
 	
 	private void roleSelected() {
 		Role r = lstRoles.getSelectedItem().getValue();
-		if (r != null || r != selectedRole) {
+		if (r != null && r != selectedRole) {
 			selectedRole = r;
 			txtRoleName.setValue(r.getName());
 			txtRoleDesc.setValue(r.getDescription());

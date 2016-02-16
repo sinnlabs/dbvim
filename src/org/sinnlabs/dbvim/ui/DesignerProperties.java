@@ -263,6 +263,13 @@ public class DesignerProperties extends Groupbox implements IdSpace {
 			return;
 		}
 		
+		// Return if descriptor is null
+		if (descr == null) {
+			System.err.println("Unable to update property: Property does not exists (" +
+					propName + ") for component " + cmp);
+			return;
+		}
+		
 		// set the new Property values, depending on
 		// the property type
 		if (cmp.getClass().getSimpleName().equals("Textbox"))

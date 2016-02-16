@@ -91,7 +91,12 @@ public class Database {
 			ResultSet res = q.executeQuery();
 			
 			List<Entry> entries = readEntries(res, results, limit);
+			
+			// release resources
 			res.close();
+			q.close();
+			db.close();
+			
 			return entries;
 		} catch (SQLException e) {
 			System.err.println("ERROR: while executing sql query: "
@@ -171,7 +176,11 @@ public class Database {
 			ResultSet res = ps.executeQuery();
 			
 			List<Entry> entries = readEntries(res, results, limit);
+			// release resources
 			res.close();
+			ps.close();
+			db.close();
+			
 			return entries;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -223,7 +232,11 @@ public class Database {
 			
 			List<Entry> entries = readEntries(res, results, limit);
 			
+			//release resources
 			res.close();
+			ps.close();
+			db.close();
+			
 			return entries;
 			
 		} catch (SQLException e) {
@@ -267,6 +280,11 @@ public class Database {
 			
 			// Update entry:
 			ps.executeUpdate();
+			
+			//release resources
+			ps.close();
+			db.close();
+			
 		} catch (SQLException e1) {
 			System.err.println("ERROR: Unable to update entry: ");
 			e1.printStackTrace();
@@ -325,6 +343,10 @@ public class Database {
 
 			// Update entry:
 			ps.executeUpdate();
+			
+			//release resources
+			ps.close();
+			db.close();
 		} catch (SQLException e1) {
 			System.err.println("ERROR: Unable to update entry: ");
 			e1.printStackTrace();
@@ -380,6 +402,10 @@ public class Database {
 
 			// Update entry:
 			ps.executeUpdate();
+			
+			//release resources
+			ps.close();
+			db.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -534,9 +560,13 @@ public class Database {
 			
 			// Update entry:
 			ps.executeUpdate();
+			
+			ps.close();
+			
+			db.close();
 		} catch (SQLException e1) {
 			System.err.println("ERROR: Unable to update entry: ");
-			e1.printStackTrace();
+			e1.printStackTrace();	
 			throw new DatabaseOperationException("Unable to update entry.", e1);
 		}
 	}
@@ -577,6 +607,10 @@ public class Database {
 			}
 			
 			ps.executeUpdate();
+			
+			//release resources
+			ps.close();
+			db.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			throw new DatabaseOperationException("Unable to create entry.", e1);
@@ -611,6 +645,9 @@ public class Database {
 			setParameters(ps, e);
 			
 			ps.executeUpdate();
+			
+			ps.close();
+			db.close();
 			
 		} catch (SQLException e1) {
 			System.err.println("ERROR: Unable to delete entry: " + e1.getMessage());

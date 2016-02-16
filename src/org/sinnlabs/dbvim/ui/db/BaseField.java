@@ -281,8 +281,8 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 			if (field.isGenerated()) {
 				value.setReadonly(true);
 			}
+			map = field.getName();
 		}
-		map = field.getName();
 	}
 
 	/* (non-Javadoc)
