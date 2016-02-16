@@ -311,10 +311,19 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 		formName = form;
 	}
 	
+	/**
+	 * Returns attached menu name
+	 * @return null if menu not attached, otherwise attached menu name
+	 */
 	public String getMenu() {
 		return menu;
 	}
 	
+	/**
+	 * Attach menu to the field.
+	 * @param menu Menu name or null to detach menu.
+	 * @throws Exception
+	 */
 	public void setMenu(String menu) throws Exception {
 		this.menu = menu;
 		if (btnMenu != null && StringUtils.isNotEmpty(menu)) {
@@ -356,27 +365,48 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 		return (T)value.getRawValue();
 	}
 
+	/**
+	 * Returns field label
+	 */
 	public String getLabel() {
 		return label.getValue();
 	}
 	
+	/**
+	 * Sets field label
+	 * @param l field label
+	 */
 	public void setLabel(String l) {
 		label.setValue(l);
 	}
 	
+	/**
+	 * Idicates that field is ReadOnly
+	 * @return True if field is read only, otherwise false
+	 */
 	public boolean isReadonly() {
 		return value.isReadonly();
 	}
 	
+	/**
+	 * Sets field read only flag
+	 * @param val True if field is read only, otherwise false
+	 */
 	public void setReadonly(boolean val) {
 		value.setReadonly(val);
 		readOnly = val;
 	}
 	
+	/**
+	 * Returns space between field label and field value
+	 */
 	public String getSpace() {
 		return space.getSpacing();
 	}
 	
+	/**
+	 * Sets space between field label and field value
+	 */
 	public void setSpace(String sp) {
 		space.setSpacing(sp);
 	}
