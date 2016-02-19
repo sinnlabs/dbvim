@@ -79,6 +79,8 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	
 	private boolean displayOnly = false;
 	
+	private boolean clientUpdate = false;
+	
 
 	protected BaseField(String zulUrl, DBField field) {
 		super();
@@ -466,6 +468,23 @@ public abstract class BaseField<T, E extends InputElement> extends Idspace imple
 	@Override
 	public void setDisplayOnly(boolean val) {
 		displayOnly = val;
+	}
+	
+	/**
+	 * Returns whether this field can update from client. 
+	 * @return True if client side update is enabled, otherwise false
+	 */
+	public boolean isClientUpdate() {
+		return clientUpdate;
+	}
+	
+	/**
+	 * Sets the client update flag
+	 * @param val true if client update enabled, otherwise false
+	 */
+	public void setClientUpdate(boolean val) {
+		this.setAttribute("org.zkoss.zk.ui.updateByClient", val);
+		clientUpdate = val;
 	}
 	
 	/**
