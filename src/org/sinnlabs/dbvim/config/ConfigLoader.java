@@ -276,7 +276,7 @@ public class ConfigLoader {
 	public void dispose() {
 		try {
 			connectionSource.close();
-		} catch (SQLException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
