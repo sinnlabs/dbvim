@@ -21,6 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
+ * Class that represents authentication logic
  * @author peter.liverovsky
  *
  */

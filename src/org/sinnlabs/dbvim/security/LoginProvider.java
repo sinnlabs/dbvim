@@ -136,6 +136,14 @@ public class LoginProvider {
 		return usr;
 	}
 	
+	/**
+	 * Updates the users password
+	 * @param user User that needs to be updated
+	 * @param newPassword new user password
+	 * @return Updated user object
+	 * @throws NoSuchAlgorithmException
+	 * @throws UnsupportedEncodingException
+	 */
 	public static User updatePassword(User user, String newPassword) 
 			throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
