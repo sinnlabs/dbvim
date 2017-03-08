@@ -86,12 +86,12 @@
 		<dependency>
 			<groupId>com.j256.ormlite</groupId>
 			<artifactId>ormlite-jdbc</artifactId>
-			<version>4.48</version>
+			<version>5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.j256.ormlite</groupId>
 			<artifactId>ormlite-core</artifactId>
-			<version>4.48</version>
+			<version>5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
