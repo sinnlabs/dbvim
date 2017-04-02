@@ -30,4 +30,8 @@
 	<listener>
     	<listener-class>org.sinnlabs.dbvim.config.ApplicationCleanup</listener-class>
 	</listener>
+	<error-page>
+    	<exception-type>java.lang.Throwable</exception-type>    
+    	<location>/error.zul</location>    
+	</error-page>
 </zk>
