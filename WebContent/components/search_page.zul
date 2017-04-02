@@ -1,6 +1,6 @@
 <?page title="new page title" contentType="text/html;charset=UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
 <zk>
-	
 	<borderlayout id="border"
 		apply="org.sinnlabs.dbvim.zk.SearchComposer">
 		<zscript><![CDATA[

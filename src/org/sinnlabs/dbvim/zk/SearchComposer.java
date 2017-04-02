@@ -28,6 +28,8 @@ import org.sinnlabs.dbvim.ui.db.ConditionFieldMenuitem;
 import org.sinnlabs.dbvim.ui.events.VimEvents;
 import org.sinnlabs.dbvim.zk.model.FormEventProcessor;
 import org.sinnlabs.dbvim.zk.model.IFormComposer;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -40,6 +42,7 @@ import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Hlayout;
@@ -63,7 +66,7 @@ import org.zkoss.zul.impl.InputElement;
  * @author peter.liverovsky
  *
  */
-// @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class) 
 public class SearchComposer extends SelectorComposer<Component> implements IFormComposer {
 
 	/**
@@ -212,22 +215,11 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 		search = new LastSearch();
 		form = (Form) Executions.getCurrent().getArg().get("form");
 		
-		try {
-			resolver = FormFieldResolverFactory.getResolver(form);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		// init field lists
 		fieldList = new ArrayList<Component>();
 		fields = new ArrayList<IField<?>>();
 		eventProcessor = new FormEventProcessor();
 		
-		try {
-			db = DatabaseFactory.createInstance(form, resolver);
-		} catch (ClassNotFoundException | DatabaseOperationException
-				| SQLException e) {
-			e.printStackTrace();
-		}
 		// init script api object
 		api = new ScriptApi(this);
 		
@@ -235,6 +227,22 @@ public class SearchComposer extends SelectorComposer<Component> implements IForm
 	}
 	
 	public void doAfterCompose(Component comp) throws Exception {
+		// Initialize components
+		try {
+			resolver = FormFieldResolverFactory.getResolver(form);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		try {
+			db = DatabaseFactory.createInstance(form, resolver);
+		} catch (ClassNotFoundException | DatabaseOperationException
+				| SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
 		super.doAfterCompose(comp);
 		// create form ui
 		loadForm();
